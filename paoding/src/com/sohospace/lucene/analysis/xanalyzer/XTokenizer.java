@@ -17,6 +17,7 @@ package com.sohospace.lucene.analysis.xanalyzer;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.lucene.analysis.Token;
@@ -146,15 +147,16 @@ public final class XTokenizer extends TokenStream implements Collector {
 	public Token next() throws IOException {
 		// 已经穷尽tokensIteractor的Token对象，则继续请求reader流入数据
 		while (tokenIteractor == null || !tokenIteractor.hasNext()) {
+			System.out.println(dissected);
 			int read = 0;
-			int remainning = -1;//重新读入字符时，buffer中还剩下的字符数，-1表示当前暂不需要从reader中读入字符
+			int remainning = -1;//重新从reader读入字符前，buffer中还剩下的字符数，负数表示当前暂不需要从reader中读入字符
 			if (dissected >= beef.length()) {
 				remainning = 0;
 			}
 			else if (dissected < 0){
 				remainning = bufferLength + dissected;
 			}
-			if (remainning != -1) {
+			if (remainning >= 0) {
 				if (remainning > 0) {
 					System.arraycopy(buffer, -dissected, buffer, 0, remainning);
 				}
@@ -169,11 +171,12 @@ public final class XTokenizer extends TokenStream implements Collector {
 				}
 				// 构造“牛”，并使用knife“解”之
 				beef.set(0, charCount);
-				offset -= remainning;
+				offset += Math.abs(dissected);
+				//offset -= remainning;
 				dissected = 0;
 			}
 			dissected = knife.dissect((Collector)this, beef, dissected);
-			offset += read;// !!!
+//			offset += read;// !!!
 			tokenIteractor = tokenCollector.iterator();
 		}
 		// 返回tokensIteractor下一个Token对象
