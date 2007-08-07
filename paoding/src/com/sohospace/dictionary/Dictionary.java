@@ -52,7 +52,7 @@ public interface Dictionary {
 	 * @param input 要搜索的字符串是其中连续的一部分
 	 * @param offset 要搜索的字符串开始位置相对input的偏移
 	 * @param count 要搜索的字符串字符个数
-	 * @return 返回的Hit对象非空，程序通过word对象提供的方法判断搜索结果
+	 * @return 返回的Hit对象非空，程序通过hit对象提供的方法判断搜索结果
 	 * 
 	 * @see Hit
 	 */
