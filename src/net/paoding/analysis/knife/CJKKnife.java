@@ -98,14 +98,12 @@ public class CJKKnife implements Knife, DictionariesWare {
 					if (setup == offset && maxWordLength < count) {
 						maxWordLength = count;
 					}
-					if (!(word.isUnclosed() && end < beaf.length())) {
-						break;
-					}
-					if (beaf.charAt(end) < word.getNext().charAt(count)) {
-						break;
-					}
-					if (!word.isUnclosed() && end < beaf.length()
-							&& beaf.charAt(end) >= word.getNext().charAt(count)) {
+					//gotoNextChar为true表示在词典中存在以当前词为开头的词，
+					//比如：加入当前词是"中华"，词典存在"中华人民国和国"词以它为开头的
+					boolean gotoNextChar = word.isUnclosed()
+							&& end < beaf.length()
+							&& beaf.charAt(end) >= word.getNext().charAt(count);
+					if (!gotoNextChar) {
 						break;
 					}
 				}

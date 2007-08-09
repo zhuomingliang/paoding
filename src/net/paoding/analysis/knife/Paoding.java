@@ -27,7 +27,6 @@ import java.util.List;
  * 
  * @see Knife
  * @see KnifeBox
- * @see KnifeBoxBean
  * 
  * @since 1.0
  */

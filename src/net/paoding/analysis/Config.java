@@ -4,8 +4,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import net.paoding.analysis.knife.FileWordsLoader;
-
 public class Config {
 	private static Properties p;
 
@@ -13,7 +11,7 @@ public class Config {
 		if (p == null) {
 			Properties p = new Properties();
 			try {
-				URL url = FileWordsLoader.class.getClassLoader().getResource(
+				URL url = Config.class.getClassLoader().getResource(
 						"paoding-analysis.properties");
 				if (url == null) {
 					System.out
