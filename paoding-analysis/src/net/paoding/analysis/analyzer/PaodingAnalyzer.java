@@ -25,20 +25,17 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 
 /**
- * XAnalyzer是基于“庖丁解牛”框架的Lucene词语分析器，是“庖丁解牛”框架对Lucene的适配器。
+ * PaodingAnalyzer是基于“庖丁解牛”框架的Lucene词语分析器，是“庖丁解牛”框架对Lucene的适配器。
  * <p>
  * 
- * XAnalyzer是线程安全的：并发情况下使用同一个XAnalyzer实例是可行的。<br>
- * XAnalyzer是可复用的：推荐多次同一个XAnalyzer实例。
+ * PaodingAnalyzer是线程安全的：并发情况下使用同一个PaodingAnalyzer实例是可行的。<br>
+ * PaodingAnalyzer是可复用的：推荐多次同一个PaodingAnalyzer实例。
  * <p>
  * 
  * 如有需要特别调整，应通过构造函数或knife设置器(setter)配置自订制的Knife实例。
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
- * 
- * @see XWriterAnalyzer
- * @see XQueryAnalyzer
  * 
  * @see PaodingTokenizer
  * @see Knife
@@ -101,6 +98,19 @@ public class PaodingAnalyzer extends Analyzer {
 		this.knife = knife;
 		this.mode = mode;
 	}
+	
+
+
+	/**
+	 * @see #setKnife(Knife)
+	 * @see #setMode(int)
+	 * @param knife
+	 * @param mode
+	 */
+	public PaodingAnalyzer(Knife knife, String mode) {
+		this.knife = knife;
+		this.setMode(mode);
+	}
 
 	public static PaodingAnalyzer writerMode(Knife knife) {
 		return new PaodingAnalyzer(knife, WRITER_MODE);
@@ -136,6 +146,15 @@ public class PaodingAnalyzer extends Analyzer {
 	public void setMode(int mode) {
 		this.mode = mode;
 	}
+	
+	public void setMode(String mode) {
+		if ("writer".equalsIgnoreCase(mode)){
+			this.mode = WRITER_MODE;
+		}
+		else if ("query".equalsIgnoreCase(mode)){
+			this.mode = QUERY_MODE;
+		}
+	}
 
 	// -------------------------------------------------
 
@@ -144,7 +163,7 @@ public class PaodingAnalyzer extends Analyzer {
 		if (knife == null) {
 			throw new NullPointerException("knife should be set before token");
 		}
-		// XTokenizer是TokenStream实现，使用knife解析reader流入的文本
+		// PaodingTokenizer是TokenStream实现，使用knife解析reader流入的文本
 		return new PaodingTokenizer(reader, knife, createTokenCollector());
 	}
 

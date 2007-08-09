@@ -30,7 +30,7 @@ import org.apache.lucene.analysis.Tokenizer;
 
 
 /**
- * XTokenizer是基于“庖丁解牛”框架的TokenStream实现，为XAnalyzer使用。
+ * PaodingTokenizer是基于“庖丁解牛”框架的TokenStream实现，为PaodingAnalyzer使用。
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -90,7 +90,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	private int dissected;
 
 	/**
-	 * 用于分解beef中的文本字符，由XAnalyzer提供
+	 * 用于分解beef中的文本字符，由PaodingAnalyzer提供
 	 * 
 	 * @see #next()
 	 */
