@@ -27,20 +27,20 @@ import org.apache.lucene.store.RAMDirectory;
 
 public class Chinese {
 	private static String FIELD_NAME = "content";
-	private static String QUERY = "中华";
+	private static String QUERY = "涓崕";
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 0) {
 			QUERY = args[0];
 		}
-		// 将庖丁封装成符合Lucene要求的Analyzer规范
+		// 灏嗗簴涓佸皝瑁呮垚绗﹀悎Lucene瑕佹眰鐨凙nalyzer瑙勮寖
 		Paoding paoding = PaodingMaker.make();
 		Analyzer writerAnalyzer = PaodingAnalyzer.writerMode(paoding);
 		
-		//读取本类目录下的text.txt文件
+		//璇诲彇鏈被鐩綍涓嬬殑text.txt鏂囦欢
 		String content = ContentReader.readText(Chinese.class);
 
-		//接下来是标准的Lucene建立索引和检索的代码
+		//鎺ヤ笅鏉ユ槸鏍囧噯鐨凩ucene寤虹珛绱㈠紩鍜屾绱㈢殑浠ｇ爜
 		Directory ramDir = new RAMDirectory();
 		IndexWriter writer = new IndexWriter(ramDir, writerAnalyzer);
 		Document doc = new Document();
