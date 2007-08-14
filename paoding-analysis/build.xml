@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<project name="paoding analysis" basedir="." default="build">
+
+	<property file="build.properties" />
+	<property environment="env" />
+
+	<property name="src" value="src" />
+	<property name="examples" value="examples" />
+	<property name="classes" value="classes" />
+
+	<path id="classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<tstamp>
+		<format property="buildtime" pattern="yyyy-MM-dd HH:mm:ss" />
+	</tstamp>
+
+	<target name="help">
+		<echo message="" />
+		<echo message="中文分词 庖丁解牛 构建文件" />
+		<echo message="------------------------------------------------------" />
+		<echo message="compile" />
+		<echo message="jar" />
+		<echo message="build=compile+jar" />
+	</target>
+
+	<target name="compile" description="编译所有java文件到classes目录中">
+		<delete dir="${classes}" />
+		<mkdir dir="${classes}" />
+		<javac destdir="${classes}" encoding="UTF-8" target="1.5" debug="true" deprecation="false" optimize="false" nowarn="true" failonerror="true">
+			<src path="${src}" />
+			<src path="${examples}" />
+			<classpath refid="classpath" />
+		</javac>
+		<copy todir="${classes}" flatten="false" preservelastmodified="true">
+			<fileset dir="${src}">
+				<exclude name="**/*.java"/>
+			</fileset>
+			<fileset dir="${examples}">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" description="生成paoding-analysis.jar">
+		<delete file="paoding-analysis.jar" />
+		<jar jarfile="paoding-analysis.jar" basedir="${classes}" compress="true"/>
+	</target>
+
+	<target name="build" depends="compile,jar" description="comple, jar"/>
+
+</project>
