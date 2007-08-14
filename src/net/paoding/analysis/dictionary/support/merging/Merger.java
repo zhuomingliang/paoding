@@ -29,6 +29,9 @@ import java.util.ListIterator;
 public class Merger {
 
 	public static void merge(LinkedList<String> a, LinkedList<String> b) {
+		if (b == null) {
+			return;
+		}
 		ListIterator<String> aIter = (ListIterator<String>) a.iterator();
 		ListIterator<String> bIter = (ListIterator<String>) b.iterator();
 		while (aIter.hasNext() && bIter.hasNext()) {
@@ -44,8 +47,7 @@ public class Merger {
 					aIter.previous();
 					aIter.add(bWord);
 					aIter.next();
-				}
-				else {
+				} else {
 					bIter.previous();
 					bGoOn = false;
 				}
@@ -55,8 +57,11 @@ public class Merger {
 			a.add(bIter.next());
 		}
 	}
-	
+
 	public static void remove(LinkedList<String> a, LinkedList<String> b) {
+		if (b == null) {
+			return;
+		}
 		ListIterator<String> aIter = (ListIterator<String>) a.iterator();
 		ListIterator<String> bIter = (ListIterator<String>) b.iterator();
 		while (aIter.hasNext() && bIter.hasNext()) {
@@ -70,18 +75,16 @@ public class Merger {
 					if (aIter.hasNext()) {
 						aWord = aIter.next();
 					}
-				}
-				else if (r < 0){
+				} else if (r < 0) {
 					continue;
-				}
-				else {
+				} else {
 					bIter.previous();
 					bGoOn = false;
 				}
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		LinkedList<String> a = new LinkedList<String>();
 		LinkedList<String> b = new LinkedList<String>();
@@ -89,15 +92,15 @@ public class Merger {
 		a.add("4");
 		a.add("a");
 		a.add("c");
-		
+
 		b.add("2");
 		b.add("3");
 		b.add("b");
 		b.add("d");
 		b.add("Ì«Ñô");
-		
+
 		Merger.merge(a, b);
-		
-		System.out.println(Arrays.toString(a.toArray(new String[]{})));
+
+		System.out.println(Arrays.toString(a.toArray(new String[] {})));
 	}
 }

@@ -16,8 +16,6 @@
 package net.paoding.analysis.dictionary;
 
 import static net.paoding.analysis.dictionary.Hit.UNDEFINED;
-import net.paoding.analysis.dictionary.support.Utils;
-
 
 /**
  * Dictionary的二叉查找实现。
@@ -33,10 +31,10 @@ public class BinaryDictionary implements Dictionary {
 	// -------------------------------------------------
 
 	private String[] ascWords;
-	
+
 	private final int start;
 	private final int end;
-	private final int count; 
+	private final int count;
 
 	// -------------------------------------------------
 
@@ -50,7 +48,7 @@ public class BinaryDictionary implements Dictionary {
 	public BinaryDictionary(String[] ascWords) {
 		this(ascWords, 0, ascWords.length);
 	}
-	
+
 	public BinaryDictionary(String[] ascWords, int start, int end) {
 		this.ascWords = ascWords;
 		this.start = start;
@@ -59,7 +57,7 @@ public class BinaryDictionary implements Dictionary {
 	}
 
 	// -------------------------------------------------
-	
+
 	public String get(int index) {
 		return ascWords[start + index];
 	}
@@ -78,7 +76,7 @@ public class BinaryDictionary implements Dictionary {
 		while (left <= right) {
 			pointer = (left + right) >> 1;
 			word = ascWords[pointer];
-			relation = Utils.compare(input, begin, count, word);
+			relation = compare(input, begin, count, word);
 			if (relation == 0) {
 				// System.out.println(new String(input,begin, count)+"***" +
 				// word);
@@ -113,4 +111,16 @@ public class BinaryDictionary implements Dictionary {
 		return asPrex ? new Hit(Hit.UNCLOSED_INDEX, null, nextWord) : UNDEFINED;
 	}
 
+	public static int compare(CharSequence one, int begin, int count,
+			CharSequence theOther) {
+		for (int i = begin, j = 0; i < one.length()
+				&& j < Math.min(theOther.length(), count); i++, j++) {
+			if (one.charAt(i) > theOther.charAt(j)) {
+				return 1;
+			} else if (one.charAt(i) < theOther.charAt(j)) {
+				return -1;
+			}
+		}
+		return count - theOther.length();
+	}
 }
