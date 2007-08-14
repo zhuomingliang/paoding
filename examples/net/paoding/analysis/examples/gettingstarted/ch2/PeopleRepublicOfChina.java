@@ -27,20 +27,20 @@ import org.apache.lucene.store.RAMDirectory;
 
 public class PeopleRepublicOfChina {
 	private static String FIELD_NAME = "content";
-	private static String QUERY = "¹²ºÍ¹ú";
+	private static String QUERY = "å…±å’Œå›½";
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 0) {
 			QUERY = args[0];
 		}
-		// ½«âÒ¶¡·â×°³É·ûºÏLuceneÒªÇóµÄAnalyzer¹æ·¶
+		// å°†åº–ä¸å°è£…æˆç¬¦åˆLuceneè¦æ±‚çš„Analyzerè§„èŒƒ
 		Paoding paoding = PaodingMaker.make();
 		Analyzer writerAnalyzer = PaodingAnalyzer.writerMode(paoding);
 		
-		//¶ÁÈ¡±¾ÀàÄ¿Â¼ÏÂµÄtext.txtÎÄ¼ş
+		//è¯»å–æœ¬ç±»ç›®å½•ä¸‹çš„text.txtæ–‡ä»¶
 		String content = ContentReader.readText(PeopleRepublicOfChina.class);
 
-		//½ÓÏÂÀ´ÊÇ±ê×¼µÄLucene½¨Á¢Ë÷ÒıºÍ¼ìË÷µÄ´úÂë
+		//æ¥ä¸‹æ¥æ˜¯æ ‡å‡†çš„Luceneå»ºç«‹ç´¢å¼•å’Œæ£€ç´¢çš„ä»£ç 
 		Directory ramDir = new RAMDirectory();
 		IndexWriter writer = new IndexWriter(ramDir, writerAnalyzer);
 		Document doc = new Document();
