@@ -152,14 +152,14 @@ public class PaodingMaker {
 				path = path.substring("classpath:".length());
 				URL url = PaodingMaker.class.getClassLoader().getResource(path);
 				if (url == null) {
-					throw new IllegalArgumentException("Not found " + path
+					throw new PaodingAnalysisException("Not found " + path
 							+ " in classpath.");
 				}
 				f = new File(url.getFile());
 			} else {
 				f = new File(path);
 				if (!f.exists()) {
-					throw new IllegalArgumentException("Not found " + path
+					throw new PaodingAnalysisException("Not found " + path
 							+ " in system.");
 				}
 				
@@ -169,7 +169,7 @@ public class PaodingMaker {
 			p.setProperty("paoding.dic.home.absolute", f.getAbsolutePath());
 			p.load(in);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new PaodingAnalysisException(e);
 		} finally {
 			if (in != null) {
 				try {
