@@ -22,8 +22,8 @@ import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.HashBinaryDictionary;
 
 /**
- * ÖĞÎÄ×Öµä»º´æ¸ù¾İµØ,Îª{@link CJKKnife}ËùÓÃ¡£<br>
- * ´Ó±¾¶ÔÏó¿ÉÒÔ»ñÈ¡ÖĞÎÄĞèÒªµÄÏà¹Ø×Öµä¡£°üÀ¨´Ê»ã±í¡¢ĞÕÊÏ±í¡¢¼ÆÁ¿µ¥Î»±í¡¢ºöÂÔµÄ´Ê»òµ¥×ÖµÈ¡£
+ * ä¸­æ–‡å­—å…¸ç¼“å­˜æ ¹æ®åœ°,ä¸º{@link CJKKnife}æ‰€ç”¨ã€‚<br>
+ * ä»æœ¬å¯¹è±¡å¯ä»¥è·å–ä¸­æ–‡éœ€è¦çš„ç›¸å…³å­—å…¸ã€‚åŒ…æ‹¬è¯æ±‡è¡¨ã€å§“æ°è¡¨ã€è®¡é‡å•ä½è¡¨ã€å¿½ç•¥çš„è¯æˆ–å•å­—ç­‰ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -37,36 +37,36 @@ public class FileDictionaries implements Dictionaries {
 	// -------------------------------------------------
 
 	/**
-	 * ÓÃÓÚ´ÓÎÄ¼şÏµÍ³ÖĞ»ñÈ¡´ÊÓï
+	 * ç”¨äºä»æ–‡ä»¶ç³»ç»Ÿä¸­è·å–è¯è¯­
 	 */
 	private FileWordsLoader wordsLoader;
 
 	// -------------------------------------------------
 
 	/**
-	 * ´Ê»ã±í×Öµä
+	 * è¯æ±‡è¡¨å­—å…¸
 	 */
 	private Dictionary vocabulary;
 
 	/**
-	 * ĞÕÊÏ×Öµä
+	 * å§“æ°å­—å…¸
 	 * 
 	 */
 	private Dictionary confucianFamilyNames;
 
 	/**
-	 * ºöÂÔµÄµ¥×Ö
+	 * å¿½ç•¥çš„å•å­—
 	 */
 	private Dictionary noiseCharactors;
 
 	/**
-	 * ºöÂÔµÄ´ÊÓï
+	 * å¿½ç•¥çš„è¯è¯­
 	 * 
 	 */
 	private Dictionary noiseWords;
 
 	/**
-	 * ¼ÆÁ¿µ¥Î»
+	 * è®¡é‡å•ä½
 	 */
 	private Dictionary units;
 
@@ -85,7 +85,7 @@ public class FileDictionaries implements Dictionaries {
 
 	// -------------------------------------------------
 	/**
-	 * ´Ê»ã±í×Öµä
+	 * è¯æ±‡è¡¨å­—å…¸
 	 * 
 	 * @return
 	 */
@@ -96,7 +96,7 @@ public class FileDictionaries implements Dictionaries {
 					String[] words = wordsLoader.getVocabulary().toArray(
 							new String[0]);
 					Arrays.sort(words);
-					// ´ó¸ÅÓĞ5639¸ö×ÖÓĞ´ÊÓï£¬¹ÊÈ¡0x2fff=x^13>8000>8000*0.75=6000>5639
+					// å¤§æ¦‚æœ‰5639ä¸ªå­—æœ‰è¯è¯­ï¼Œæ•…å–0x2fff=x^13>8000>8000*0.75=6000>5639
 					vocabulary = new HashBinaryDictionary(words, 0x2fff, 0.75f);
 				}
 			}
@@ -105,7 +105,7 @@ public class FileDictionaries implements Dictionaries {
 	}
 
 	/**
-	 * ĞÕÊÏ×Öµä
+	 * å§“æ°å­—å…¸
 	 * 
 	 * @return
 	 */
@@ -124,7 +124,7 @@ public class FileDictionaries implements Dictionaries {
 	}
 
 	/**
-	 * ºöÂÔµÄ´ÊÓï
+	 * å¿½ç•¥çš„è¯è¯­
 	 * 
 	 * @return
 	 */
@@ -144,7 +144,7 @@ public class FileDictionaries implements Dictionaries {
 	}
 
 	/**
-	 * ºöÂÔµÄµ¥×Ö
+	 * å¿½ç•¥çš„å•å­—
 	 * 
 	 * @return
 	 */
@@ -163,7 +163,7 @@ public class FileDictionaries implements Dictionaries {
 	}
 
 	/**
-	 * ¼ÆÁ¿µ¥Î»
+	 * è®¡é‡å•ä½
 	 * 
 	 * @return
 	 */

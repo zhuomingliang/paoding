@@ -97,7 +97,7 @@ public class Merger {
 		b.add("3");
 		b.add("b");
 		b.add("d");
-		b.add("Ì«Ñô");
+		b.add("å¤ªé˜³");
 
 		Merger.merge(a, b);
 

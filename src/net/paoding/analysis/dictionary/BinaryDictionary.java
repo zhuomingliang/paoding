@@ -18,7 +18,7 @@ package net.paoding.analysis.dictionary;
 import static net.paoding.analysis.dictionary.Hit.UNDEFINED;
 
 /**
- * DictionaryµÄ¶ş²æ²éÕÒÊµÏÖ¡£
+ * Dictionaryçš„äºŒå‰æŸ¥æ‰¾å®ç°ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -39,11 +39,11 @@ public class BinaryDictionary implements Dictionary {
 	// -------------------------------------------------
 
 	/**
-	 * ÒÔÒ»×éÉıĞòÅÅÁĞµÄ´ÊÓï¹¹Ôì¶ş²æ²éÕÒ×Öµä
+	 * ä»¥ä¸€ç»„å‡åºæ’åˆ—çš„è¯è¯­æ„é€ äºŒå‰æŸ¥æ‰¾å­—å…¸
 	 * <p>
 	 * 
 	 * @param ascWords
-	 *            ÉıĞòÅÅÁĞ´ÊÓï
+	 *            å‡åºæ’åˆ—è¯è¯­
 	 */
 	public BinaryDictionary(String[] ascWords) {
 		this(ascWords, 0, ascWords.length);

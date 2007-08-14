@@ -3,8 +3,8 @@ package net.paoding.analysis.knife;
 import net.paoding.analysis.dictionary.Dictionary;
 
 /**
- * ÖĞÎÄ×Öµä»º´æ¸ù¾İµØ,Îª{@link CJKKnife}ËùÓÃ¡£<br>
- * ´Ó±¾¶ÔÏó¿ÉÒÔ»ñÈ¡ÖĞÎÄĞèÒªµÄÏà¹Ø×Öµä¡£°üÀ¨´Ê»ã±í¡¢ĞÕÊÏ±í¡¢¼ÆÁ¿µ¥Î»±í¡¢ºöÂÔµÄ´Ê»òµ¥×ÖµÈ¡£
+ * ä¸­æ–‡å­—å…¸ç¼“å­˜æ ¹æ®åœ°,ä¸º{@link CJKKnife}æ‰€ç”¨ã€‚<br>
+ * ä»æœ¬å¯¹è±¡å¯ä»¥è·å–ä¸­æ–‡éœ€è¦çš„ç›¸å…³å­—å…¸ã€‚åŒ…æ‹¬è¯æ±‡è¡¨ã€å§“æ°è¡¨ã€è®¡é‡å•ä½è¡¨ã€å¿½ç•¥çš„è¯æˆ–å•å­—ç­‰ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -15,35 +15,35 @@ import net.paoding.analysis.dictionary.Dictionary;
  */
 public interface Dictionaries {
 	/**
-	 * ´Ê»ã±í×Öµä
+	 * è¯æ±‡è¡¨å­—å…¸
 	 * 
 	 * @return
 	 */
 	public Dictionary getVocabulary();
 
 	/**
-	 * ĞÕÊÏ×Öµä
+	 * å§“æ°å­—å…¸
 	 * 
 	 * @return
 	 */
 	public Dictionary getConfucianFamilyNames();
 
 	/**
-	 * ºöÂÔµÄ´ÊÓï
+	 * å¿½ç•¥çš„è¯è¯­
 	 * 
 	 * @return
 	 */
 	public Dictionary getNoiseCharactors();
 
 	/**
-	 * ºöÂÔµÄµ¥×Ö
+	 * å¿½ç•¥çš„å•å­—
 	 * 
 	 * @return
 	 */
 	public Dictionary getNoiseWords();
 
 	/**
-	 * ¼ÆÁ¿µ¥Î»
+	 * è®¡é‡å•ä½
 	 * 
 	 * @return
 	 */

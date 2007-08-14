@@ -31,7 +31,7 @@ import org.apache.lucene.analysis.Token;
 public class QueryTokenCollector implements TokenCollector {
 
 	/**
-	 * 存储当前被knife分解而成的Token对象
+	 * 瀛樺偍褰撳墠琚玨nife鍒嗚В鑰屾垚鐨凾oken瀵硅薄
 	 * 
 	 */
 	private LinkedList<Token> tokens = new LinkedList<Token>();

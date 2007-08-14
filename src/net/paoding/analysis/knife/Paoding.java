@@ -18,10 +18,10 @@ package net.paoding.analysis.knife;
 import java.util.List;
 
 /**
- * PaodingÊÇÒ»¸ö±³×Å¡°µ¶Ïä¡±(ÄÚ²Ø¸÷ÖÖ¡°µ¶¡±)±ÏÉú¾«Á¦¡°½âÅ£¡±µÄÈË£¬¼´¡°âÒ¶¡¡±¡£
+ * Paodingæ˜¯ä¸€ä¸ªèƒŒç€â€œåˆ€ç®±â€(å†…è—å„ç§â€œåˆ€â€)æ¯•ç”Ÿç²¾åŠ›â€œè§£ç‰›â€çš„äººï¼Œå³â€œåº–ä¸â€ã€‚
  * <p>
- * ÕýÒòÎªËûÓµÓÐ¸÷ÖÖ²»Í¬µÄ¡°µ¶¡±£¬¶øÇÒÄÜ¹»Ê¶±ðÊ²Ã´¡°Èâ(×Ö·û)¡±Ó¦¸ÃÓÃÊ²Ã´¡°µ¶¡±·Ö¸î£¬ËùÒÔËûÄÜÓÎÈÐÓÐÓàµØ°ÑÕûÍ·Å£ÇÐ¸î£¬³ÉÎªºÏÊÊµÄ¡°ÈâÆ¬(´ÊÓï)¡±¡£ <br>
- * ÕâÀïµÄ¡°µ¶¡±ÓÉKnife°çÑÝ£¬¸÷ÖÖ¡°µ¶¡±ÓÉ¡°µ¶Ïä¡±KnifeBox¹ÜÀí(Paoding¶ÔÏó±¾Éí¾ÍÊÇÒ»¸öKnifeBox)£¬²¢ÓÉKnifeBox¾ö²ßÊ²Ã´Ê±ºò³öÊ²Ã´¡°µ¶¡±¡£
+ * æ­£å› ä¸ºä»–æ‹¥æœ‰å„ç§ä¸åŒçš„â€œåˆ€â€ï¼Œè€Œä¸”èƒ½å¤Ÿè¯†åˆ«ä»€ä¹ˆâ€œè‚‰(å­—ç¬¦)â€åº”è¯¥ç”¨ä»€ä¹ˆâ€œåˆ€â€åˆ†å‰²ï¼Œæ‰€ä»¥ä»–èƒ½æ¸¸åˆƒæœ‰ä½™åœ°æŠŠæ•´å¤´ç‰›åˆ‡å‰²ï¼Œæˆä¸ºåˆé€‚çš„â€œè‚‰ç‰‡(è¯è¯­)â€ã€‚ <br>
+ * è¿™é‡Œçš„â€œåˆ€â€ç”±Knifeæ‰®æ¼”ï¼Œå„ç§â€œåˆ€â€ç”±â€œåˆ€ç®±â€KnifeBoxç®¡ç†(Paodingå¯¹è±¡æœ¬èº«å°±æ˜¯ä¸€ä¸ªKnifeBox)ï¼Œå¹¶ç”±KnifeBoxå†³ç­–ä»€ä¹ˆæ—¶å€™å‡ºä»€ä¹ˆâ€œåˆ€â€ã€‚
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 

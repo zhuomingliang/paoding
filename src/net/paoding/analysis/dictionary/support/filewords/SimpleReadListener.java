@@ -56,7 +56,7 @@ public class SimpleReadListener implements ReadListener {
 				|| word.charAt(0) == '-') {
 			return;
 		}
-		//保证不会重复
+		//淇濊瘉涓嶄細閲嶅
 		if (setSortedWords.add(word)) {
 			sortedWords.add(word);
 		}

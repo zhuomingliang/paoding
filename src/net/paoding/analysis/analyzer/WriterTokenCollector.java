@@ -30,14 +30,14 @@ import org.apache.lucene.analysis.Token;
 public class WriterTokenCollector implements TokenCollector {
 
 	/**
-	 * ´æ´¢µ±Ç°±»knife·Ö½â¶ø³ÉµÄToken¶ÔÏó
+	 * å­˜å‚¨å½“å‰è¢«knifeåˆ†è§£è€Œæˆçš„Tokenå¯¹è±¡
 	 * 
 	 */
 	private LinkedList<Token> tokens;
 
 	/**
-	 * Collector½Ó¿ÚÊµÏÖ¡£<br>
-	 * ¹¹Ôì´ÊÓïToken¶ÔÏó£¬²¢·ÅÖÃÔÚtokensÖĞ
+	 * Collectoræ¥å£å®ç°ã€‚<br>
+	 * æ„é€ è¯è¯­Tokenå¯¹è±¡ï¼Œå¹¶æ”¾ç½®åœ¨tokensä¸­
 	 * 
 	 */
 	public void collect(String word, int begin, int end) {

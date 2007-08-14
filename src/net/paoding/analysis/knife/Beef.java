@@ -16,12 +16,12 @@
 package net.paoding.analysis.knife;
 
 /**
- * {@link Beef}ÊÇÒª±»âÒ¶¡¡°½â¡±µÄ¡°Å£¹ÇÈâ¡±£¬ÊÇ¶ÔÎÄ±¾×Ö·ûÁ÷µÄ¸ßĞ§·â×°£¬¿ÉÒÔ´ÓÖĞ¶ÁÈ¡Ö¸¶¨Î»ÖÃµÄ×Ö·û¡£
+ * {@link Beef}æ˜¯è¦è¢«åº–ä¸â€œè§£â€çš„â€œç‰›éª¨è‚‰â€ï¼Œæ˜¯å¯¹æ–‡æœ¬å­—ç¬¦æµçš„é«˜æ•ˆå°è£…ï¼Œå¯ä»¥ä»ä¸­è¯»å–æŒ‡å®šä½ç½®çš„å­—ç¬¦ã€‚
  * <p>
- * {@link Beef}ºÍ{@link String}¶ÔÏóµÄ²»Í¬Ö®´¦ÔÚÓÚ£º<br>
- * {@link Beef}¹²ÏíÊäÈëµÄcharÊı×é£¬{@link String}µÄ²ßÂÔÊÇ¶Ô¹²ÏíÊı×é½øĞĞ¿ËÂ¡£¬¿ËÂ¡ËğºÄÁËĞÔÄÜ¡£<br>
- * Í¬Ê±£¬{@link Beef}ÔÚ {@link #charAt(int)}·½·¨»¹½øĞĞ¶Ô×Ö·ûµÄÔ¤´¦Àí£¬Ê¹·µ»ØÊ±·ûºÏ¹æÔò:1)toLowerCase
- * 2)È«½Ç×ª°ë½ÇµÈ
+ * {@link Beef}å’Œ{@link String}å¯¹è±¡çš„ä¸åŒä¹‹å¤„åœ¨äºï¼š<br>
+ * {@link Beef}å…±äº«è¾“å…¥çš„charæ•°ç»„ï¼Œ{@link String}çš„ç­–ç•¥æ˜¯å¯¹å…±äº«æ•°ç»„è¿›è¡Œå…‹éš†ï¼Œå…‹éš†æŸè€—äº†æ€§èƒ½ã€‚<br>
+ * åŒæ—¶ï¼Œ{@link Beef}åœ¨ {@link #charAt(int)}æ–¹æ³•è¿˜è¿›è¡Œå¯¹å­—ç¬¦çš„é¢„å¤„ç†ï¼Œä½¿è¿”å›æ—¶ç¬¦åˆè§„åˆ™:1)toLowerCase
+ * 2)å…¨è§’è½¬åŠè§’ç­‰
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -34,17 +34,17 @@ public class Beef implements CharSequence {
 	// -------------------------------------------------
 
 	/**
-	 * ÎÄ±¾×Ö·ûÊı×é
+	 * æ–‡æœ¬å­—ç¬¦æ•°ç»„
 	 */
 	private final char[] value;
 
 	/**
-	 * ×Ö·û¿ªÊ¼Î»ÖÃ£¬¼´charAt(i)·µ»Øvalue[offset+i]×Ö·û
+	 * å­—ç¬¦å¼€å§‹ä½ç½®ï¼Œå³charAt(i)è¿”å›value[offset+i]å­—ç¬¦
 	 */
 	private int offset;
 
 	/**
-	 * ´ÓoffsetÎ»ÖÃ¿ªÊ¼µÄ×Ö·ûÊı
+	 * ä»offsetä½ç½®å¼€å§‹çš„å­—ç¬¦æ•°
 	 */
 	private int count;
 
@@ -54,14 +54,14 @@ public class Beef implements CharSequence {
 	// -------------------------------------------------
 
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * 
 	 * @param body
-	 *            ±»±¾¶ÔÏóÖĞÖ±½ÓÓµÓĞµÄÎÄ±¾×Ö·ûÊı×é
+	 *            è¢«æœ¬å¯¹è±¡ä¸­ç›´æ¥æ‹¥æœ‰çš„æ–‡æœ¬å­—ç¬¦æ•°ç»„
 	 * @param offset
-	 *            ×Ö·û¿ªÊ¼Î»ÖÃ£¬¼´get(i)·µ»Øbody[offset+i]×Ö·û
+	 *            å­—ç¬¦å¼€å§‹ä½ç½®ï¼Œå³get(i)è¿”å›body[offset+i]å­—ç¬¦
 	 * @param count
-	 *            ´ÓoffsetÎ»ÖÃ¿ªÊ¼µÄ×Ö·ûÊı
+	 *            ä»offsetä½ç½®å¼€å§‹çš„å­—ç¬¦æ•°
 	 */
 	public Beef(char[] value, int offset, int count) {
 		this.value = value;
@@ -100,7 +100,7 @@ public class Beef implements CharSequence {
 	// -------------------------------------------------
 	
 	/**
-	 * »ñÈ¡Ö¸¶¨Î»ÖÃµÄ×Ö·û¡£·µ»ØÖ®Ç°½«±»Ô¤´¦Àí£º1)toLowerCase£¬2)È«½Ç×ª°ë½ÇµÈ
+	 * è·å–æŒ‡å®šä½ç½®çš„å­—ç¬¦ã€‚è¿”å›ä¹‹å‰å°†è¢«é¢„å¤„ç†ï¼š1)toLowerCaseï¼Œ2)å…¨è§’è½¬åŠè§’ç­‰
 	 */
 	public char charAt(int index) {
 		if (index >= 0 && index < count) {
