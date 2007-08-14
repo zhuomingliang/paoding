@@ -36,13 +36,13 @@ import java.util.Map;
 public class FileWordsReader {
 
 	public static Map<String, LinkedList<String>> readWords(
-			String fileOrDirectory) throws IOException {
+			String fileOrDirectory, String charsetName) throws IOException {
 		SimpleReadListener l = new SimpleReadListener();
-		readWords(fileOrDirectory, l);
+		readWords(fileOrDirectory, l, charsetName);
 		return l.getResult();
 	}
 
-	public static void readWords(String fileOrDirectory, ReadListener l)
+	public static void readWords(String fileOrDirectory, ReadListener l, String charsetName)
 			throws IOException {
 		File file;
 		if (fileOrDirectory.startsWith("classpath:")) {
@@ -85,7 +85,7 @@ public class FileWordsReader {
 				continue;
 			}
 			BufferedReader in = new BufferedReader(new InputStreamReader(
-					new FileInputStream(f)));
+					new FileInputStream(f), charsetName));
 			String word;
 			while ((word = in.readLine()) != null) {
 				l.onWord(word);

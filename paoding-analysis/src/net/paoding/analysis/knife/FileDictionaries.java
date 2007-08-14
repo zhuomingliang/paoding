@@ -16,7 +16,6 @@
 package net.paoding.analysis.knife;
 
 import java.util.Arrays;
-import java.util.Properties;
 
 import net.paoding.analysis.dictionary.BinaryDictionary;
 import net.paoding.analysis.dictionary.Dictionary;
@@ -74,11 +73,14 @@ public class FileDictionaries implements Dictionaries {
 	// -------------------------------------------------
 
 	public FileDictionaries() {
-		wordsLoader = new FileWordsLoader();
 	}
-	
-	public FileDictionaries(Properties p) {
-		wordsLoader = new FileWordsLoader(p);
+
+	public FileDictionaries(FileWordsLoader wordsLoader) {
+		setWordsLoader(wordsLoader);
+	}
+
+	public void setWordsLoader(FileWordsLoader wordsLoader) {
+		this.wordsLoader = wordsLoader;
 	}
 
 	// -------------------------------------------------

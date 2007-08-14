@@ -21,12 +21,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.paoding.analysis.Config;
+import net.paoding.analysis.Constants;
 import net.paoding.analysis.dictionary.support.filewords.FileWordsReader;
 import net.paoding.analysis.dictionary.support.merging.Merger;
+import net.paoding.analysis.exception.PaodingAnalysisException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 
@@ -34,52 +35,56 @@ import net.paoding.analysis.dictionary.support.merging.Merger;
  * 
  */
 public class FileWordsLoader {
-	
+
 	private static Log log = LogFactory.getLog(FileWordsLoader.class);
-	
+
 	private String dicHome;
 	private String skipPrefix;
 	private String noiseCharactor;
 	private String noiseWord;
 	private String unit;
 	private String confucianFamilyName;
+	private String charsetName;
 
 	public FileWordsLoader() {
-		setProperties(Config.properties());
 	}
 
 	public FileWordsLoader(Properties p) {
 		setProperties(p);
 	}
 
-	private void setProperties(Properties p) {
+	public void setProperties(Properties p) {
 		// dicHome
-		this.dicHome = p.getProperty("paoding.dic.home", "dic/");
-		dicHome = dicHome.replace('\\', '/');
+		this.dicHome = p.getProperty(Constants.DIC_HOME, "dic/");
+		// dicHome = dicHome.replaceAll("\\", "/");
 		if (!dicHome.endsWith("/")) {
 			this.dicHome = this.dicHome + "/";
 		}
-		log.info("paoding.dic.home=" + this.dicHome);
+		log.info(Constants.DIC_HOME + "=" + this.dicHome);
 		//
-		this.skipPrefix = p.getProperty("paoding.dic.skip.prefix", "x-");
-		this.noiseCharactor = p.getProperty("paoding.dic.noise-charactor",
+		this.skipPrefix = p.getProperty(Constants.DIC_SKIP_PREFIX, "x-");
+		this.noiseCharactor = p.getProperty(Constants.DIC_NOISE_CHARACTOR,
 				"x-noise-charactor");
 		this.noiseWord = p
-				.getProperty("paoding.dic.noise-word", "x-noise-word");
-		this.unit = p.getProperty("paoding.dic.unit", "x-unit");
+				.getProperty(Constants.DIC_NOISE_WORD, "x-noise-word");
+		this.unit = p.getProperty(Constants.DIC_UNIT, "x-unit");
 		this.confucianFamilyName = p.getProperty(
-				"paoding.dic.confucian-family-name", "x-confucian-family-name");
+				Constants.DIC_CONFUCIAN_FAMILY_NAME, "x-confucian-family-name");
+		this.charsetName = p.getProperty(Constants.DIC_CHARSET, "UTF-8");
 	}
 
 	public LinkedList<String> getVocabulary() {
 		try {
-			Map<String, LinkedList<String>> cjk = FileWordsReader
-					.readWords(dicHome);
+			Map<String, LinkedList<String>> cjk = FileWordsReader.readWords(
+					dicHome, charsetName);
 			LinkedList<String> result = null;
 			Iterator<String> iter = cjk.keySet().iterator();
+			log.info(dicHome);
 			while (iter.hasNext()) {
 				String name = iter.next();
-				if (name.startsWith(skipPrefix)) {
+				log.info(name);
+				if (name.startsWith(skipPrefix)
+						|| name.indexOf("/" + skipPrefix) != -1) {
 					continue;
 				}
 				if (result == null) {
@@ -87,6 +92,12 @@ public class FileWordsLoader {
 				} else {
 					Merger.merge(result, cjk.get(name));
 				}
+			}
+			if (result == null) {
+				String message = "Not found any dictionary files, have you set the 'paoding.dic.home' right? ("
+						+ this.dicHome + ")";
+				log.error(message);
+				throw new PaodingAnalysisException(message);
 			}
 			Merger.remove(result, cjk.get(noiseWord));
 			Merger.remove(result, cjk.get(noiseCharactor));
@@ -96,47 +107,37 @@ public class FileWordsLoader {
 		}
 	}
 
-	public LinkedList<String> getConfucianFamilyNames() {
+	protected LinkedList<String> getDictionary(String dicNameRelativeDicHome) {
 		try {
-			return FileWordsReader.readWords(
-					dicHome + confucianFamilyName + ".dic").values().iterator()
-					.next();
-		} catch (IOException e) {
-			throw toRuntimeException(e);
-		}
-	}
-
-	public LinkedList<String> getNoiseWords() {
-		try {
-			return FileWordsReader.readWords(dicHome + noiseWord + ".dic")
-					.values().iterator().next();
-		} catch (IOException e) {
-			throw toRuntimeException(e);
-		}
-	}
-
-	public LinkedList<String> getNoiseCharactors() {
-		try {
-			return FileWordsReader.readWords(dicHome + noiseCharactor + ".dic")
-					.values().iterator().next();
-		} catch (IOException e) {
-			throw toRuntimeException(e);
-		}
-	}
-
-	public LinkedList<String> getUnits() {
-		try {
-			return FileWordsReader.readWords(dicHome + unit + ".dic").values()
+			Map<String, LinkedList<String>> dics = FileWordsReader.readWords(
+					dicHome + dicNameRelativeDicHome + ".dic", charsetName);
+			return dics.size() == 0 ? new LinkedList<String>() : dics.values()
 					.iterator().next();
 		} catch (IOException e) {
 			throw toRuntimeException(e);
 		}
 	}
 
+	public LinkedList<String> getConfucianFamilyNames() {
+		return getDictionary(confucianFamilyName);
+	}
+
+	public LinkedList<String> getNoiseWords() {
+		return getDictionary(noiseWord);
+	}
+
+	public LinkedList<String> getNoiseCharactors() {
+		return getDictionary(noiseCharactor);
+	}
+
+	public LinkedList<String> getUnits() {
+		return getDictionary(unit);
+	}
+
 	// -------------------------------------
 
 	protected RuntimeException toRuntimeException(IOException e) {
-		return new RuntimeException(e);
+		return new PaodingAnalysisException(e);
 	}
 
 }

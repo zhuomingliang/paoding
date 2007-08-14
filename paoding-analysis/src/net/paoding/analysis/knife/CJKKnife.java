@@ -43,7 +43,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		setDictionaries(dictionaries);
 	}
 	
-	@Override
+//	@Override
 	public void setDictionaries(Dictionaries dictionaries) {
 		vocabulary = dictionaries.getVocabulary();
 		noiseWords = dictionaries.getNoiseWords();

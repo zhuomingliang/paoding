@@ -62,7 +62,7 @@ public class PaodingAnalyzer extends Analyzer {
 
 	// -------------------------------------------------
 	/**
-	 * 用于向XTokenizer提供，分解文本字符
+	 * 用于向PaodingTokenizer提供，分解文本字符
 	 * 
 	 * @see PaodingTokenizer#next()
 	 * 

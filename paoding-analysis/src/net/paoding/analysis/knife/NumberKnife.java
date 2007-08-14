@@ -34,7 +34,7 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 		setDictionaries(dictionaries);
 	}
 
-	@Override
+//	@Override
 	public void setDictionaries(Dictionaries dictionaries) {
 		units = dictionaries.getUnits();
 	}
