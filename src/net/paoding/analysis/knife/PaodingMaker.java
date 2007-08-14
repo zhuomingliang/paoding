@@ -36,12 +36,18 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0.0
  */
 public class PaodingMaker {
+	private PaodingMaker(){}
 
 	private static Log log = LogFactory.getLog(PaodingMaker.class);
 
 	/**
-	 * 读取类路径下的paoding-analysis.properties文件，据之创建一个新的Paoding对象．
+	 * 读取类路径下的paoding-analysis.properties文件，据之获取一个Paoding对象．
 	 * <p>
+	 * 如果paoding-analysis.properties中paoding.make.protype=singleton，
+	 * 则每次返回一个先前创建的Paoding对象(如果先前没有创建则创建之)，如果没有配置
+	 * 或配置的值不是singleton，则每次返回一个新的Paoding对象。<p>
+	 * 
+	 * 一般，应不配置或配置为singleton。
 	 * 
 	 * @return
 	 */
@@ -50,8 +56,14 @@ public class PaodingMaker {
 	}
 
 	/**
-	 * 读取类指定路径的配置文件(如果配置文件放置在类路径下，则应该加"classpath:"为前缀)，据之创建一个新的Paoding对象．
+	 * 读取类指定路径的配置文件(如果配置文件放置在类路径下，则应该加"classpath:"为前缀)，据之获取一个新的Paoding对象．
 	 * <p>
+	 * 
+	 * 如果给定的属性文件中paoding.make.protype=singleton，
+	 * 则每次返回一个先前创建的Paoding对象(如果先前没有创建则创建之)，如果没有配置
+	 * 或配置的值不是singleton，则每次返回一个新的Paoding对象。<p>
+	 * 
+	 * 一般，应不配置或配置为singleton。
 	 * 
 	 * @param properties
 	 * @return
@@ -61,10 +73,15 @@ public class PaodingMaker {
 	}
 
 	/**
-	 * 根据给定的属性对象创建一个新的Paoding对象．
+	 * 根据给定的属性对象获取一个Paoding对象．
 	 * <p>
+	 * 如果给定的属性对象中paoding.make.protype=singleton，
+	 * 则每次返回一个先前创建的Paoding对象(如果先前没有创建则创建之)，如果没有配置
+	 * 或配置的值不是singleton，则每次返回一个新的Paoding对象。<p>
 	 * 
-	 * 一般地，创建后使用者应该将之保存在一个全局共享的变量中重复利用。
+	 * 注意的是，要获取先前通过此方法创建的Paoding对象，必须传入上一次传入的属性对象。
+	 * 
+	 * 一般，应不配置或配置为singleton。
 	 * 
 	 * @param properties
 	 * @return
@@ -77,10 +94,18 @@ public class PaodingMaker {
 
 	@SuppressWarnings("unchecked")
 	private static Paoding implMake(Properties p, Object holderKey) {
+		Paoding paoding = null;
 		String singleton = p.getProperty(Constants.MAKE_PROTYPE, "singleton");
-		Paoding paoding = PaodingHolder.get(holderKey);
-		if (paoding != null) {
-			return paoding;
+		//paoding.dic.home.absolute这个属性由系统自动设置，不需要外部指定
+		String absoluteDicHome = p.getProperty("paoding.dic.home.absolute");
+		if (absoluteDicHome != null) {
+			holderKey = absoluteDicHome;
+		}
+		if ("singleton".equalsIgnoreCase(singleton)) {
+			paoding = PaodingHolder.get(holderKey);
+			if (paoding != null) {
+				return paoding;
+			}
 		}
 		paoding = new Paoding();
 		try {
@@ -120,6 +145,7 @@ public class PaodingMaker {
 		if (path == null) {
 			return p;
 		}
+		File f = null;
 		InputStream in = null;
 		try {
 			if (path.startsWith("classpath:")) {
@@ -129,15 +155,18 @@ public class PaodingMaker {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in classpath.");
 				}
-				in = url.openStream();
+				f = new File(url.getFile());
 			} else {
-				File f = new File(path);
+				f = new File(path);
 				if (!f.exists()) {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in system.");
 				}
-				in = new FileInputStream(f);
+				
 			}
+			in = new FileInputStream(f);
+			//保存字典安装目录的绝对路径
+			p.setProperty("paoding.dic.home.absolute", f.getAbsolutePath());
 			p.load(in);
 		} catch (Exception e) {
 			e.printStackTrace();
