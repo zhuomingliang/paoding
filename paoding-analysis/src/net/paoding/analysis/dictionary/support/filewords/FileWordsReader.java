@@ -95,10 +95,4 @@ public class FileWordsReader {
 			in.close();
 		}
 	}
-	
-	public static void main(String[] args) {
-		String s = "\\a\\b";
-		System.out.println(s.replace('\\', '/'));
-			
-	}
 }
