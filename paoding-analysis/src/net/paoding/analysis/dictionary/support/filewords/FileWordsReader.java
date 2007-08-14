@@ -81,6 +81,7 @@ public class FileWordsReader {
 		for (File f : dics) {
 			String name = f.getAbsolutePath().substring(
 						dir.length() + 1);
+			name = name.replace('\\', '/');
 			if (!l.onFileBegin(name)) {
 				continue;
 			}
@@ -93,5 +94,11 @@ public class FileWordsReader {
 			l.onFileEnd(name);
 			in.close();
 		}
+	}
+	
+	public static void main(String[] args) {
+		String s = "\\a\\b";
+		System.out.println(s.replace('\\', '/'));
+			
 	}
 }
