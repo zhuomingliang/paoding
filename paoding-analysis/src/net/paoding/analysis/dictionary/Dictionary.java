@@ -16,7 +16,7 @@
 package net.paoding.analysis.dictionary;
 
 /**
- * DictionaryÊÇÒ»¸öÖ»¶Á×Öµä£¬ÓÃÓÚ²éÕÒÊÇ·ñ°üº¬Ä³¸ö´ÊÓï£¬ÒÔ¼°Ïà¹ØĞÅÏ¢¡£
+ * Dictionaryæ˜¯ä¸€ä¸ªåªè¯»å­—å…¸ï¼Œç”¨äºæŸ¥æ‰¾æ˜¯å¦åŒ…å«æŸä¸ªè¯è¯­ï¼Œä»¥åŠç›¸å…³ä¿¡æ¯ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -30,14 +30,14 @@ package net.paoding.analysis.dictionary;
 public interface Dictionary {
 
 	/**
-	 * ·µ»Ø×ÖµäÖĞ´ÊÓïÊı>=0
+	 * è¿”å›å­—å…¸ä¸­è¯è¯­æ•°>=0
 	 * 
 	 * @return
 	 */
 	public int size();
 
 	/**
-	 * ·µ»Ø¸ø¶¨Î»ÖÃµÄ´ÊÓï
+	 * è¿”å›ç»™å®šä½ç½®çš„è¯è¯­
 	 * 
 	 * @param index
 	 *            0,1,2,...,size-1
@@ -46,13 +46,13 @@ public interface Dictionary {
 	public String get(int index);
 
 	/**
-	 * ËÑË÷´ÊµäÊÇ·ñÊÕ¼¯input[offset]µ½input[offset+count-1]Ö®¼ä×Ö·û´®(°üº¬±ß½ç)µÄ´Ê¡£<br>
-	 * ËÑË÷½á¹ûÒÔ·Ç¿ÕHit¶ÔÏó¸ø³ö¡£
+	 * æœç´¢è¯å…¸æ˜¯å¦æ”¶é›†input[offset]åˆ°input[offset+count-1]ä¹‹é—´å­—ç¬¦ä¸²(åŒ…å«è¾¹ç•Œ)çš„è¯ã€‚<br>
+	 * æœç´¢ç»“æœä»¥éç©ºHitå¯¹è±¡ç»™å‡ºã€‚
 	 * <p>
-	 * @param input ÒªËÑË÷µÄ×Ö·û´®ÊÇÆäÖĞÁ¬ĞøµÄÒ»²¿·Ö
-	 * @param offset ÒªËÑË÷µÄ×Ö·û´®¿ªÊ¼Î»ÖÃÏà¶ÔinputµÄÆ«ÒÆ
-	 * @param count ÒªËÑË÷µÄ×Ö·û´®×Ö·û¸öÊı
-	 * @return ·µ»ØµÄHit¶ÔÏó·Ç¿Õ£¬³ÌĞòÍ¨¹ıhit¶ÔÏóÌá¹©µÄ·½·¨ÅĞ¶ÏËÑË÷½á¹û
+	 * @param input è¦æœç´¢çš„å­—ç¬¦ä¸²æ˜¯å…¶ä¸­è¿ç»­çš„ä¸€éƒ¨åˆ†
+	 * @param offset è¦æœç´¢çš„å­—ç¬¦ä¸²å¼€å§‹ä½ç½®ç›¸å¯¹inputçš„åç§»
+	 * @param count è¦æœç´¢çš„å­—ç¬¦ä¸²å­—ç¬¦ä¸ªæ•°
+	 * @return è¿”å›çš„Hitå¯¹è±¡éç©ºï¼Œç¨‹åºé€šè¿‡hitå¯¹è±¡æä¾›çš„æ–¹æ³•åˆ¤æ–­æœç´¢ç»“æœ
 	 * 
 	 * @see Hit
 	 */

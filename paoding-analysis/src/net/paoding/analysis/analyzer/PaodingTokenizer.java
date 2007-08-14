@@ -30,7 +30,7 @@ import org.apache.lucene.analysis.Tokenizer;
 
 
 /**
- * PaodingTokenizerÊÇ»ùÓÚ¡°âÒ¶¡½âÅ£¡±¿ò¼ÜµÄTokenStreamÊµÏÖ£¬ÎªPaodingAnalyzerÊ¹ÓÃ¡£
+ * PaodingTokenizeræ˜¯åŸºäºâ€œåº–ä¸è§£ç‰›â€æ¡†æ¶çš„TokenStreamå®ç°ï¼Œä¸ºPaodingAnalyzerä½¿ç”¨ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -53,7 +53,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	// -------------------------------------------------
 
 	/**
-	 * ÎÄ±¾×Ö·ûÔ´
+	 * æ–‡æœ¬å­—ç¬¦æº
 	 * 
 	 * @see #next()
 	 */
@@ -65,14 +65,14 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	private static final int bufferLength = 128;
 
 	/**
-	 * ½ÓÊÕÀ´×Ô{@link #input}µÄÎÄ±¾×Ö·û
+	 * æ¥æ”¶æ¥è‡ª{@link #input}çš„æ–‡æœ¬å­—ç¬¦
 	 * 
 	 * @see #next()
 	 */
 	private final char[] buffer = new char[bufferLength];
 
 	/**
-	 * {@link buffer}[0]ÔÚ{@link #input}ÖĞµÄÆ«ÒÆ
+	 * {@link buffer}[0]åœ¨{@link #input}ä¸­çš„åç§»
 	 * 
 	 * @see #collect(String, int, int)
 	 * @see #next()
@@ -90,7 +90,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	private int dissected;
 
 	/**
-	 * ÓÃÓÚ·Ö½âbeefÖĞµÄÎÄ±¾×Ö·û£¬ÓÉPaodingAnalyzerÌá¹©
+	 * ç”¨äºåˆ†è§£beefä¸­çš„æ–‡æœ¬å­—ç¬¦ï¼Œç”±PaodingAnalyzeræä¾›
 	 * 
 	 * @see #next()
 	 */
@@ -102,7 +102,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	private TokenCollector tokenCollector;
 
 	/**
-	 * tokensµü´úÆ÷£¬ÓÃÓÚnext()·½·¨Ë³Ğò¶ÁÈ¡tokensÖĞµÄToken¶ÔÏó
+	 * tokensè¿­ä»£å™¨ï¼Œç”¨äºnext()æ–¹æ³•é¡ºåºè¯»å–tokensä¸­çš„Tokenå¯¹è±¡
 	 * 
 	 * @see #tokens
 	 * @see #next()
@@ -143,11 +143,11 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	// -------------------------------------------------
 	@Override
 	public Token next() throws IOException {
-		// ÒÑ¾­Çî¾¡tokensIteractorµÄToken¶ÔÏó£¬Ôò¼ÌĞøÇëÇóreaderÁ÷ÈëÊı¾İ
+		// å·²ç»ç©·å°½tokensIteractorçš„Tokenå¯¹è±¡ï¼Œåˆ™ç»§ç»­è¯·æ±‚readeræµå…¥æ•°æ®
 		while (tokenIteractor == null || !tokenIteractor.hasNext()) {
 			//System.out.println(dissected);
 			int read = 0;
-			int remainning = -1;//ÖØĞÂ´Óreader¶ÁÈë×Ö·ûÇ°£¬bufferÖĞ»¹Ê£ÏÂµÄ×Ö·ûÊı£¬¸ºÊı±íÊ¾µ±Ç°Ôİ²»ĞèÒª´ÓreaderÖĞ¶ÁÈë×Ö·û
+			int remainning = -1;//é‡æ–°ä»readerè¯»å…¥å­—ç¬¦å‰ï¼Œbufferä¸­è¿˜å‰©ä¸‹çš„å­—ç¬¦æ•°ï¼Œè´Ÿæ•°è¡¨ç¤ºå½“å‰æš‚ä¸éœ€è¦ä»readerä¸­è¯»å…¥å­—ç¬¦
 			if (dissected >= beef.length()) {
 				remainning = 0;
 			}
@@ -161,13 +161,13 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 				read = input.read(buffer, remainning, bufferLength - remainning);
 				int charCount = remainning + read;
 				if (charCount < 0) {
-					// readerÒÑ¾¡£¬°´½Ó¿Únext()ÒªÇó·µ»Ønull.
+					// readerå·²å°½ï¼ŒæŒ‰æ¥å£next()è¦æ±‚è¿”å›null.
 					return null;
 				}
 				if (charCount < bufferLength) {
 					buffer[charCount ++] = 0;
 				}
-				// ¹¹Ôì¡°Å£¡±£¬²¢Ê¹ÓÃknife¡°½â¡±Ö®
+				// æ„é€ â€œç‰›â€ï¼Œå¹¶ä½¿ç”¨knifeâ€œè§£â€ä¹‹
 				beef.set(0, charCount);
 				offset += Math.abs(dissected);
 				//offset -= remainning;
@@ -177,7 +177,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 //			offset += read;// !!!
 			tokenIteractor = tokenCollector.iterator();
 		}
-		// ·µ»ØtokensIteractorÏÂÒ»¸öToken¶ÔÏó
+		// è¿”å›tokensIteractorä¸‹ä¸€ä¸ªTokenå¯¹è±¡
 		return tokenIteractor.next();
 	}
 

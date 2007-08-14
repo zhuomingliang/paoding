@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * DictionaryµÄÉ¢ÁĞ+¶ş²æ²éÕÒÊµÏÖ¡£
+ * Dictionaryçš„æ•£åˆ—+äºŒå‰æŸ¥æ‰¾å®ç°ã€‚
  * <p>
- * ÓÃÓÚ¶Ô´óÊıÁ¿µÄ£¬ÇÒÍ·×Ö·ûÏàÍ¬µÄ×Ö·û´®½Ï¶àµÄÇé¿ö£¬e.gºº×Ö´ÊÓï×Öµä¡£ÔÚÕâÖÖÇé¿öÏÂ£¬¼ìË÷ËÙ¶È½«±È¶ş²æ×Öµä¸ü¿ì¡£
+ * ç”¨äºå¯¹å¤§æ•°é‡çš„ï¼Œä¸”å¤´å­—ç¬¦ç›¸åŒçš„å­—ç¬¦ä¸²è¾ƒå¤šçš„æƒ…å†µï¼Œe.gæ±‰å­—è¯è¯­å­—å…¸ã€‚åœ¨è¿™ç§æƒ…å†µä¸‹ï¼Œæ£€ç´¢é€Ÿåº¦å°†æ¯”äºŒå‰å­—å…¸æ›´å¿«ã€‚
  * <p>
  * 
- * HashBinaryDictionaryÒÔÒ»×éÒÑ¾­ÅÅĞòµÄ´ÊÓïÎªÊäÈë£¬ËùÓĞ<b>Í·×Ö·û</b>ÏàÍ¬µÄ´ÊÓï»®ÎªÒ»¸ö¼¯ºÏ×÷Îª·Ö×Öµä(Ê¹ÓÃBinaryDictionaryÊµÏÖ)¡£
- * ²éÕÒ´ÊÓïÊ±£¬ÏÈ¸ù¾İµÚÒ»¸ö×Ö·ûÕÒµÃ·Ö´Êµä(BinaryDictionaryÊµÏÖ)£¬ÔÙ´Ó¸Ã·Ö´ÊµäÖĞ¶¨Î»¸Ã´ÊÓï¡£
+ * HashBinaryDictionaryä»¥ä¸€ç»„å·²ç»æ’åºçš„è¯è¯­ä¸ºè¾“å…¥ï¼Œæ‰€æœ‰<b>å¤´å­—ç¬¦</b>ç›¸åŒçš„è¯è¯­åˆ’ä¸ºä¸€ä¸ªé›†åˆä½œä¸ºåˆ†å­—å…¸(ä½¿ç”¨BinaryDictionaryå®ç°)ã€‚
+ * æŸ¥æ‰¾è¯è¯­æ—¶ï¼Œå…ˆæ ¹æ®ç¬¬ä¸€ä¸ªå­—ç¬¦æ‰¾å¾—åˆ†è¯å…¸(BinaryDictionaryå®ç°)ï¼Œå†ä»è¯¥åˆ†è¯å…¸ä¸­å®šä½è¯¥è¯è¯­ã€‚
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -40,12 +40,12 @@ public class HashBinaryDictionary implements Dictionary {
 	// -------------------------------------------------
 
 	/**
-	 * ×ÖµäÖĞËùÓĞ´ÊÓï£¬ÓÃÓÚ·½±ã{@link #get(int)}·½·¨
+	 * å­—å…¸ä¸­æ‰€æœ‰è¯è¯­ï¼Œç”¨äºæ–¹ä¾¿{@link #get(int)}æ–¹æ³•
 	 */
 	private String[] ascWords;
 
 	/**
-	 * Ê××Ö·ûµ½·Ö´ÊµäµÄÓ³Éä
+	 * é¦–å­—ç¬¦åˆ°åˆ†è¯å…¸çš„æ˜ å°„
 	 */
 	private Map<Integer, SubDictionaryWrap> subs;
 	
@@ -63,7 +63,7 @@ public class HashBinaryDictionary implements Dictionary {
 	/**
 	 * 
 	 * @param ascWords
-	 *            ÉıĞòÅÅÁĞ´ÊÓï
+	 *            å‡åºæ’åˆ—è¯è¯­
 	 * @param initialCapacity
 	 * @param loadFactor
 	 */
@@ -86,10 +86,10 @@ public class HashBinaryDictionary implements Dictionary {
 	// -------------------------------------------------
 
 	/**
-	 * ´´½¨·Ö´ÊµäÓ³Éä£¬Îª¹¹Ôìº¯Êıµ÷ÓÃ
+	 * åˆ›å»ºåˆ†è¯å…¸æ˜ å°„ï¼Œä¸ºæ„é€ å‡½æ•°è°ƒç”¨
 	 */
 	protected void createSubDictionaries() {
-		// ¶¨Î»ÏàÍ¬Í·×Ö·û´ÊÓïµÄ¿ªÍ·ºÍ½áÊøÎ»ÖÃÒÔÈ·ÈÏ·Ö×Öµä
+		// å®šä½ç›¸åŒå¤´å­—ç¬¦è¯è¯­çš„å¼€å¤´å’Œç»“æŸä½ç½®ä»¥ç¡®è®¤åˆ†å­—å…¸
 		int beginIndex = this.start;
 		int endIndex = this.start + 1;
 
@@ -114,7 +114,7 @@ public class HashBinaryDictionary implements Dictionary {
 	}
 
 	/**
-	 * ½«Î»ÖÃÔÚbeginIndexºÍendIndexÖ®¼ä(²»°üÀ¨endIndex)µÄ´ÊÓï×÷ÎªÒ»¸ö·Ö´Êµä
+	 * å°†ä½ç½®åœ¨beginIndexå’ŒendIndexä¹‹é—´(ä¸åŒ…æ‹¬endIndex)çš„è¯è¯­ä½œä¸ºä¸€ä¸ªåˆ†è¯å…¸
 	 * 
 	 * @param hashChar
 	 * @param beginIndex
@@ -127,7 +127,7 @@ public class HashBinaryDictionary implements Dictionary {
 				beginIndex);
 		Integer key = keyOf(hashChar);
 		if (subs.containsKey(key)) {
-			System.out.println("³öÏÖÕâ¸öÎÄ×Ö£¬±íÊ¾ÊäÈëµÄ´ÊÓïÅÅĞò´íÎó£¬ÇëÈ·±£´ÊµäÅÅĞòÕıÈ·>>>>>>>>>"
+			System.out.println("å‡ºç°è¿™ä¸ªæ–‡å­—ï¼Œè¡¨ç¤ºè¾“å…¥çš„è¯è¯­æ’åºé”™è¯¯ï¼Œè¯·ç¡®ä¿è¯å…¸æ’åºæ­£ç¡®>>>>>>>>>"
 					+ hashChar);
 		}
 		subs.put(key, subDic);
@@ -182,7 +182,7 @@ public class HashBinaryDictionary implements Dictionary {
 			return Hit.UNDEFINED;
 		}
 		Dictionary dic = subDic.dic;
-		//¶Ôcount==hashIndex + 1µÄ´¦Àí
+		//å¯¹count==hashIndex + 1çš„å¤„ç†
 		if (count == hashIndex + 1) {
 			String header = dic.get(0);
 			if (header.length() == hashIndex + 1) {
@@ -216,7 +216,7 @@ public class HashBinaryDictionary implements Dictionary {
 	// -------------------------------------------------
 
 	/**
-	 * ×Ö·ûµÄÔÚ{@link #subs}µÄkeyÖµ¡£
+	 * å­—ç¬¦çš„åœ¨{@link #subs}çš„keyå€¼ã€‚
 	 * 
 	 * @param theChar
 	 * @return
@@ -224,26 +224,26 @@ public class HashBinaryDictionary implements Dictionary {
 	 * @see #subs
 	 */
 	protected int keyOf(char theChar) {
-		// return theChar - 0x4E00;// 'Ò»'==0x4E00
+		// return theChar - 0x4E00;// 'ä¸€'==0x4E00
 		return theChar;
 	}
 
 	/**
-	 * ·Ö´Êµä·âÏä
+	 * åˆ†è¯å…¸å°ç®±
 	 */
 	static class SubDictionaryWrap {
 		/**
-		 * ·Ö´Êµä´Ê×éµÄÍ·×Ö·û
+		 * åˆ†è¯å…¸è¯ç»„çš„å¤´å­—ç¬¦
 		 */
 		char hashChar;
 
 		/**
-		 * ·Ö´Êµä
+		 * åˆ†è¯å…¸
 		 */
 		Dictionary dic;
 
 		/**
-		 * ·Ö´ÊµäµÚÒ»¸ö´ÊÓïÔÚËùÓĞ´ÊÓïÖĞµÄÆ«ÒÆÎ»ÖÃ
+		 * åˆ†è¯å…¸ç¬¬ä¸€ä¸ªè¯è¯­åœ¨æ‰€æœ‰è¯è¯­ä¸­çš„åç§»ä½ç½®
 		 */
 		int wordIndexOffset;
 

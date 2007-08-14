@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * KnifeBox负责决策当遇到字符串指定位置时应使用的Knife对象.
+ * KnifeBox璐熻矗鍐崇瓥褰撻亣鍒板瓧绗︿覆鎸囧畾浣嶇疆鏃跺簲浣跨敤鐨凨nife瀵硅薄.
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]

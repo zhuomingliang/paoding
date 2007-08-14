@@ -41,13 +41,13 @@ public class PaodingMaker {
 	private static Log log = LogFactory.getLog(PaodingMaker.class);
 
 	/**
-	 * ¶ÁÈ¡ÀàÂ·¾¶ÏÂµÄpaoding-analysis.propertiesÎÄ¼ş£¬¾İÖ®»ñÈ¡Ò»¸öPaoding¶ÔÏó£®
+	 * è¯»å–ç±»è·¯å¾„ä¸‹çš„paoding-analysis.propertiesæ–‡ä»¶ï¼Œæ®ä¹‹è·å–ä¸€ä¸ªPaodingå¯¹è±¡ï¼
 	 * <p>
-	 * Èç¹ûpaoding-analysis.propertiesÖĞpaoding.make.protype=singleton£¬
-	 * ÔòÃ¿´Î·µ»ØÒ»¸öÏÈÇ°´´½¨µÄPaoding¶ÔÏó(Èç¹ûÏÈÇ°Ã»ÓĞ´´½¨Ôò´´½¨Ö®)£¬Èç¹ûÃ»ÓĞÅäÖÃ
-	 * »òÅäÖÃµÄÖµ²»ÊÇsingleton£¬ÔòÃ¿´Î·µ»ØÒ»¸öĞÂµÄPaoding¶ÔÏó¡£<p>
+	 * å¦‚æœpaoding-analysis.propertiesä¸­paoding.make.protype=singletonï¼Œ
+	 * åˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªå…ˆå‰åˆ›å»ºçš„Paodingå¯¹è±¡(å¦‚æœå…ˆå‰æ²¡æœ‰åˆ›å»ºåˆ™åˆ›å»ºä¹‹)ï¼Œå¦‚æœæ²¡æœ‰é…ç½®
+	 * æˆ–é…ç½®çš„å€¼ä¸æ˜¯singletonï¼Œåˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªæ–°çš„Paodingå¯¹è±¡ã€‚<p>
 	 * 
-	 * Ò»°ã£¬Ó¦²»ÅäÖÃ»òÅäÖÃÎªsingleton¡£
+	 * ä¸€èˆ¬ï¼Œåº”ä¸é…ç½®æˆ–é…ç½®ä¸ºsingletonã€‚
 	 * 
 	 * @return
 	 */
@@ -56,14 +56,14 @@ public class PaodingMaker {
 	}
 
 	/**
-	 * ¶ÁÈ¡ÀàÖ¸¶¨Â·¾¶µÄÅäÖÃÎÄ¼ş(Èç¹ûÅäÖÃÎÄ¼ş·ÅÖÃÔÚÀàÂ·¾¶ÏÂ£¬ÔòÓ¦¸Ã¼Ó"classpath:"ÎªÇ°×º)£¬¾İÖ®»ñÈ¡Ò»¸öĞÂµÄPaoding¶ÔÏó£®
+	 * è¯»å–ç±»æŒ‡å®šè·¯å¾„çš„é…ç½®æ–‡ä»¶(å¦‚æœé…ç½®æ–‡ä»¶æ”¾ç½®åœ¨ç±»è·¯å¾„ä¸‹ï¼Œåˆ™åº”è¯¥åŠ "classpath:"ä¸ºå‰ç¼€)ï¼Œæ®ä¹‹è·å–ä¸€ä¸ªæ–°çš„Paodingå¯¹è±¡ï¼
 	 * <p>
 	 * 
-	 * Èç¹û¸ø¶¨µÄÊôĞÔÎÄ¼şÖĞpaoding.make.protype=singleton£¬
-	 * ÔòÃ¿´Î·µ»ØÒ»¸öÏÈÇ°´´½¨µÄPaoding¶ÔÏó(Èç¹ûÏÈÇ°Ã»ÓĞ´´½¨Ôò´´½¨Ö®)£¬Èç¹ûÃ»ÓĞÅäÖÃ
-	 * »òÅäÖÃµÄÖµ²»ÊÇsingleton£¬ÔòÃ¿´Î·µ»ØÒ»¸öĞÂµÄPaoding¶ÔÏó¡£<p>
+	 * å¦‚æœç»™å®šçš„å±æ€§æ–‡ä»¶ä¸­paoding.make.protype=singletonï¼Œ
+	 * åˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªå…ˆå‰åˆ›å»ºçš„Paodingå¯¹è±¡(å¦‚æœå…ˆå‰æ²¡æœ‰åˆ›å»ºåˆ™åˆ›å»ºä¹‹)ï¼Œå¦‚æœæ²¡æœ‰é…ç½®
+	 * æˆ–é…ç½®çš„å€¼ä¸æ˜¯singletonï¼Œåˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªæ–°çš„Paodingå¯¹è±¡ã€‚<p>
 	 * 
-	 * Ò»°ã£¬Ó¦²»ÅäÖÃ»òÅäÖÃÎªsingleton¡£
+	 * ä¸€èˆ¬ï¼Œåº”ä¸é…ç½®æˆ–é…ç½®ä¸ºsingletonã€‚
 	 * 
 	 * @param properties
 	 * @return
@@ -73,15 +73,15 @@ public class PaodingMaker {
 	}
 
 	/**
-	 * ¸ù¾İ¸ø¶¨µÄÊôĞÔ¶ÔÏó»ñÈ¡Ò»¸öPaoding¶ÔÏó£®
+	 * æ ¹æ®ç»™å®šçš„å±æ€§å¯¹è±¡è·å–ä¸€ä¸ªPaodingå¯¹è±¡ï¼
 	 * <p>
-	 * Èç¹û¸ø¶¨µÄÊôĞÔ¶ÔÏóÖĞpaoding.make.protype=singleton£¬
-	 * ÔòÃ¿´Î·µ»ØÒ»¸öÏÈÇ°´´½¨µÄPaoding¶ÔÏó(Èç¹ûÏÈÇ°Ã»ÓĞ´´½¨Ôò´´½¨Ö®)£¬Èç¹ûÃ»ÓĞÅäÖÃ
-	 * »òÅäÖÃµÄÖµ²»ÊÇsingleton£¬ÔòÃ¿´Î·µ»ØÒ»¸öĞÂµÄPaoding¶ÔÏó¡£<p>
+	 * å¦‚æœç»™å®šçš„å±æ€§å¯¹è±¡ä¸­paoding.make.protype=singletonï¼Œ
+	 * åˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªå…ˆå‰åˆ›å»ºçš„Paodingå¯¹è±¡(å¦‚æœå…ˆå‰æ²¡æœ‰åˆ›å»ºåˆ™åˆ›å»ºä¹‹)ï¼Œå¦‚æœæ²¡æœ‰é…ç½®
+	 * æˆ–é…ç½®çš„å€¼ä¸æ˜¯singletonï¼Œåˆ™æ¯æ¬¡è¿”å›ä¸€ä¸ªæ–°çš„Paodingå¯¹è±¡ã€‚<p>
 	 * 
-	 * ×¢ÒâµÄÊÇ£¬Òª»ñÈ¡ÏÈÇ°Í¨¹ı´Ë·½·¨´´½¨µÄPaoding¶ÔÏó£¬±ØĞë´«ÈëÉÏÒ»´Î´«ÈëµÄÊôĞÔ¶ÔÏó¡£
+	 * æ³¨æ„çš„æ˜¯ï¼Œè¦è·å–å…ˆå‰é€šè¿‡æ­¤æ–¹æ³•åˆ›å»ºçš„Paodingå¯¹è±¡ï¼Œå¿…é¡»ä¼ å…¥ä¸Šä¸€æ¬¡ä¼ å…¥çš„å±æ€§å¯¹è±¡ã€‚
 	 * 
-	 * Ò»°ã£¬Ó¦²»ÅäÖÃ»òÅäÖÃÎªsingleton¡£
+	 * ä¸€èˆ¬ï¼Œåº”ä¸é…ç½®æˆ–é…ç½®ä¸ºsingletonã€‚
 	 * 
 	 * @param properties
 	 * @return
@@ -96,7 +96,7 @@ public class PaodingMaker {
 	private static Paoding implMake(Properties p, Object holderKey) {
 		Paoding paoding = null;
 		String singleton = p.getProperty(Constants.MAKE_PROTYPE, "singleton");
-		//paoding.dic.home.absoluteÕâ¸öÊôĞÔÓÉÏµÍ³×Ô¶¯ÉèÖÃ£¬²»ĞèÒªÍâ²¿Ö¸¶¨
+		//paoding.dic.home.absoluteè¿™ä¸ªå±æ€§ç”±ç³»ç»Ÿè‡ªåŠ¨è®¾ç½®ï¼Œä¸éœ€è¦å¤–éƒ¨æŒ‡å®š
 		String absoluteDicHome = p.getProperty("paoding.dic.home.absolute");
 		if (absoluteDicHome != null) {
 			holderKey = absoluteDicHome;
@@ -109,14 +109,14 @@ public class PaodingMaker {
 		}
 		paoding = new Paoding();
 		try {
-			// °ü×°¸÷ÖÖ×Öµä-½«×Ô¶¯Ñ°ÕÒ£¬Èô´æÔÚÔò¶ÁÈ¡ÀàÂ·¾¶ÖĞµÄpaoding-analysis.propertiesÎÄ¼ş
-			// Èô²»´æÔÚ¸ÃÅäÖÃÎÄ¼ş£¬ÔòÒ»ÇĞÊ¹ÓÃÄ¬ÈÏÉèÖÃ£¬¼´×ÖµäÔÚÎÄ¼şÏµÍ³µ±Ç°Â·¾¶µÄdicÏÂ(·ÇÀàÂ·¾¶dicÏÂ)
+			// åŒ…è£…å„ç§å­—å…¸-å°†è‡ªåŠ¨å¯»æ‰¾ï¼Œè‹¥å­˜åœ¨åˆ™è¯»å–ç±»è·¯å¾„ä¸­çš„paoding-analysis.propertiesæ–‡ä»¶
+			// è‹¥ä¸å­˜åœ¨è¯¥é…ç½®æ–‡ä»¶ï¼Œåˆ™ä¸€åˆ‡ä½¿ç”¨é»˜è®¤è®¾ç½®ï¼Œå³å­—å…¸åœ¨æ–‡ä»¶ç³»ç»Ÿå½“å‰è·¯å¾„çš„dicä¸‹(éç±»è·¯å¾„dicä¸‹)
 			Dictionaries dictionaries = new FileDictionaries(
 					new FileWordsLoader(p));
 			Enumeration names = p.propertyNames();
 			while (names.hasMoreElements()) {
 				String name = (String) names.nextElement();
-				// ÒÔpaoding.knife.class¿ªÍ·µÄ±»ÈÏÎªÊÇknife¶ÔÏó
+				// ä»¥paoding.knife.classå¼€å¤´çš„è¢«è®¤ä¸ºæ˜¯knifeå¯¹è±¡
 				if (name.startsWith("paoding.knife.class")) {
 					String className = p.getProperty(name);
 					Class clazz = Class.forName(className);
@@ -125,7 +125,7 @@ public class PaodingMaker {
 						((DictionariesWare) knife)
 								.setDictionaries(dictionaries);
 					}
-					// °Ñµ¶½»¸øâÒ¶¡
+					// æŠŠåˆ€äº¤ç»™åº–ä¸
 					log.info("add knike: " + className);
 					paoding.addKnife(knife);
 				}
@@ -165,7 +165,7 @@ public class PaodingMaker {
 				
 			}
 			in = new FileInputStream(f);
-			//±£´æ×Öµä°²×°Ä¿Â¼µÄ¾ø¶ÔÂ·¾¶
+			//ä¿å­˜å­—å…¸å®‰è£…ç›®å½•çš„ç»å¯¹è·¯å¾„
 			p.setProperty("paoding.dic.home.absolute", f.getAbsolutePath());
 			p.load(in);
 		} catch (Exception e) {

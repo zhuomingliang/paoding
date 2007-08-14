@@ -64,21 +64,21 @@ public class CJKKnife implements Knife, DictionariesWare {
 				&& offset > 0 && beaf.length() - offset < 50) {
 			return -offset;
 		}
-		/* Àı¾ä:Íõ³çºÆ×¡ÔÚ±±¾©»ıË®Ì¶ÇÅ¸½½ü */
-		// setupºÍendÓÃÓÚ¹æ¶¨ÆäÖ®¼äµÄÎÄ×ÖÊÇ·ñÎª´Êµä´ÊÓï
+		/* ä¾‹å¥:ç‹å´‡æµ©ä½åœ¨åŒ—äº¬ç§¯æ°´æ½­æ¡¥é™„è¿‘ */
+		// setupå’Œendç”¨äºè§„å®šå…¶ä¹‹é—´çš„æ–‡å­—æ˜¯å¦ä¸ºè¯å…¸è¯è¯­
 		int setup, end;
-		// ÎªunidentifiedIndex·şÎñ£¬ÎªÒÑÕÒ³öµÄ´ÊÓï½áÊøÎ»ÖÃµÄ×î´óÕß£¬e.g 'ÔÚ','¾©','ÇÅ','½ü'
+		// ä¸ºunidentifiedIndexæœåŠ¡ï¼Œä¸ºå·²æ‰¾å‡ºçš„è¯è¯­ç»“æŸä½ç½®çš„æœ€å¤§è€…ï¼Œe.g 'åœ¨','äº¬','æ¡¥','è¿‘'
 		int identifiedEnd = offset;
-		// ÓÃÓÚ¶¨Î»Î´ÄÜ·Ö´ÊµÄ¿éµÄ¿ªÊ¼Î»ÖÃ£¬e.g 'Íõ'
+		// ç”¨äºå®šä½æœªèƒ½åˆ†è¯çš„å—çš„å¼€å§‹ä½ç½®ï¼Œe.g 'ç‹'
 		int unidentifiedIndex = -1;
-		// ÓÃÓÚ¸¨ÖúÅĞ¶ÏÊÇ·ñµ÷ÓÃshouldAWord()·½·¨
+		// ç”¨äºè¾…åŠ©åˆ¤æ–­æ˜¯å¦è°ƒç”¨shouldAWord()æ–¹æ³•
 		int maxWordLength = 0;
 		Hit word = null;
 		for (setup = offset, end = offset; setup < beaf.length()
 				&& CharSet.isCjkUnifiedIdeographs(beaf.charAt(setup)); end = ++setup) {
 			for (int count = 1; end < beaf.length()
 					&& CharSet.isCjkUnifiedIdeographs(beaf.charAt(end++)); count++) {
-				// µÚÒ»´ÎforÑ­»·Ê±£¬end=setup+1
+				// ç¬¬ä¸€æ¬¡forå¾ªç¯æ—¶ï¼Œend=setup+1
 				word = vocabulary.search(beaf, setup, count);
 				if (word.isUndefined()) {
 					if (unidentifiedIndex < 0 && setup >= identifiedEnd) {
@@ -98,8 +98,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 					if (setup == offset && maxWordLength < count) {
 						maxWordLength = count;
 					}
-					//gotoNextCharÎªtrue±íÊ¾ÔÚ´ÊµäÖĞ´æÔÚÒÔµ±Ç°´ÊÎª¿ªÍ·µÄ´Ê£¬
-					//±ÈÈç£º¼ÓÈëµ±Ç°´ÊÊÇ"ÖĞ»ª"£¬´Êµä´æÔÚ"ÖĞ»ªÈËÃñ¹úºÍ¹ú"´ÊÒÔËüÎª¿ªÍ·µÄ
+					//gotoNextCharä¸ºtrueè¡¨ç¤ºåœ¨è¯å…¸ä¸­å­˜åœ¨ä»¥å½“å‰è¯ä¸ºå¼€å¤´çš„è¯ï¼Œ
+					//æ¯”å¦‚ï¼šåŠ å…¥å½“å‰è¯æ˜¯"ä¸­å"ï¼Œè¯å…¸å­˜åœ¨"ä¸­åäººæ°‘å›½å’Œå›½"è¯ä»¥å®ƒä¸ºå¼€å¤´çš„
 					boolean gotoNextChar = word.isUnclosed()
 							&& end < beaf.length()
 							&& beaf.charAt(end) >= word.getNext().charAt(count);
@@ -117,13 +117,13 @@ public class CJKKnife implements Knife, DictionariesWare {
 		if (len > 2 && len != maxWordLength && shouldAWord(beaf, offset, end)) {
 			collect(collector, beaf, offset, end);
 		}
-		return setup;// ´ËÊ±end=start
+		return setup;// æ­¤æ—¶end=start
 	}
 
 	// -------------------------------------------------
 
 	/**
-	 * ¶Ô·Ç´Ê»ã±íÖĞµÄ×Ö´Ê·Ö´Ê
+	 * å¯¹éè¯æ±‡è¡¨ä¸­çš„å­—è¯åˆ†è¯
 	 * 
 	 * @param cellector
 	 * @param beaf
@@ -151,18 +151,18 @@ public class CJKKnife implements Knife, DictionariesWare {
 				i++;
 				continue;
 			}
-			// Í·×Ö
+			// å¤´å­—
 			if (i == offset) {
-				// °Ù¶ÈÃÅÊÂ¼ş=°Ù¶È+ÃÅ+...!=°Ù¶È+ÃÅÊÂ+...
+				// ç™¾åº¦é—¨äº‹ä»¶=ç™¾åº¦+é—¨+...!=ç™¾åº¦+é—¨äº‹+...
 				collect(collector, beaf, offset, offset + 1);
 			}
-			// Î²×Ö
+			// å°¾å­—
 			if (i == nearEnd) {
 				if (nearEnd != offset) {
 					collect(collector, beaf, nearEnd, end);
 				}
 			}
-			// Çî¾¡¶şÔª·Ö´Ê
+			// ç©·å°½äºŒå…ƒåˆ†è¯
 			else {
 				collect(collector, beaf, i, i + 2);
 			}
@@ -171,15 +171,29 @@ public class CJKKnife implements Knife, DictionariesWare {
 	}
 
 	protected boolean shouldAWord(CharSequence beaf, int offset, int end) {
-		if (offset > 0 && end < beaf.length()) {// È·±£Ç°ÓĞ×Ö·û£¬ºóÒ²ÓĞ×Ö·û
+		if (offset > 0 && end < beaf.length()) {// ç¡®ä¿å‰æœ‰å­—ç¬¦ï¼Œåä¹Ÿæœ‰å­—ç¬¦
 			int prev = offset - 1;
-			if (beaf.charAt(prev) == '¡°' && beaf.charAt(end) == '¡±') {
+			//ä¸­æ–‡å•åŒå¼•å·
+			if (beaf.charAt(prev) == 'â€œ' && beaf.charAt(end) == 'â€') {
 				return true;
-			} else if (beaf.charAt(prev) == '¡®' && beaf.charAt(end) == '¡¯') {
+			} else if (beaf.charAt(prev) == 'â€˜' && beaf.charAt(end) == 'â€™') {
 				return true;
-			} else if (beaf.charAt(prev) == '\'' && beaf.charAt(end) == '\'') {
+			}
+			//è‹±æ–‡å•åŒå¼•å·
+			else if (beaf.charAt(prev) == '\'' && beaf.charAt(end) == '\'') {
 				return true;
 			} else if (beaf.charAt(prev) == '\"' && beaf.charAt(end) == '\"') {
+				return true;
+			}
+			//ä¸­æ–‡ä¹¦åå·
+			else if (beaf.charAt(prev) == 'ã€Š' && beaf.charAt(end) == 'ã€‹') {
+				return true;
+			} 
+			else if (beaf.charAt(prev) == 'ã€ˆ' && beaf.charAt(end) == 'ã€‰') {
+				return true;
+			} 
+			//è‹±æ–‡å°–æ‹¬å·
+			else if (beaf.charAt(prev) == '<' && beaf.charAt(end) == '>') {
 				return true;
 			}
 		}
@@ -213,11 +227,11 @@ public class CJKKnife implements Knife, DictionariesWare {
 		int cur = offset;
 		int bitValue = 0;
 		int maxUnit = 0;
-		boolean hasDigit = false;// ×÷ÓÃ£ºÈ¥³ıÃ»ÓĞÊı×ÖÖ»ÓĞµ¥Î»µÄºº×Ö£¬Èç¡°Íò¡±£¬¡°Ç§¡±
+		boolean hasDigit = false;// ä½œç”¨ï¼šå»é™¤æ²¡æœ‰æ•°å­—åªæœ‰å•ä½çš„æ±‰å­—ï¼Œå¦‚â€œä¸‡â€ï¼Œâ€œåƒâ€
 		for (; cur <= end && (bitValue = toNumber(beaf.charAt(cur))) >= 0; cur++) {
 			if (bitValue == 2
-					&& (beaf.charAt(cur) == 'Á½' || beaf.charAt(cur) == 'Á©' || beaf
-							.charAt(cur) == '‚z')) {
+					&& (beaf.charAt(cur) == 'ä¸¤' || beaf.charAt(cur) == 'ä¿©' || beaf
+							.charAt(cur) == 'å€†')) {
 				if (cur != offset)
 					break;
 			}
@@ -264,7 +278,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		if (number1 >= 0) {
 			collector.collect(String.valueOf(number1), offset, cur);
 
-			// ºóÃæ¿ÉÄÜ¸úÁË¼ÆÁ¿µ¥Î»
+			// åé¢å¯èƒ½è·Ÿäº†è®¡é‡å•ä½
 			Hit wd;
 			int i = cur + 1;
 			while (i <= beaf.length()
@@ -283,52 +297,52 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 	private final int toNumber(char c) {
 		switch (c) {
-		case 'Áã':
-		case '©–':
+		case 'é›¶':
+		case 'ã€‡':
 			return 0;
-		case 'Ò»':
-		case 'Ò¼':
+		case 'ä¸€':
+		case 'å£¹':
 			return 1;
-		case '¶ş':
-		case 'Á½':
-		case 'Á©':
-		case 'ÙE':
+		case 'äºŒ':
+		case 'ä¸¤':
+		case 'ä¿©':
+		case 'è²³':
 			return 2;
-		case 'Èı':
-		case 'Èş':
+		case 'ä¸‰':
+		case 'å':
 			return 3;
-		case 'ËÄ':
-		case 'ËÁ':
+		case 'å››':
+		case 'è‚†':
 			return 4;
-		case 'Îå':
-		case 'Îé':
+		case 'äº”':
+		case 'ä¼':
 			return 5;
-		case 'Áù':
-		case 'ê‘':
+		case 'å…­':
+		case 'é™¸':
 			return 6;
-		case 'Æâ':
-		case 'Æß':
+		case 'æŸ’':
+		case 'ä¸ƒ':
 			return 7;
-		case '°Æ':
-		case '°Ë':
+		case 'æŒ':
+		case 'å…«':
 			return 8;
-		case '¾Å':
-		case '¾Á':
+		case 'ä¹':
+		case 'ç–':
 			return 9;
-		case 'Ê®':
-		case 'Ê²':
+		case 'å':
+		case 'ä»€':
 			return 10;
-		case '°Ù':
-		case '°Û':
+		case 'ç™¾':
+		case 'ä½°':
 			return 100;
-		case 'Ç§':
-		case 'Çª':
+		case 'åƒ':
+		case 'ä»Ÿ':
 			return 1000;
-		case 'Íò':
-		case 'Èf':
+		case 'ä¸‡':
+		case 'è¬':
 			return 10000;
-		case 'ÒÚ':
-		case 'ƒ|':
+		case 'äº¿':
+		case 'å„„':
 			return 100000000;
 		default:
 			return -1;
