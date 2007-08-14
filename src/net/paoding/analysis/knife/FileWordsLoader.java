@@ -56,8 +56,8 @@ public class FileWordsLoader {
 	public void setProperties(Properties p) {
 		// dicHome
 		this.dicHome = p.getProperty(Constants.DIC_HOME, "dic/");
-		// dicHome = dicHome.replaceAll("\\", "/");
-		if (!dicHome.endsWith("/")) {
+		this.dicHome = this.dicHome.replace('\\', '/');
+		if (!this.dicHome.endsWith("/")) {
 			this.dicHome = this.dicHome + "/";
 		}
 		log.info(Constants.DIC_HOME + "=" + this.dicHome);
