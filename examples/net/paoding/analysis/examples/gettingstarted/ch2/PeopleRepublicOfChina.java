@@ -35,14 +35,14 @@ public class PeopleRepublicOfChina {
 		}
 		// 将庖丁封装成符合Lucene要求的Analyzer规范
 		Paoding paoding = PaodingMaker.make();
-		Analyzer writerAnalyzer = PaodingAnalyzer.writerMode(paoding);
+		Analyzer analyzer = PaodingAnalyzer.writerMode(paoding);
 		
 		//读取本类目录下的text.txt文件
 		String content = ContentReader.readText(PeopleRepublicOfChina.class);
 
 		//接下来是标准的Lucene建立索引和检索的代码
 		Directory ramDir = new RAMDirectory();
-		IndexWriter writer = new IndexWriter(ramDir, writerAnalyzer);
+		IndexWriter writer = new IndexWriter(ramDir, analyzer);
 		Document doc = new Document();
 		Field fd = new Field(FIELD_NAME, content, Field.Store.YES,
 				Field.Index.TOKENIZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
@@ -53,8 +53,7 @@ public class PeopleRepublicOfChina {
 
 		IndexReader reader = IndexReader.open(ramDir);
 		String queryString = QUERY;
-		QueryParser parser = new QueryParser(FIELD_NAME, PaodingAnalyzer
-				.queryMode(paoding));
+		QueryParser parser = new QueryParser(FIELD_NAME, analyzer);
 		Query query = parser.parse(queryString);
 		Searcher searcher = new IndexSearcher(ramDir);
 		query = query.rewrite(reader);
