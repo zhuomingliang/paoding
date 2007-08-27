@@ -17,7 +17,7 @@ package net.paoding.analysis.knife;
 
 import static net.paoding.analysis.Constants.DIC_CHARSET;
 import static net.paoding.analysis.Constants.DIC_CONFUCIAN_FAMILY_NAME;
-import static net.paoding.analysis.Constants.DIC_DETECTION_INTERVAL;
+import static net.paoding.analysis.Constants.DIC_DETECTOR_INTERVAL;
 import static net.paoding.analysis.Constants.DIC_HOME;
 import static net.paoding.analysis.Constants.DIC_NOISE_CHARACTOR;
 import static net.paoding.analysis.Constants.DIC_NOISE_WORD;
@@ -214,7 +214,7 @@ public class PaodingMaker {
 			paodingHolder.remove(paodingKey);
 		}
 		String dicHomeAbsolutePath = p.getProperty("paoding.dic.home.absolute.path");
-		String interval = getProperty(p, DIC_DETECTION_INTERVAL);
+		String interval = getProperty(p, DIC_DETECTOR_INTERVAL);
 		paoding = new Paoding();
 		paoding.setDicHomeAbsolutePath(dicHomeAbsolutePath);
 		paoding.setInterval(Integer.parseInt(interval));

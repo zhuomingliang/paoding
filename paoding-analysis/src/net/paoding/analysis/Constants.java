@@ -41,8 +41,8 @@ public class Constants {
 	public static final String DIC_CONFUCIAN_FAMILY_NAME_DEFAULT = "x-confucian-family-name";
 
 	// like "Wang", "Zhang", ...
-	public static final String DIC_DETECTION_INTERVAL = "paoding.dic.detection.interval";
-	public static final String DIC_DETECTION_INTERVAL_DEFAULT = "60";
+	public static final String DIC_DETECTOR_INTERVAL = "paoding.dic.detector.interval";
+	public static final String DIC_DETECTOR_INTERVAL_DEFAULT = "60";
 
 	private static final Map<String, String> map = new HashMap<String, String>();
 	
@@ -54,7 +54,7 @@ public class Constants {
 		map.put(DIC_NOISE_WORD, DIC_NOISE_WORD_DEFAULT);
 		map.put(DIC_UNIT, DIC_UNIT_DEFAULT);
 		map.put(DIC_CONFUCIAN_FAMILY_NAME, DIC_CONFUCIAN_FAMILY_NAME_DEFAULT);
-		map.put(DIC_DETECTION_INTERVAL, DIC_DETECTION_INTERVAL_DEFAULT);
+		map.put(DIC_DETECTOR_INTERVAL, DIC_DETECTOR_INTERVAL_DEFAULT);
 	}
 
 	//
