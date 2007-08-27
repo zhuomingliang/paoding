@@ -17,9 +17,8 @@ package net.paoding.analysis.dictionary.support.filewords;
 
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.Map;
-
+import java.util.Set;
 
 /**
  * 
@@ -29,40 +28,36 @@ import java.util.Map;
  * 
  */
 public class SimpleReadListener implements ReadListener {
-	private Map<String, LinkedList<String>> dics = new Hashtable<String, LinkedList<String>>();
-	private LinkedList<String> sortedWords;
-	private HashSet<String> setSortedWords;
-	
+	private Map<String, Set<String>> dics = new Hashtable<String, Set<String>>();
+	// 保证不会重复
+	private HashSet<String> words = new HashSet<String>();
+
 	public boolean onFileBegin(String file) {
-		if (!file.endsWith(".dic")){
+		if (!file.endsWith(".dic")) {
 			return false;
 		}
-		sortedWords = new LinkedList<String>();
-		setSortedWords = new HashSet<String>();
+		words = new HashSet<String>();
 		return true;
 	}
 
 	public void onFileEnd(String file) {
 		String name = file.substring(0, file.length() - 4);
-		dics.put(name, sortedWords);
-		setSortedWords = null;
-		sortedWords = null;
+		dics.put(name, words);
+		words = null;
 	}
 
 	public void onWord(String word) {
 		word = word.trim().toLowerCase();
-		if (word.length() == 0 
-				|| word.charAt(0) == '#'
+		if (word.length() == 0 || word.charAt(0) == '#'
 				|| word.charAt(0) == '-') {
 			return;
 		}
-		//保证不会重复
-		if (setSortedWords.add(word)) {
-			sortedWords.add(word);
-		}
+
+		words.add(word);
 	}
-	public Map<String, LinkedList<String>> getResult(){
+
+	public Map<String, Set<String>> getResult() {
 		return dics;
 	}
-	
+
 }

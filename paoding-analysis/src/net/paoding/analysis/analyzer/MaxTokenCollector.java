@@ -28,7 +28,7 @@ import org.apache.lucene.analysis.Token;
  * 
  * @since 1.1
  */
-public class QueryTokenCollector implements TokenCollector {
+public class MaxTokenCollector implements TokenCollector {
 
 	/**
 	 * 存储当前被knife分解而成的Token对象

@@ -45,10 +45,10 @@ public class CJKKnife implements Knife, DictionariesWare {
 	
 //	@Override
 	public void setDictionaries(Dictionaries dictionaries) {
-		vocabulary = dictionaries.getVocabulary();
-		noiseWords = dictionaries.getNoiseWords();
-		noiseCharactors = dictionaries.getNoiseCharactors();
-		units = dictionaries.getUnits();
+		vocabulary = dictionaries.getVocabularyDictionary();
+		noiseWords = dictionaries.getNoiseWordsDictionary();
+		noiseCharactors = dictionaries.getNoiseCharactorsDictionary();
+		units = dictionaries.getUnitsDictionary();
 	}
 
 	// -------------------------------------------------
@@ -59,12 +59,12 @@ public class CJKKnife implements Knife, DictionariesWare {
 		return CharSet.isCjkUnifiedIdeographs(beaf.charAt(index));
 	}
 
-	public int dissect(Collector collector, CharSequence beaf, int offset) {
-		if (CharSet.isCjkUnifiedIdeographs(beaf.charAt(beaf.length() - 1))
-				&& offset > 0 && beaf.length() - offset < 50) {
+	public int dissect(Collector collector, CharSequence beef, int offset) {
+		if (CharSet.isCjkUnifiedIdeographs(beef.charAt(beef.length() - 1))
+				&& offset > 0 && beef.length() - offset < 50) {
 			return -offset;
 		}
-		/* 例句:王崇浩住在北京积水潭桥附近 */
+		/* 例句:王宜家住在北京积水潭桥附近 */
 		// setup和end用于规定其之间的文字是否为词典词语
 		int setup, end;
 		// 为unidentifiedIndex服务，为已找出的词语结束位置的最大者，e.g '在','京','桥','近'
@@ -74,12 +74,12 @@ public class CJKKnife implements Knife, DictionariesWare {
 		// 用于辅助判断是否调用shouldAWord()方法
 		int maxWordLength = 0;
 		Hit word = null;
-		for (setup = offset, end = offset; setup < beaf.length()
-				&& CharSet.isCjkUnifiedIdeographs(beaf.charAt(setup)); end = ++setup) {
-			for (int count = 1; end < beaf.length()
-					&& CharSet.isCjkUnifiedIdeographs(beaf.charAt(end++)); count++) {
+		for (setup = offset, end = offset; setup < beef.length()
+				&& CharSet.isCjkUnifiedIdeographs(beef.charAt(setup)); end = ++setup) {
+			for (int count = 1; end < beef.length()
+					&& CharSet.isCjkUnifiedIdeographs(beef.charAt(end++)); count++) {
 				// 第一次for循环时，end=setup+1
-				word = vocabulary.search(beaf, setup, count);
+				word = vocabulary.search(beef, setup, count);
 				if (word.isUndefined()) {
 					if (unidentifiedIndex < 0 && setup >= identifiedEnd) {
 						unidentifiedIndex = setup;
@@ -90,19 +90,27 @@ public class CJKKnife implements Knife, DictionariesWare {
 						identifiedEnd = end;
 					}
 					if (unidentifiedIndex >= 0) {
-						dissectUnidentified(collector, beaf, unidentifiedIndex,
+						dissectUnidentified(collector, beef, unidentifiedIndex,
 								setup - unidentifiedIndex);
 						unidentifiedIndex = -1;
 					}
-					collector.collect(word.getWord(), setup, end);
+					//如果切出来的词是noise词，则抛弃-此功能在此被抛弃，
+					//理由：避免每一个分出来的词还得在从noise词典去检索
+					//约束：词汇表设置进来，就要把这些noise词、字移出去，使不会把noise词、字切出来
+					//这样，这些noise词、字将被视为Unidentified的一部分，在dissectUnidentified中处理
+					//dissectUnidentified能够辨别哪些是noise词和字，不对他们进行二元切分。
+					//Hit noiseWordsHit = noiseWords.search(beef, setup, count);
+					//if (!noiseWordsHit.isHit()) {
+						collector.collect(word.getWord(), setup, end);
+					//}
 					if (setup == offset && maxWordLength < count) {
 						maxWordLength = count;
 					}
 					//gotoNextChar为true表示在词典中存在以当前词为开头的词，
 					//比如：加入当前词是"中华"，词典存在"中华人民国和国"词以它为开头的
 					boolean gotoNextChar = word.isUnclosed()
-							&& end < beaf.length()
-							&& beaf.charAt(end) >= word.getNext().charAt(count);
+							&& end < beef.length()
+							&& beef.charAt(end) >= word.getNext().charAt(count);
 					if (!gotoNextChar) {
 						break;
 					}
@@ -110,12 +118,12 @@ public class CJKKnife implements Knife, DictionariesWare {
 			}
 		}
 		if (identifiedEnd != end) {
-			dissectUnidentified(collector, beaf, identifiedEnd, end
+			dissectUnidentified(collector, beef, identifiedEnd, end
 					- identifiedEnd);
 		}
 		int len = end - offset;
-		if (len > 2 && len != maxWordLength && shouldAWord(beaf, offset, end)) {
-			collect(collector, beaf, offset, end);
+		if (len > 2 && len != maxWordLength && shouldAWord(beef, offset, end)) {
+			collect(collector, beef, offset, end);
 		}
 		return setup;// 此时end=start
 	}
