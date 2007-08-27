@@ -27,7 +27,7 @@ import org.apache.lucene.analysis.Token;
  *
  * @since 1.1
  */
-public class WriterTokenCollector implements TokenCollector {
+public class DefaultTokenCollector implements TokenCollector {
 
 	/**
 	 * 存储当前被knife分解而成的Token对象

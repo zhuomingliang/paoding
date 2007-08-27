@@ -19,33 +19,33 @@ public interface Dictionaries {
 	 * 
 	 * @return
 	 */
-	public Dictionary getVocabulary();
+	public Dictionary getVocabularyDictionary();
 
 	/**
 	 * 姓氏字典
 	 * 
 	 * @return
 	 */
-	public Dictionary getConfucianFamilyNames();
+	public Dictionary getConfucianFamilyNamesDictionary();
 
 	/**
 	 * 忽略的词语
 	 * 
 	 * @return
 	 */
-	public Dictionary getNoiseCharactors();
+	public Dictionary getNoiseCharactorsDictionary();
 
 	/**
 	 * 忽略的单字
 	 * 
 	 * @return
 	 */
-	public Dictionary getNoiseWords();
+	public Dictionary getNoiseWordsDictionary();
 
 	/**
 	 * 计量单位
 	 * 
 	 * @return
 	 */
-	public Dictionary getUnits();
+	public Dictionary getUnitsDictionary();
 }

@@ -51,14 +51,14 @@ public class PaodingAnalyzer extends Analyzer {
 	// -------------------------------------------------
 
 	/**
-	 * 该模式在建立索引时使用，能够使分析器对每个可能的词语建立索引
+	 * 最大切分和最小切分兼有
 	 */
-	public static final int WRITER_MODE = 1;
+	public static final int DEFAULT_MODE = 1;
 
 	/**
-	 * 该模式在用户搜索时使用，使用户检索的结果匹配度最大化
+	 * 按最大切分
 	 */
-	public static final int QUERY_MODE = 2;
+	public static final int MAX_MODE = 2;
 
 	// -------------------------------------------------
 	/**
@@ -70,10 +70,10 @@ public class PaodingAnalyzer extends Analyzer {
 	private Knife knife;
 
 	/**
-	 * @see #WRITER_MODE
-	 * @see #QUERY_MODE
+	 * @see #DEFAULT_MODE
+	 * @see #MAX_MODE
 	 */
-	private int mode = WRITER_MODE;
+	private int mode = DEFAULT_MODE;
 
 	// -------------------------------------------------
 
@@ -112,13 +112,13 @@ public class PaodingAnalyzer extends Analyzer {
 		this.setMode(mode);
 	}
 
-	public static PaodingAnalyzer writerMode(Knife knife) {
-		return new PaodingAnalyzer(knife, WRITER_MODE);
+	public static PaodingAnalyzer defaultMode(Knife knife) {
+		return new PaodingAnalyzer(knife, DEFAULT_MODE);
 	}
 	
 	
-	public static PaodingAnalyzer queryMode(Knife knife) {
-		return new PaodingAnalyzer(knife, QUERY_MODE);
+	public static PaodingAnalyzer maxMode(Knife knife) {
+		return new PaodingAnalyzer(knife, MAX_MODE);
 	}
 
 	// -------------------------------------------------
@@ -148,11 +148,11 @@ public class PaodingAnalyzer extends Analyzer {
 	}
 	
 	public void setMode(String mode) {
-		if ("writer".equalsIgnoreCase(mode)){
-			this.mode = WRITER_MODE;
+		if ("default".equalsIgnoreCase(mode)){
+			this.mode = DEFAULT_MODE;
 		}
-		else if ("query".equalsIgnoreCase(mode)){
-			this.mode = QUERY_MODE;
+		else if ("max".equalsIgnoreCase(mode)){
+			this.mode = MAX_MODE;
 		}
 	}
 
@@ -169,10 +169,10 @@ public class PaodingAnalyzer extends Analyzer {
 
 	protected TokenCollector createTokenCollector() {
 		switch (mode) {
-		case WRITER_MODE:
-			return new WriterTokenCollector();
-		case QUERY_MODE:
-			return new QueryTokenCollector();
+		case DEFAULT_MODE:
+			return new DefaultTokenCollector();
+		case MAX_MODE:
+			return new MaxTokenCollector();
 		default:
 			throw new IllegalArgumentException("wrong mode");
 		}

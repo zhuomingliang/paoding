@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class FileWordsReader {
 
-	public static Map<String, LinkedList<String>> readWords(
+	public static Map<String, Set<String>> readWords(
 			String fileOrDirectory, String charsetName) throws IOException {
 		SimpleReadListener l = new SimpleReadListener();
 		readWords(fileOrDirectory, l, charsetName);
@@ -55,6 +56,9 @@ public class FileWordsReader {
 		}
 		else {
 			file = new File(fileOrDirectory);
+			if (!file.exists()) {
+				throw new FileNotFoundException("file \"" + fileOrDirectory + "\" not found!");
+			}
 		}
 		ArrayList<File> dirs = new ArrayList<File>();
 		LinkedList<File> dics = new LinkedList<File>();

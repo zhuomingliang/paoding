@@ -36,7 +36,7 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 
 //	@Override
 	public void setDictionaries(Dictionaries dictionaries) {
-		units = dictionaries.getUnits();
+		units = dictionaries.getUnitsDictionary();
 	}
 
 	public boolean assignable(CharSequence beaf, int index) {

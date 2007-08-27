@@ -35,7 +35,7 @@ public class Chinese {
 		}
 		// 将庖丁封装成符合Lucene要求的Analyzer规范
 		Paoding paoding = PaodingMaker.make();
-		Analyzer analyzer = PaodingAnalyzer.writerMode(paoding);
+		Analyzer analyzer = PaodingAnalyzer.defaultMode(paoding);
 		
 		//读取本类目录下的text.txt文件
 		String content = ContentReader.readText(Chinese.class);
