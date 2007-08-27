@@ -43,8 +43,8 @@ import org.apache.lucene.analysis.Tokenizer;
  * 
  * @see Collector
  * @see TokenCollector
- * @see QueryTokenCollector
- * @see WriterTokenCollector
+ * @see MAxTokenCollector
+ * @see DefaultTokenCollector
  * 
  * @since 1.0
  */

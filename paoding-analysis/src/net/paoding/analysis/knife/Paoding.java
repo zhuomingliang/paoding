@@ -15,7 +15,7 @@
  */
 package net.paoding.analysis.knife;
 
-import net.paoding.analysis.dictionary.support.detection.Detection;
+import net.paoding.analysis.dictionary.support.detection.Detector;
 import net.paoding.analysis.dictionary.support.detection.Difference;
 import net.paoding.analysis.dictionary.support.detection.DifferenceListener;
 import net.paoding.analysis.dictionary.support.detection.ExtensionFileFilter;
@@ -43,7 +43,7 @@ public class Paoding extends SmartKnifeBox implements Knife {
 	
 	private int interval;
 	
-	private Detection detection;
+	private Detector detector;
 
 	private Snapshot lastSnapshot;
 
@@ -89,17 +89,17 @@ public class Paoding extends SmartKnifeBox implements Knife {
 	 * 默认为60秒。如果设置为０或负数则表示不需要进行检测
 	 */
 	public synchronized void startDetecting() {
-		if (detection != null || interval < 0) {
+		if (detector != null || interval < 0) {
 			return;
 		}
-		Detection detection = new Detection();
-		detection.setHome(dicHomeAbsolutePath);
-		detection.setFilter(new ExtensionFileFilter(".dic"));
-		detection.setLastSnapshot(detection.flash());
-		setLastSnapshot(detection.getLastSnapshot());
+		Detector detector = new Detector();
+		detector.setHome(dicHomeAbsolutePath);
+		detector.setFilter(new ExtensionFileFilter(".dic"));
+		detector.setLastSnapshot(detector.flash());
+		setLastSnapshot(detector.getLastSnapshot());
 		final DifferenceListener l = new FileDictionariesDifferenceListener(
 				dictionaries, this);
-		detection.setListener(new DifferenceListener() {
+		detector.setListener(new DifferenceListener() {
 			public boolean on(Difference diff) {
 				boolean b = l.on(diff);
 				if (b) {
@@ -108,28 +108,28 @@ public class Paoding extends SmartKnifeBox implements Knife {
 				return b;
 			}
 		});
-		detection.setInterval(interval);
-		detection.start(true);
-		this.detection = detection;
+		detector.setInterval(interval);
+		detector.start(true);
+		this.detector = detector;
 	}
 
 	public synchronized void stopDetecting() {
-		if (detection == null) {
+		if (detector == null) {
 			return;
 		}
-		detection.setStop();
-		detection = null;
+		detector.setStop();
+		detector = null;
 	}
 
 	public void forceDetecting() {
-		final Detection detection = new Detection();
-		detection.setHome(this.dicHomeAbsolutePath);
-		detection.setFilter(new ExtensionFileFilter(".dic"));
+		final Detector detector = new Detector();
+		detector.setHome(this.dicHomeAbsolutePath);
+		detector.setFilter(new ExtensionFileFilter(".dic"));
 		final DifferenceListener l = new FileDictionariesDifferenceListener(
 				dictionaries, this);
-		detection.setListener(new DifferenceListener() {
+		detector.setListener(new DifferenceListener() {
 			public boolean on(Difference diff) {
-				detection.setStop();
+				detector.setStop();
 				boolean b = l.on(diff);
 				if (b) {
 					lastSnapshot = diff.getYounger();
@@ -137,9 +137,9 @@ public class Paoding extends SmartKnifeBox implements Knife {
 				return b;
 			}
 		});
-		detection.setInterval(1);
-		detection.setLastSnapshot(lastSnapshot);
-		detection.start(true);
+		detector.setInterval(1);
+		detector.setLastSnapshot(lastSnapshot);
+		detector.start(true);
 	}
 
 	/**
@@ -147,12 +147,12 @@ public class Paoding extends SmartKnifeBox implements Knife {
 	 * 直到检查到是否有了更新，以及做了相应的更新后才返回本方法。
 	 */
 	public void forceDetectingAndWaiting() {
-		Detection detection = new Detection();
-		detection.setHome(this.dicHomeAbsolutePath);
-		detection.setFilter(new ExtensionFileFilter(".dic"));
+		Detector detector = new Detector();
+		detector.setHome(this.dicHomeAbsolutePath);
+		detector.setFilter(new ExtensionFileFilter(".dic"));
 		final DifferenceListener l = new FileDictionariesDifferenceListener(
 				dictionaries, this);
-		detection.setListener(new DifferenceListener() {
+		detector.setListener(new DifferenceListener() {
 			public boolean on(Difference diff) {
 				boolean b = l.on(diff);
 				if (b) {
@@ -161,8 +161,8 @@ public class Paoding extends SmartKnifeBox implements Knife {
 				return b;
 			}
 		});
-		detection.setLastSnapshot(lastSnapshot);
-		detection.forceDetecting();
+		detector.setLastSnapshot(lastSnapshot);
+		detector.forceDetecting();
 	}
 
 }
