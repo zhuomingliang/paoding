@@ -25,18 +25,23 @@ public class Detection implements Runnable {
 
 	private long interval;
 
-	private Snapshot last;
+	private Snapshot lastSnapshot;
+	
+	private Thread thread;
+
+	private boolean alive = true;
 
 	public void setListener(DifferenceListener listener) {
 		this.listener = listener;
 	}
-	
+
 	public Detection() {
 	}
-	
+
 	/**
 	 * 检查间隔
-	 * @param interval 
+	 * 
+	 * @param interval
 	 */
 	public void setInterval(int interval) {
 		this.interval = interval * 1000;
@@ -46,36 +51,65 @@ public class Detection implements Runnable {
 		this.home = home;
 	}
 
+	public void setHome(String home) {
+		this.home = new File(home);
+	}
+
 	public void setFilter(FileFilter filter) {
 		this.filter = filter;
 	}
+	
+	public Snapshot flash(){
+		return Snapshot.flash(home, filter);
+	}
 
 	public void start(boolean daemon) {
-		last = Snapshot.flash(home, filter);
-		Thread t = new Thread(this);
-		t.setDaemon(daemon);
-		t.start();
+		if (lastSnapshot == null) {
+			lastSnapshot = flash();
+		}
+		thread = new Thread(this);
+		thread.setDaemon(daemon);
+		thread.start();
+	}
+	
+	
+	public Snapshot getLastSnapshot() {
+		return lastSnapshot;
+	}
+	
+	public void setLastSnapshot(Snapshot last) {
+		this.lastSnapshot = last;
 	}
 
 	public void run() {
-		if (interval <= 0) 
-			throw new IllegalArgumentException("should set a interval(>0) for the detection.");
-		while (true) {
+		if (interval <= 0)
+			throw new IllegalArgumentException(
+					"should set a interval(>0) for the detection.");
+		while (alive) {
 			sleep();
-			Snapshot current = Snapshot.flash(home, filter);
-			Difference diff = current.diff(last);
-			if (!diff.isEmpty()) {
-				try {
-					if (listener.on(diff)) {
-						log.info("detected differen in " + home);
-						log.info(diff);
-						last = current;
-					}
-				} catch (Exception e) {
-					log.error(e);
+			forceDetecting();
+		}
+	}
+
+	public void forceDetecting() {
+		Snapshot current = flash();
+		Difference diff = current.diff(lastSnapshot);
+		if (!diff.isEmpty()) {
+			try {
+				if (listener.on(diff)) {
+					log.info("found differen for " + home);
+					log.info(diff);
+					lastSnapshot = current;
 				}
+			} catch (Exception e) {
+				log.error(e);
 			}
 		}
+	}
+
+	public void setStop() {
+		alive = false;
+		thread = null;
 	}
 
 	private void sleep() {

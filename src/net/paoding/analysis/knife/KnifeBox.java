@@ -49,8 +49,8 @@ public class KnifeBox implements Knife {
 	}
 
 	public List<Knife> getKnives() {
-		ArrayList<Knife> knives = new ArrayList<Knife>();
-		knives.addAll(this.knives);
+//		ArrayList<Knife> knives = new ArrayList<Knife>();
+//		knives.addAll(this.knives);
 		return knives;
 	}
 

@@ -15,14 +15,19 @@
  */
 package net.paoding.analysis.knife;
 
+import static net.paoding.analysis.Constants.DIC_CHARSET;
+import static net.paoding.analysis.Constants.DIC_CONFUCIAN_FAMILY_NAME;
 import static net.paoding.analysis.Constants.DIC_DETECTION_INTERVAL;
 import static net.paoding.analysis.Constants.DIC_HOME;
+import static net.paoding.analysis.Constants.DIC_NOISE_CHARACTOR;
+import static net.paoding.analysis.Constants.DIC_NOISE_WORD;
+import static net.paoding.analysis.Constants.DIC_SKIP_PREFIX;
+import static net.paoding.analysis.Constants.DIC_UNIT;
 import static net.paoding.analysis.Constants.KNIFE_CLASS;
 import static net.paoding.analysis.Constants.getProperty;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -31,9 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import net.paoding.analysis.dictionary.support.detection.Detection;
-import net.paoding.analysis.dictionary.support.detection.ExtensionFileFilter;
-import net.paoding.analysis.dictionary.support.filewords.FileWordsReader;
+import net.paoding.analysis.Constants;
 import net.paoding.analysis.exception.PaodingAnalysisException;
 
 import org.apache.commons.logging.Log;
@@ -54,6 +57,8 @@ public class PaodingMaker {
 	private static ObjectHolder<Properties> propertiesHolder = new ObjectHolder<Properties>();
 
 	private static ObjectHolder<Paoding> paodingHolder = new ObjectHolder<Paoding>();
+
+	// ----------------获取Paoding对象的方法-----------------------
 
 	/**
 	 * 
@@ -89,7 +94,7 @@ public class PaodingMaker {
 	 * @return
 	 */
 	public static Paoding make(String propertiesPath) {
-		return implMake(loadProperties(propertiesPath));
+		return make(loadProperties(propertiesPath));
 	}
 
 	/**
@@ -100,7 +105,35 @@ public class PaodingMaker {
 	 * @return
 	 */
 	public static Paoding make(Properties p) {
+		preheatProperties(p);
 		return implMake(p);
+	}
+
+	// -------------------私有 或 辅助方法----------------------------------
+
+	private static void preheatProperties(Properties p) {
+
+		if (p.getProperty("paoding.dic.home.absolute.path") == null) {
+			String dicHome = getProperty(p, DIC_HOME);
+			File dicHomeFile;
+			if (dicHome.startsWith("classpath:")) {
+				String name = dicHome.substring("classpath:".length());
+				URL url = PaodingMaker.class.getClassLoader().getResource(name);
+				if (url == null) {
+					throw new PaodingAnalysisException("file \"" + name
+							+ "\" not found in classpath!");
+				}
+				dicHomeFile = new File(url.getFile());
+			} else {
+				dicHomeFile = new File(dicHome);
+				if (!dicHomeFile.exists()) {
+					throw new PaodingAnalysisException("Not found " + dicHome
+							+ " in system.");
+				}
+			}
+			p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
+					.getAbsolutePath());
+		}
 	}
 
 	// --------------------------------------------------
@@ -162,7 +195,7 @@ public class PaodingMaker {
 
 	@SuppressWarnings("unchecked")
 	private static Paoding implMake(Properties p) {
-		Paoding paoding = null;
+		Paoding paoding;
 		Object paodingKey;
 		// paoding.dic.properties.path这个属性由系统自动设置，不需要外部指定
 		String propertiesFileId = p.getProperty("paoding.dic.properties.path");
@@ -180,12 +213,30 @@ public class PaodingMaker {
 		} else {
 			paodingHolder.remove(paodingKey);
 		}
+		String dicHomeAbsolutePath = p.getProperty("paoding.dic.home.absolute.path");
+		String interval = getProperty(p, DIC_DETECTION_INTERVAL);
 		paoding = new Paoding();
+		paoding.setDicHomeAbsolutePath(dicHomeAbsolutePath);
+		paoding.setInterval(Integer.parseInt(interval));
 		try {
 			// 包装字典。
 			// 将自动寻找，若存在则读取类路径中的paoding-analysis.properties文件
 			// 若不存在该配置文件，则一切使用默认设置，即字典在文件系统当前路径的dic下(非类路径dic下)
-			Dictionaries dictionaries = new FileDictionaries(p);
+
+			String dicHome = getProperty(p, DIC_HOME);
+			String skipPrefix = getProperty(p, DIC_SKIP_PREFIX);
+			String noiseCharactor = getProperty(p, DIC_NOISE_CHARACTOR);
+			String noiseWord = getProperty(p, DIC_NOISE_WORD);
+			String unit = getProperty(p, DIC_UNIT);
+			String confucianFamilyName = getProperty(p,	DIC_CONFUCIAN_FAMILY_NAME);
+			String charsetName = getProperty(p, DIC_CHARSET);
+			
+			log.debug(Constants.DIC_HOME + "=" + dicHome);
+
+			Dictionaries dictionaries = new FileDictionaries(dicHome,
+					skipPrefix, noiseCharactor, noiseWord, unit,
+					confucianFamilyName, charsetName);
+			paoding.setDictionaries(dictionaries);
 			Enumeration names = p.propertyNames();
 			while (names.hasMoreElements()) {
 				String name = (String) names.nextElement();
@@ -204,30 +255,9 @@ public class PaodingMaker {
 				}
 			}
 			paodingHolder.set(paodingKey, paoding);
-			// 获取字典安装路径，启动字典动态转载/卸载检测器
-			String dicHome = getProperty(p, DIC_HOME);
-			File dicHomeFile;
-			if (dicHome.startsWith("classpath:")) {
-				String name = dicHome.substring("classpath:".length());
-				URL url = FileWordsReader.class.getClassLoader().getResource(
-						name);
-				if (url == null) {
-					throw new FileNotFoundException("file \"" + name
-							+ "\" not found in classpath!");
-				}
-				dicHomeFile = new File(url.getFile());
-			} else {
-				dicHomeFile = new File(dicHome);
-			}
-			Detection detection = new Detection();
-			detection.setHome(dicHomeFile);
-			detection.setFilter(new ExtensionFileFilter(".dic"));
-			detection.setListener(new FileDictionariesDifferenceListener(
-					dictionaries, paoding));
-			//侦测时间间隔(秒)。默认为60秒。
-			int interval = Integer.parseInt(getProperty(p, DIC_DETECTION_INTERVAL));
-			detection.setInterval(interval);
-			detection.start(true);
+			// 启动字典动态转载/卸载检测器
+			// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
+			paoding.startDetecting();
 			return paoding;
 		} catch (Exception e) {
 			throw new PaodingAnalysisException("Wrong paoding analysis config:"
