@@ -29,7 +29,6 @@ import java.util.Set;
  */
 public class SimpleReadListener implements ReadListener {
 	private Map<String, Set<String>> dics = new Hashtable<String, Set<String>>();
-	// 保证不会重复
 	private HashSet<String> words = new HashSet<String>();
 
 	public boolean onFileBegin(String file) {
