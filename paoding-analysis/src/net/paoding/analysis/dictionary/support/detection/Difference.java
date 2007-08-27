@@ -3,6 +3,7 @@ package net.paoding.analysis.dictionary.support.detection;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -34,6 +35,9 @@ public class Difference {
 	 */
 	private List<Node> newcome = new LinkedList<Node>();
 
+	private Snapshot older;
+	private Snapshot younger;
+
 	public List<Node> getModified() {
 		return modified;
 	}
@@ -58,6 +62,22 @@ public class Difference {
 		this.newcome = newcome;
 	}
 
+	public Snapshot getOlder() {
+		return older;
+	}
+
+	public void setOlder(Snapshot older) {
+		this.older = older;
+	}
+
+	public Snapshot getYounger() {
+		return younger;
+	}
+
+	public void setYounger(Snapshot younger) {
+		this.younger = younger;
+	}
+
 	public boolean isEmpty() {
 		return deleted.isEmpty() && modified.isEmpty() && newcome.isEmpty();
 	}
@@ -67,7 +87,8 @@ public class Difference {
 		String smodified = Arrays.toString(modified.toArray(new Node[] {}));
 		String snewcome = Arrays.toString(newcome.toArray(new Node[] {}));
 		String sdeleted = Arrays.toString(deleted.toArray(new Node[] {}));
-		return "modified=" + smodified + ";newcome=" + snewcome + ";deleted=" + sdeleted;
+		return "modified=" + smodified + ";newcome=" + snewcome + ";deleted="
+				+ sdeleted;
 	}
 
 }

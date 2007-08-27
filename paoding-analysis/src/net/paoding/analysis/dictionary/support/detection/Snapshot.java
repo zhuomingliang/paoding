@@ -33,6 +33,10 @@ public class Snapshot {
 	private Snapshot() {
 	}
 
+	public static Snapshot flash(String root, FileFilter filter) {
+		return flash(new File(root), filter);
+	}
+	
 	public static Snapshot flash(File rootFile, FileFilter filter) {
 		Snapshot snapshot = new Snapshot();
 		snapshot.implFlash(rootFile, filter);
@@ -90,17 +94,17 @@ public class Snapshot {
 
 	public Difference diff(Snapshot that) {
 		Snapshot older = that;
-		Snapshot yonger = this;
+		Snapshot younger = this;
 		if (that.version > this.version) {
 			older = this;
-			yonger = that;
+			younger = that;
 		}
 		Difference diff = new Difference();
-		if (!yonger.root.equals(older.root)) {
+		if (!younger.root.equals(older.root)) {
 			throw new IllegalArgumentException("the snaps should be same root");
 		}
 		for (InnerNode olderNode : older.nodes) {
-			InnerNode yongerNode = yonger.nodesMap.get((String) olderNode.path);
+			InnerNode yongerNode = younger.nodesMap.get((String) olderNode.path);
 			if (yongerNode == null) {
 				diff.getDeleted().add(olderNode);
 			} else if (yongerNode.lastModified != olderNode.lastModified) {
@@ -108,12 +112,14 @@ public class Snapshot {
 			}
 		}
 
-		for (InnerNode yongerNode : yonger.nodes) {
+		for (InnerNode yongerNode : younger.nodes) {
 			InnerNode olderNode = older.nodesMap.get((String) yongerNode.path);
 			if (olderNode == null) {
 				diff.getNewcome().add(yongerNode);
 			}
 		}
+		diff.setOlder(older);
+		diff.setYounger(younger);
 		return diff;
 	}
 

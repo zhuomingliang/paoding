@@ -15,25 +15,14 @@
  */
 package net.paoding.analysis.knife;
 
-import static net.paoding.analysis.Constants.DIC_CHARSET;
-import static net.paoding.analysis.Constants.DIC_CONFUCIAN_FAMILY_NAME;
-import static net.paoding.analysis.Constants.DIC_HOME;
-import static net.paoding.analysis.Constants.DIC_NOISE_CHARACTOR;
-import static net.paoding.analysis.Constants.DIC_NOISE_WORD;
-import static net.paoding.analysis.Constants.DIC_SKIP_PREFIX;
-import static net.paoding.analysis.Constants.DIC_UNIT;
-import static net.paoding.analysis.Constants.getProperty;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
-import net.paoding.analysis.Constants;
 import net.paoding.analysis.dictionary.BinaryDictionary;
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.HashBinaryDictionary;
@@ -106,19 +95,72 @@ public class FileDictionaries implements Dictionaries {
 	public FileDictionaries() {
 	}
 
-	public FileDictionaries(Properties p) {
-		setProperties(p);
+	public FileDictionaries(String dicHome, String skipPrefix,
+			String noiseCharactor, String noiseWord, String unit,
+			String confucianFamilyName, String charsetName) {
+		this.dicHome = dicHome;
+		this.skipPrefix = skipPrefix;
+		this.noiseCharactor = noiseCharactor;
+		this.noiseWord = noiseWord;
+		this.unit = unit;
+		this.confucianFamilyName = confucianFamilyName;
+		this.charsetName = charsetName;
 	}
 
-	public void setProperties(Properties p) {
-		this.dicHome = getProperty(p, DIC_HOME);
-		this.skipPrefix = getProperty(p, DIC_SKIP_PREFIX);
-		this.noiseCharactor = getProperty(p, DIC_NOISE_CHARACTOR);
-		this.noiseWord = getProperty(p, DIC_NOISE_WORD);
-		this.unit = getProperty(p, DIC_UNIT);
-		this.confucianFamilyName = getProperty(p, DIC_CONFUCIAN_FAMILY_NAME);
-		this.charsetName = getProperty(p, DIC_CHARSET);
-		log.debug(Constants.DIC_HOME + "=" + this.dicHome);
+	public String getDicHome() {
+		return dicHome;
+	}
+
+	public void setDicHome(String dicHome) {
+		this.dicHome = dicHome;
+	}
+
+	public String getSkipPrefix() {
+		return skipPrefix;
+	}
+
+	public void setSkipPrefix(String skipPrefix) {
+		this.skipPrefix = skipPrefix;
+	}
+
+	public String getNoiseCharactor() {
+		return noiseCharactor;
+	}
+
+	public void setNoiseCharactor(String noiseCharactor) {
+		this.noiseCharactor = noiseCharactor;
+	}
+
+	public String getNoiseWord() {
+		return noiseWord;
+	}
+
+	public void setNoiseWord(String noiseWord) {
+		this.noiseWord = noiseWord;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public String getConfucianFamilyName() {
+		return confucianFamilyName;
+	}
+
+	public void setConfucianFamilyName(String confucianFamilyName) {
+		this.confucianFamilyName = confucianFamilyName;
+	}
+
+	public String getCharsetName() {
+		return charsetName;
+	}
+
+	public void setCharsetName(String charsetName) {
+		this.charsetName = charsetName;
 	}
 
 	// -------------------------------------------------
@@ -228,7 +270,7 @@ public class FileDictionaries implements Dictionaries {
 		if (noiseWordDic != null) {
 			result.removeAll(noiseWordDic);
 		}
-		Set<String> noiseCharactorDic = getNoiseCharactors() ;
+		Set<String> noiseCharactorDic = getNoiseCharactors();
 		if (noiseCharactorDic != null) {
 			result.removeAll(noiseCharactorDic);
 		}
@@ -306,13 +348,13 @@ public class FileDictionaries implements Dictionaries {
 			// 如果来的的是noiseWord
 			if (isNoiseWordDicFile(dicName)) {
 				this.noiseWordsDictionary = null;
-				//noiseWord和vocabulary有关，所以需要更新vocabulary
+				// noiseWord和vocabulary有关，所以需要更新vocabulary
 				this.vocabularyDictionary = null;
 			}
 			// 如果来的的是noiseCharactors
 			else if (isNoiseCharactorDicFile(dicName)) {
 				this.noiseCharactorsDictionary = null;
-				//noiseCharactorsDictionary和vocabulary有关，所以需要更新vocabulary
+				// noiseCharactorsDictionary和vocabulary有关，所以需要更新vocabulary
 				this.vocabularyDictionary = null;
 			}
 			// 如果来的的是单元
