@@ -257,7 +257,7 @@ public class PaodingMaker {
 			paodingHolder.set(paodingKey, paoding);
 			// 启动字典动态转载/卸载检测器
 			// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
-			paoding.startDetecting();
+			paoding.startAutoDetecting();
 			return paoding;
 		} catch (Exception e) {
 			throw new PaodingAnalysisException("Wrong paoding analysis config:"
