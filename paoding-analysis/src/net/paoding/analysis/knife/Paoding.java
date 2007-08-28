@@ -88,7 +88,7 @@ public class Paoding extends SmartKnifeBox implements Knife {
 	 * 启动字典动态转载/卸载检测器 侦测时间间隔(秒)。<br>
 	 * 默认为60秒。如果设置为０或负数则表示不需要进行检测
 	 */
-	public synchronized void startDetecting() {
+	public synchronized void startAutoDetecting() {
 		if (detector != null || interval < 0) {
 			return;
 		}
@@ -113,7 +113,7 @@ public class Paoding extends SmartKnifeBox implements Knife {
 		this.detector = detector;
 	}
 
-	public synchronized void stopDetecting() {
+	public synchronized void stopAutoDetecting() {
 		if (detector == null) {
 			return;
 		}
