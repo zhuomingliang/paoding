@@ -35,5 +35,10 @@ public class CharSet {
 	public static boolean isCjkUnifiedIdeographs(char ch) {
 		return ch >= 0x4E00 && ch < 0xA000;
 	}
+	
+	public static boolean isBom(char ch) {
+		// ref:http://www.w3.org/International/questions/qa-utf8-bom
+		return ch == 0xFEFF || ch == 0xFFFE;
+	}
 
 }
