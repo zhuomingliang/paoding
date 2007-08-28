@@ -121,7 +121,30 @@ public class Paoding extends SmartKnifeBox implements Knife {
 		detector = null;
 	}
 
+	/**
+	 * 立即执行一次词典检查是否变更了，如果变更了则要通知Paoding中的Knives. <br>
+	 * 直到检查到是否有了更新，以及做了相应的更新后才返回本方法。
+	 */
 	public void forceDetecting() {
+		Detector detector = new Detector();
+		detector.setHome(this.dicHomeAbsolutePath);
+		detector.setFilter(new ExtensionFileFilter(".dic"));
+		final DifferenceListener l = new FileDictionariesDifferenceListener(
+				dictionaries, this);
+		detector.setListener(new DifferenceListener() {
+			public boolean on(Difference diff) {
+				boolean b = l.on(diff);
+				if (b) {
+					lastSnapshot = diff.getYounger();
+				}
+				return b;
+			}
+		});
+		detector.setLastSnapshot(lastSnapshot);
+		detector.forceDetecting();
+	}
+
+	public void forceDetectingNotice() {
 		final Detector detector = new Detector();
 		detector.setHome(this.dicHomeAbsolutePath);
 		detector.setFilter(new ExtensionFileFilter(".dic"));
@@ -140,29 +163,6 @@ public class Paoding extends SmartKnifeBox implements Knife {
 		detector.setInterval(1);
 		detector.setLastSnapshot(lastSnapshot);
 		detector.start(true);
-	}
-
-	/**
-	 * 立即执行一次词典检查是否变更了，如果变更了则要通知Paoding中的Knives. <br>
-	 * 直到检查到是否有了更新，以及做了相应的更新后才返回本方法。
-	 */
-	public void forceDetectingAndWaiting() {
-		Detector detector = new Detector();
-		detector.setHome(this.dicHomeAbsolutePath);
-		detector.setFilter(new ExtensionFileFilter(".dic"));
-		final DifferenceListener l = new FileDictionariesDifferenceListener(
-				dictionaries, this);
-		detector.setListener(new DifferenceListener() {
-			public boolean on(Difference diff) {
-				boolean b = l.on(diff);
-				if (b) {
-					lastSnapshot = diff.getYounger();
-				}
-				return b;
-			}
-		});
-		detector.setLastSnapshot(lastSnapshot);
-		detector.forceDetecting();
 	}
 
 }
