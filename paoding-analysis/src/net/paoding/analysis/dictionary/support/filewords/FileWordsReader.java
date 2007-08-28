@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import net.paoding.analysis.knife.CharSet;
+
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -92,11 +94,28 @@ public class FileWordsReader {
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					new FileInputStream(f), charsetName));
 			String word;
+			boolean firstInDic = true;
 			while ((word = in.readLine()) != null) {
+				if (firstInDic) {
+					firstInDic = false;
+					// ref:http://www.w3.org/International/questions/qa-utf8-bom
+					// ZERO WIDTH NO-BREAK SPACE
+					// notepad将文件保存为unitcode或utf-8时会在文件开头保存bom字符串
+					// notepad根据是否有bom来识别该文件是否是utf-8编码存储的。
+					// 庖丁字典需要将这个字符从词典中去掉
+					if (word.length() > 0 && CharSet.isBom(word.charAt(0))) {
+						word = word.substring(1);
+					}
+				}
 				l.onWord(word);
 			}
 			l.onFileEnd(name);
 			in.close();
 		}
+	}
+	
+	public static void main(String[] args) {
+		int i =0xFEFF;
+		System.out.println(i);
 	}
 }
