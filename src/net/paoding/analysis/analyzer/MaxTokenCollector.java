@@ -34,19 +34,19 @@ public class MaxTokenCollector implements TokenCollector {
 	 * 存储当前被knife分解而成的Token对象
 	 * 
 	 */
-	private LinkedList<Token> tokens = new LinkedList<Token>();
+	private LinkedList/* <Token> */ tokens = new LinkedList/* <Token> */();
 
 	private Token candidate;
 
 	private Token last;
 
-	public Iterator<Token> iterator() {
+	public Iterator/* <Token> */ iterator() {
 		if (candidate != null) {
 			this.tokens.add(candidate);
 			candidate = null;
 		}
-		Iterator<Token> iter = this.tokens.iterator();
-		this.tokens = new LinkedList<Token>();
+		Iterator/* <Token> */ iter = this.tokens.iterator();
+		this.tokens = new LinkedList/* <Token> */();
 		return iter;
 	}
 
@@ -70,8 +70,8 @@ public class MaxTokenCollector implements TokenCollector {
 		} else if (end >= c.endOffset()) {
 			if (last != null && last.startOffset() >= offset
 					&& last.endOffset() <= end) {
-				for (Iterator<Token> iter = tokens.iterator(); iter.hasNext();) {
-					last = iter.next();
+				for (Iterator/* <Token> */ iter = tokens.iterator(); iter.hasNext();) {
+					last = (Token) iter.next();
 					if (last.startOffset() >= offset && last.endOffset() <= end) {
 						iter.remove();
 					}

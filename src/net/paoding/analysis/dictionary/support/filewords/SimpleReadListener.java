@@ -18,7 +18,6 @@ package net.paoding.analysis.dictionary.support.filewords;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 
@@ -28,14 +27,14 @@ import java.util.Set;
  * 
  */
 public class SimpleReadListener implements ReadListener {
-	private Map<String, Set<String>> dics = new Hashtable<String, Set<String>>();
-	private HashSet<String> words = new HashSet<String>();
+	private Map/* <String, Set<String>> */dics = new Hashtable/* <String, Set<String>> */();
+	private HashSet/* <String> */words = new HashSet/* <String> */();
 
 	public boolean onFileBegin(String file) {
 		if (!file.endsWith(".dic")) {
 			return false;
 		}
-		words = new HashSet<String>();
+		words = new HashSet/* <String> */();
 		return true;
 	}
 
@@ -55,7 +54,7 @@ public class SimpleReadListener implements ReadListener {
 		words.add(word);
 	}
 
-	public Map<String, Set<String>> getResult() {
+	public Map/* <String, Set<String>> */getResult() {
 		return dics;
 	}
 

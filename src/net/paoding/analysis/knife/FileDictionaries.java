@@ -80,7 +80,7 @@ public class FileDictionaries implements Dictionaries {
 
 	// -------------------------------------------------
 
-	protected Map<String, Set<String>> allWords;
+	protected Map/* <String, Set<String>> */allWords;
 
 	protected String dicHome;
 	protected String skipPrefix;
@@ -172,9 +172,9 @@ public class FileDictionaries implements Dictionaries {
 	 */
 	public synchronized Dictionary getVocabularyDictionary() {
 		if (vocabularyDictionary == null) {
-			Set<String> vocabularySet = getVocabularyWords();
-			String[] words = vocabularySet.toArray(new String[vocabularySet
-					.size()]);
+			Set/* <String> */vocabularySet = getVocabularyWords();
+			String[] words = (String[]) vocabularySet
+					.toArray(new String[vocabularySet.size()]);
 			Arrays.sort(words);
 			// 大概有5639个字有词语，故取0x2fff=x^13>8000>8000*0.75=6000>5639
 			vocabularyDictionary = new HashBinaryDictionary(words, 0x2fff,
@@ -190,8 +190,8 @@ public class FileDictionaries implements Dictionaries {
 	 */
 	public synchronized Dictionary getConfucianFamilyNamesDictionary() {
 		if (confucianFamilyNamesDictionary == null) {
-			Set<String> confucianFamilyNamesSet = getConfucianFamilyNames();
-			String[] words = confucianFamilyNamesSet
+			Set/* <String> */confucianFamilyNamesSet = getConfucianFamilyNames();
+			String[] words = (String[]) confucianFamilyNamesSet
 					.toArray(new String[confucianFamilyNamesSet.size()]);
 			Arrays.sort(words);
 			confucianFamilyNamesDictionary = new BinaryDictionary(words);
@@ -206,8 +206,8 @@ public class FileDictionaries implements Dictionaries {
 	 */
 	public synchronized Dictionary getNoiseCharactorsDictionary() {
 		if (noiseCharactorsDictionary == null) {
-			Set<String> noiseCharactorsSet = getNoiseCharactors();
-			String[] words = noiseCharactorsSet
+			Set/* <String> */noiseCharactorsSet = getNoiseCharactors();
+			String[] words = (String[]) noiseCharactorsSet
 					.toArray(new String[noiseCharactorsSet.size()]);
 			Arrays.sort(words);
 			noiseCharactorsDictionary = new HashBinaryDictionary(words, 256,
@@ -223,9 +223,9 @@ public class FileDictionaries implements Dictionaries {
 	 */
 	public synchronized Dictionary getNoiseWordsDictionary() {
 		if (noiseWordsDictionary == null) {
-			Set<String> noiseWordsSet = getNoiseWords();
-			String[] words = noiseWordsSet.toArray(new String[noiseWordsSet
-					.size()]);
+			Set/* <String> */noiseWordsSet = getNoiseWords();
+			String[] words = (String[]) noiseWordsSet
+					.toArray(new String[noiseWordsSet.size()]);
 			Arrays.sort(words);
 			noiseWordsDictionary = new BinaryDictionary(words);
 		}
@@ -239,8 +239,9 @@ public class FileDictionaries implements Dictionaries {
 	 */
 	public synchronized Dictionary getUnitsDictionary() {
 		if (unitsDictionary == null) {
-			Set<String> unitsSet = getUnits();
-			String[] words = unitsSet.toArray(new String[unitsSet.size()]);
+			Set/* <String> */unitsSet = getUnits();
+			String[] words = (String[]) unitsSet.toArray(new String[unitsSet
+					.size()]);
 			Arrays.sort(words);
 			unitsDictionary = new HashBinaryDictionary(words, 1024, 0.75f);
 		}
@@ -250,53 +251,55 @@ public class FileDictionaries implements Dictionaries {
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
 
-	protected Set<String> getVocabularyWords() {
-		Map<String, Set<String>> dics = loadAllWordsIfNecessary();
-		Set<String> result = null;
-		Iterator<String> iter = dics.keySet().iterator();
+	protected Set/* <String> */getVocabularyWords() {
+		Map/* <String, Set<String>> */dics = loadAllWordsIfNecessary();
+		Set/* <String> */result = null;
+		Iterator/* <String> */iter = dics.keySet().iterator();
 		while (iter.hasNext()) {
-			String name = iter.next();
+			String name = (String) iter.next();
 			if (isSkipForVacabulary(name)) {
 				continue;
 			}
+			Set/* <String> */dic = (Set/* <String> */) dics.get(name);
 			if (result == null) {
-				result = new HashSet<String>(dics.get(name));
+				result = new HashSet/* <String> */(dic);
 			} else {
-				result.addAll(dics.get(name));
+				result.addAll(dic);
 			}
 		}
 		// 根据CJKKnife的要求，这里将noise词、字从词汇表移出，以免在切词把他们视为词典规定的成词，而还要从另外判断移出。
-		Set<String> noiseWordDic = getNoiseWords();
+		Set/* <String> */noiseWordDic = getNoiseWords();
 		if (noiseWordDic != null) {
 			result.removeAll(noiseWordDic);
 		}
-		Set<String> noiseCharactorDic = getNoiseCharactors();
+		Set/* <String> */noiseCharactorDic = getNoiseCharactors();
 		if (noiseCharactorDic != null) {
 			result.removeAll(noiseCharactorDic);
 		}
 		return result;
 	}
 
-	protected Set<String> getConfucianFamilyNames() {
+	protected Set/* <String> */getConfucianFamilyNames() {
 		return getDictionaryWords(confucianFamilyName);
 	}
 
-	protected Set<String> getNoiseWords() {
+	protected Set/* <String> */getNoiseWords() {
 		return getDictionaryWords(noiseWord);
 	}
 
-	protected Set<String> getNoiseCharactors() {
+	protected Set/* <String> */getNoiseCharactors() {
 		return getDictionaryWords(noiseCharactor);
 	}
 
-	protected Set<String> getUnits() {
+	protected Set/* <String> */getUnits() {
 		return getDictionaryWords(unit);
 	}
 
-	protected Set<String> getDictionaryWords(String dicNameRelativeDicHome) {
-		Map<String, Set<String>> dics = loadAllWordsIfNecessary();
-		Set<String> ret = dics.get(dicNameRelativeDicHome);
-		return ret == null ? new HashSet<String>() : ret;
+	protected Set/* <String> */getDictionaryWords(String dicNameRelativeDicHome) {
+		Map/* <String, Set<String>> */dics = loadAllWordsIfNecessary();
+		Set/* <String> */ret = (Set/* <String> */) dics
+				.get(dicNameRelativeDicHome);
+		return ret == null ? new HashSet/* <String> */() : ret;
 	}
 
 	// -------------------------------------
@@ -305,7 +308,7 @@ public class FileDictionaries implements Dictionaries {
 	 * 读取字典安装目录及子孙目录下的字典文件；并以该字典相对安装目录的路径(包括该字典的文件名，但不包括扩展名)作为key。
 	 * 比如，如果字典安装在dic目录下，该目录下有division/china.dic，则该字典文件对应的key是"division/china"
 	 */
-	protected synchronized Map<String, Set<String>> loadAllWordsIfNecessary() {
+	protected synchronized Map/* <String, Set<String>> */loadAllWordsIfNecessary() {
 		if (allWords == null) {
 			try {
 				log.info("loading dictionaries from " + dicHome);
@@ -333,7 +336,7 @@ public class FileDictionaries implements Dictionaries {
 		String dicName = dicPath.substring(0, index);
 		if (allWords != null) {
 			try {
-				Map<String, Set<String>> temp = FileWordsReader.readWords(
+				Map/* <String, Set<String>> */temp = FileWordsReader.readWords(
 						dicHome + dicPath, charsetName);
 				allWords.put(dicName, temp.values().iterator().next());
 			} catch (FileNotFoundException e) {

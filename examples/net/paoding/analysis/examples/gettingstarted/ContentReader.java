@@ -7,7 +7,7 @@ import java.io.Reader;
 
 public class ContentReader {
 
-	public static String readText(Class<?> clazz) throws IOException {
+	public static String readText(Class clazz) throws IOException {
 		InputStream in = clazz.getResourceAsStream("text.txt");
 		Reader re = new InputStreamReader(in, "UTF-8");
 		char[] chs = new char[1024];

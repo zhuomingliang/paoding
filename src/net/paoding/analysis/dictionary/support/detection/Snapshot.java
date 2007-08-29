@@ -40,7 +40,7 @@ public class Snapshot {
 	private String root;
 
 	// String为相对根的地址，使用/作为目录分隔符
-	private Map<String, InnerNode> nodesMap = new HashMap<String, InnerNode>();
+	private Map/*<String, InnerNode>*/ nodesMap = new HashMap/*<String, InnerNode>*/();
 
 	//
 	private InnerNode[] nodes;
@@ -70,11 +70,11 @@ public class Snapshot {
 			rootNode.lastModified = rootFile.lastModified();
 			nodesMap.put(root, rootNode);
 			if (rootFile.isDirectory()) {
-				LinkedList<File> files = getPosterity(rootFile, filter);
+				LinkedList/*<File>*/ files = getPosterity(rootFile, filter);
 				nodes = new InnerNode[files.size()];
-				Iterator<File> iter = files.iterator();
+				Iterator/*<File>*/ iter = files.iterator();
 				for (int i = 0; i < nodes.length; i++) {
-					File f = iter.next();
+					File f = (File) iter.next();
 					String path = f.getAbsolutePath().substring(
 							this.root.length() + 1);
 					path = path.replace('\\', '/');
@@ -118,8 +118,9 @@ public class Snapshot {
 		if (!younger.root.equals(older.root)) {
 			throw new IllegalArgumentException("the snaps should be same root");
 		}
-		for (InnerNode olderNode : older.nodes) {
-			InnerNode yongerNode = younger.nodesMap.get((String) olderNode.path);
+		for (int i = 0; i< older.nodes.length; i ++) {
+			InnerNode olderNode = older.nodes[i];
+			InnerNode yongerNode = (InnerNode) younger.nodesMap.get((String) olderNode.path);
 			if (yongerNode == null) {
 				diff.getDeleted().add(olderNode);
 			} else if (yongerNode.lastModified != olderNode.lastModified) {
@@ -127,8 +128,9 @@ public class Snapshot {
 			}
 		}
 
-		for (InnerNode yongerNode : younger.nodes) {
-			InnerNode olderNode = older.nodesMap.get((String) yongerNode.path);
+		for (int i = 0; i< younger.nodes.length; i ++) {
+			InnerNode yongerNode = younger.nodes[i];
+			InnerNode olderNode = (InnerNode) older.nodesMap.get((String) yongerNode.path);
 			if (olderNode == null) {
 				diff.getNewcome().add(yongerNode);
 			}
@@ -161,15 +163,16 @@ public class Snapshot {
 
 	// --------------------------------------------
 
-	private LinkedList<File> getPosterity(File root, FileFilter filter) {
-		ArrayList<File> dirs = new ArrayList<File>();
-		LinkedList<File> files = new LinkedList<File>();
+	private LinkedList/*<File>*/ getPosterity(File root, FileFilter filter) {
+		ArrayList/*<File>*/ dirs = new ArrayList/*<File>*/();
+		LinkedList/*<File>*/ files = new LinkedList/*<File>*/();
 		dirs.add(root);
 		int index = 0;
 		while (index < dirs.size()) {
-			File cur = dirs.get(index++);
+			File cur = (File) dirs.get(index++);
 			File[] children = cur.listFiles();
-			for (File f : children) {
+			for (int i = 0; i < children.length; i ++) {
+				File f = children[i];
 				if (filter == null || filter.accept(f)) {
 					if (f.isDirectory()) {
 						dirs.add(f);

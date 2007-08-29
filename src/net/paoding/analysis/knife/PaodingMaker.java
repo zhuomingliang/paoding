@@ -15,17 +15,6 @@
  */
 package net.paoding.analysis.knife;
 
-import static net.paoding.analysis.Constants.DIC_CHARSET;
-import static net.paoding.analysis.Constants.DIC_CONFUCIAN_FAMILY_NAME;
-import static net.paoding.analysis.Constants.DIC_DETECTOR_INTERVAL;
-import static net.paoding.analysis.Constants.DIC_HOME;
-import static net.paoding.analysis.Constants.DIC_NOISE_CHARACTOR;
-import static net.paoding.analysis.Constants.DIC_NOISE_WORD;
-import static net.paoding.analysis.Constants.DIC_SKIP_PREFIX;
-import static net.paoding.analysis.Constants.DIC_UNIT;
-import static net.paoding.analysis.Constants.KNIFE_CLASS;
-import static net.paoding.analysis.Constants.getProperty;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,9 +43,9 @@ public class PaodingMaker {
 
 	private static Log log = LogFactory.getLog(PaodingMaker.class);
 
-	private static ObjectHolder<Properties> propertiesHolder = new ObjectHolder<Properties>();
+	private static ObjectHolder/* <Properties> */propertiesHolder = new ObjectHolder/* <Properties> */();
 
-	private static ObjectHolder<Paoding> paodingHolder = new ObjectHolder<Paoding>();
+	private static ObjectHolder/* <Paoding> */paodingHolder = new ObjectHolder/* <Paoding> */();
 
 	// ----------------获取Paoding对象的方法-----------------------
 
@@ -111,10 +100,14 @@ public class PaodingMaker {
 
 	// -------------------私有 或 辅助方法----------------------------------
 
+	private static String getProperty(Properties p, String name) {
+		return Constants.getProperty(p, name);
+	}
+
 	private static void preheatProperties(Properties p) {
 
 		if (p.getProperty("paoding.dic.home.absolute.path") == null) {
-			String dicHome = getProperty(p, DIC_HOME);
+			String dicHome = getProperty(p, Constants.DIC_HOME);
 			File dicHomeFile;
 			if (dicHome.startsWith("classpath:")) {
 				String name = dicHome.substring("classpath:".length());
@@ -161,7 +154,8 @@ public class PaodingMaker {
 				}
 			}
 			String lastModified = "" + f.lastModified();
-			Properties p = propertiesHolder.get(f.getAbsolutePath());
+			Properties p = (Properties) propertiesHolder.get(f
+					.getAbsolutePath());
 			if (p != null) {
 				String lastModifiedInHolder = p
 						.getProperty("paoding.dic.properties.lastModified");
@@ -193,7 +187,6 @@ public class PaodingMaker {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Paoding implMake(Properties p) {
 		Paoding paoding;
 		Object paodingKey;
@@ -205,7 +198,7 @@ public class PaodingMaker {
 			paodingKey = p;
 		}
 		String fromHolder = p.getProperty("paoding.dic.properties.from.holder");
-		paoding = paodingHolder.get(paodingKey);
+		paoding = (Paoding) paodingHolder.get(paodingKey);
 		if (fromHolder != null) {
 			if (paoding != null) {
 				return paoding;
@@ -213,8 +206,9 @@ public class PaodingMaker {
 		} else {
 			paodingHolder.remove(paodingKey);
 		}
-		String dicHomeAbsolutePath = p.getProperty("paoding.dic.home.absolute.path");
-		String interval = getProperty(p, DIC_DETECTOR_INTERVAL);
+		String dicHomeAbsolutePath = p
+				.getProperty("paoding.dic.home.absolute.path");
+		String interval = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
 		paoding = new Paoding();
 		paoding.setDicHomeAbsolutePath(dicHomeAbsolutePath);
 		paoding.setInterval(Integer.parseInt(interval));
@@ -223,14 +217,16 @@ public class PaodingMaker {
 			// 将自动寻找，若存在则读取类路径中的paoding-analysis.properties文件
 			// 若不存在该配置文件，则一切使用默认设置，即字典在文件系统当前路径的dic下(非类路径dic下)
 
-			String dicHome = getProperty(p, DIC_HOME);
-			String skipPrefix = getProperty(p, DIC_SKIP_PREFIX);
-			String noiseCharactor = getProperty(p, DIC_NOISE_CHARACTOR);
-			String noiseWord = getProperty(p, DIC_NOISE_WORD);
-			String unit = getProperty(p, DIC_UNIT);
-			String confucianFamilyName = getProperty(p,	DIC_CONFUCIAN_FAMILY_NAME);
-			String charsetName = getProperty(p, DIC_CHARSET);
-			
+			String dicHome = getProperty(p, Constants.DIC_HOME);
+			String skipPrefix = getProperty(p, Constants.DIC_SKIP_PREFIX);
+			String noiseCharactor = getProperty(p,
+					Constants.DIC_NOISE_CHARACTOR);
+			String noiseWord = getProperty(p, Constants.DIC_NOISE_WORD);
+			String unit = getProperty(p, Constants.DIC_UNIT);
+			String confucianFamilyName = getProperty(p,
+					Constants.DIC_CONFUCIAN_FAMILY_NAME);
+			String charsetName = getProperty(p, Constants.DIC_CHARSET);
+
 			log.debug(Constants.DIC_HOME + "=" + dicHome);
 
 			Dictionaries dictionaries = new FileDictionaries(dicHome,
@@ -241,7 +237,7 @@ public class PaodingMaker {
 			while (names.hasMoreElements()) {
 				String name = (String) names.nextElement();
 				// 以paoding.knife.class开头的被认为是knife对象
-				if (name.startsWith(KNIFE_CLASS)) {
+				if (name.startsWith(Constants.KNIFE_CLASS)) {
 					String className = p.getProperty(name);
 					Class clazz = Class.forName(className);
 					Knife knife = (Knife) clazz.newInstance();
@@ -265,18 +261,18 @@ public class PaodingMaker {
 		}
 	}
 
-	static class ObjectHolder<T> {
+	static class ObjectHolder/* <T> */{
 
 		private ObjectHolder() {
 		}
 
-		private Map<Object, T> objects = new HashMap<Object, T>();
+		private Map/* <Object, T> */objects = new HashMap/* <Object, T> */();
 
-		public T get(Object name) {
+		public Object/* T */get(Object name) {
 			return objects.get(name);
 		}
 
-		public void set(Object name, T object) {
+		public void set(Object name, Object/* T */object) {
 			objects.put(name, object);
 		}
 

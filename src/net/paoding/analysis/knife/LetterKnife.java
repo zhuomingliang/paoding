@@ -39,14 +39,12 @@ public class LetterKnife extends CharKnife {
 	public boolean assignable(CharSequence beaf, int index) {
 		return CharSet.isLetter(beaf.charAt(index));
 	}
-	
-	@Override
+
 	protected boolean isTokenChar(CharSequence beaf, int history, int index) {
 		char ch = beaf.charAt(index);
-		return CharSet.isLetter(ch) || (ch >='0' && ch <='9') || ch == '-';
+		return CharSet.isLetter(ch) || (ch >= '0' && ch <= '9') || ch == '-';
 	}
 
-	@Override
 	protected void collect(Collector collector, CharSequence beaf, int offset,
 			int end, String word) {
 		if (word.length() > 1) {
