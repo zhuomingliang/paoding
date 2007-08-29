@@ -31,32 +31,40 @@ import java.util.List;
  */
 public class KnifeBox implements Knife {
 
-	private ArrayList<Knife> knives = new ArrayList<Knife>();
+	private ArrayList/* <Knife> */knives = new ArrayList/* <Knife> */();
+	private int size;
 
 	public KnifeBox() {
 	}
 
-	public KnifeBox(List<Knife> knives) {
+	public KnifeBox(List/* <Knife> */knives) {
 		this.setKnives(knives);
 	}
 
-	public void addKnife(Knife k) {
+	public synchronized void addKnife(Knife k) {
 		knives.add(k);
+		size = knives.size();
 	}
 
-	public void removeKnife(Knife k) {
+	public synchronized void removeKnife(Knife k) {
 		knives.remove(k);
+		size = knives.size();
 	}
 
-	public List<Knife> getKnives() {
-//		ArrayList<Knife> knives = new ArrayList<Knife>();
-//		knives.addAll(this.knives);
+	/**
+	 * 返回配置的所有Knife<br>
+	 * !!!不要去变更返回的List元素
+	 * 
+	 * @return
+	 */
+	public List/* <Knife> */getKnives() {
 		return knives;
 	}
 
-	public void setKnives(List<Knife> knives) {
+	public void setKnives(List/* <Knife> */knives) {
 		this.knives.clear();
 		this.knives.addAll(knives);
+		size = this.knives.size();
 	}
 
 	public boolean assignable(CharSequence beaf, int index) {
@@ -64,10 +72,9 @@ public class KnifeBox implements Knife {
 	}
 
 	public int dissect(Collector collector, CharSequence beaf, int offset) {
-		int size = knives.size();
 		Knife knife;
 		for (int i = 0; i < size; i++) {
-			knife = knives.get(i);
+			knife = (Knife) knives.get(i);
 			if (knife.assignable(beaf, offset)) {
 				return knife.dissect(collector, beaf, offset);
 			}

@@ -44,7 +44,7 @@ public class Constants {
 	public static final String DIC_DETECTOR_INTERVAL = "paoding.dic.detector.interval";
 	public static final String DIC_DETECTOR_INTERVAL_DEFAULT = "60";
 
-	private static final Map<String, String> map = new HashMap<String, String>();
+	private static final Map/* <String, String> */ map = new HashMap/* <String, String> */();
 	
 	static {
 		map.put(DIC_HOME, DIC_HOME_DEFAULT);
@@ -61,7 +61,7 @@ public class Constants {
 	public static final String KNIFE_CLASS = "paoding.knife.class";
 
 	public static String getProperty(Properties p, String name) {
-		String value = p.getProperty(name, map.get(name));
+		String value = p.getProperty(name, (String) map.get(name));
 		if (name.equals("paoding.dic.home")) {
 			value = value.replace('\\', '/');
 			if (!value.endsWith("/")) {

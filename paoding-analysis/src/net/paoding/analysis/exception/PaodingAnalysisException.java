@@ -19,8 +19,9 @@ package net.paoding.analysis.exception;
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 
  */
-@SuppressWarnings("serial")
 public class PaodingAnalysisException extends RuntimeException {
+
+	private static final long serialVersionUID = 5319477662251490296L;
 
 	public PaodingAnalysisException() {
 		super();

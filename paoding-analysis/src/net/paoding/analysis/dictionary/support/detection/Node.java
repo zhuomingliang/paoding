@@ -56,12 +56,10 @@ public class Node {
 		return isFile;
 	}
 
-	@Override
 	public String toString() {
 		return path;
 	}
 
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -69,7 +67,6 @@ public class Node {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

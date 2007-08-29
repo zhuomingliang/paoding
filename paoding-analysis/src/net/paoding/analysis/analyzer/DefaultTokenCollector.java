@@ -33,7 +33,7 @@ public class DefaultTokenCollector implements TokenCollector {
 	 * 存储当前被knife分解而成的Token对象
 	 * 
 	 */
-	private LinkedList<Token> tokens;
+	private LinkedList/* <Token> */ tokens;
 
 	/**
 	 * Collector接口实现。<br>
@@ -42,16 +42,16 @@ public class DefaultTokenCollector implements TokenCollector {
 	 */
 	public void collect(String word, int begin, int end) {
 		if (tokens == null) {
-			this.tokens = new LinkedList<Token>();
+			this.tokens = new LinkedList/* <Token> */();
 		}
 		this.tokens.add(new Token(word, begin, end));
 	}
 
-	public Iterator<Token> iterator() {
+	public Iterator/* <Token> */ iterator() {
 		if (this.tokens == null) {
-			this.tokens = new LinkedList<Token>();
+			this.tokens = new LinkedList/* <Token> */();
 		}
-		Iterator<Token> iter = this.tokens.iterator();
+		Iterator/* <Token> */ iter = this.tokens.iterator();
 		this.tokens = null;
 		return iter;
 	}

@@ -107,7 +107,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	 * @see #tokens
 	 * @see #next()
 	 */
-	private Iterator<Token> tokenIteractor;
+	private Iterator/* <Token> */ tokenIteractor;
 
 	// -------------------------------------------------
 
@@ -141,7 +141,6 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	}
 
 	// -------------------------------------------------
-	@Override
 	public Token next() throws IOException {
 		// 已经穷尽tokensIteractor的Token对象，则继续请求reader流入数据
 		while (tokenIteractor == null || !tokenIteractor.hasNext()) {
@@ -178,12 +177,11 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 			tokenIteractor = tokenCollector.iterator();
 		}
 		// 返回tokensIteractor下一个Token对象
-		return tokenIteractor.next();
+		return (Token) tokenIteractor.next();
 	}
 
 	// -------------------------------------------------
 
-	@Override
 	public void close() throws IOException {
 		super.close();
 		input.close();

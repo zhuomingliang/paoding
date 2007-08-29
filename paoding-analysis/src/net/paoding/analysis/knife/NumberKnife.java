@@ -34,7 +34,6 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 		setDictionaries(dictionaries);
 	}
 
-//	@Override
 	public void setDictionaries(Dictionaries dictionaries) {
 		units = dictionaries.getUnitsDictionary();
 	}
@@ -43,7 +42,6 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 		return CharSet.isArabianNumber(beaf.charAt(index));
 	}
 
-	@Override
 	protected boolean isTokenChar(CharSequence beaf, int history, int index) {
 		char ch = beaf.charAt(index);
 		return CharSet.isArabianNumber(ch) || ch == '.';

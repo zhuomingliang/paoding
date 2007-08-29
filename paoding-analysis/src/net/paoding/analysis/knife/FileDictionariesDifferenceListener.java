@@ -15,6 +15,7 @@
  */
 package net.paoding.analysis.knife;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -61,16 +62,18 @@ public class FileDictionariesDifferenceListener implements DifferenceListener {
 	}
 
 	public synchronized boolean on(Difference diff) {
-		List<Node> all = new LinkedList<Node>();
-		all.addAll(diff.getDeleted());
-		all.addAll(diff.getModified());
-		all.addAll(diff.getNewcome());
-		for (Node node : all) {
+		List/* <Node> */all = new LinkedList/* <Node> */();
+		all.addAll((List/* <Node> */) diff.getDeleted());
+		all.addAll((List/* <Node> */) diff.getModified());
+		all.addAll((List/* <Node> */) diff.getNewcome());
+		for (Iterator iter = all.iterator(); iter.hasNext();) {
+			Node node = (Node) iter.next();
 			if (node.isFile()) {
 				dictionaries.refreshDicWords(node.getPath());
 			}
 		}
-		for (Knife knife : knifeBox.getKnives()) {
+		for (Iterator iter = knifeBox.getKnives().iterator(); iter.hasNext();) {
+			Knife knife = (Knife) iter.next();
 			if (knife instanceof DictionariesWare) {
 				((DictionariesWare) knife).setDictionaries(dictionaries);
 			}

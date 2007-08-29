@@ -42,8 +42,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 	public CJKKnife(Dictionaries dictionaries) {
 		setDictionaries(dictionaries);
 	}
-	
-//	@Override
+
 	public void setDictionaries(Dictionaries dictionaries) {
 		vocabulary = dictionaries.getVocabularyDictionary();
 		noiseWords = dictionaries.getNoiseWordsDictionary();
@@ -94,20 +93,21 @@ public class CJKKnife implements Knife, DictionariesWare {
 								setup - unidentifiedIndex);
 						unidentifiedIndex = -1;
 					}
-					//如果切出来的词是noise词，则抛弃-此功能在此被抛弃，
-					//理由：避免每一个分出来的词还得在从noise词典去检索
-					//约束：词汇表设置进来，就要把这些noise词、字移出去，使不会把noise词、字切出来
-					//这样，这些noise词、字将被视为Unidentified的一部分，在dissectUnidentified中处理
-					//dissectUnidentified能够辨别哪些是noise词和字，不对他们进行二元切分。
-					//Hit noiseWordsHit = noiseWords.search(beef, setup, count);
-					//if (!noiseWordsHit.isHit()) {
-						collector.collect(word.getWord(), setup, end);
-					//}
+					// 如果切出来的词是noise词，则抛弃-此功能在此被抛弃，
+					// 理由：避免每一个分出来的词还得在从noise词典去检索
+					// 约束：词汇表设置进来，就要把这些noise词、字移出去，使不会把noise词、字切出来
+					// 这样，这些noise词、字将被视为Unidentified的一部分，在dissectUnidentified中处理
+					// dissectUnidentified能够辨别哪些是noise词和字，不对他们进行二元切分。
+					// Hit noiseWordsHit = noiseWords.search(beef, setup,
+					// count);
+					// if (!noiseWordsHit.isHit()) {
+					collector.collect(word.getWord(), setup, end);
+					// }
 					if (setup == offset && maxWordLength < count) {
 						maxWordLength = count;
 					}
-					//gotoNextChar为true表示在词典中存在以当前词为开头的词，
-					//比如：加入当前词是"中华"，词典存在"中华人民国和国"词以它为开头的
+					// gotoNextChar为true表示在词典中存在以当前词为开头的词，
+					// 比如：加入当前词是"中华"，词典存在"中华人民国和国"词以它为开头的
 					boolean gotoNextChar = word.isUnclosed()
 							&& end < beef.length()
 							&& beef.charAt(end) >= word.getNext().charAt(count);
@@ -181,26 +181,25 @@ public class CJKKnife implements Knife, DictionariesWare {
 	protected boolean shouldAWord(CharSequence beaf, int offset, int end) {
 		if (offset > 0 && end < beaf.length()) {// 确保前有字符，后也有字符
 			int prev = offset - 1;
-			//中文单双引号
+			// 中文单双引号
 			if (beaf.charAt(prev) == '“' && beaf.charAt(end) == '”') {
 				return true;
 			} else if (beaf.charAt(prev) == '‘' && beaf.charAt(end) == '’') {
 				return true;
 			}
-			//英文单双引号
+			// 英文单双引号
 			else if (beaf.charAt(prev) == '\'' && beaf.charAt(end) == '\'') {
 				return true;
 			} else if (beaf.charAt(prev) == '\"' && beaf.charAt(end) == '\"') {
 				return true;
 			}
-			//中文书名号
+			// 中文书名号
 			else if (beaf.charAt(prev) == '《' && beaf.charAt(end) == '》') {
 				return true;
-			} 
-			else if (beaf.charAt(prev) == '〈' && beaf.charAt(end) == '〉') {
+			} else if (beaf.charAt(prev) == '〈' && beaf.charAt(end) == '〉') {
 				return true;
-			} 
-			//英文尖括号
+			}
+			// 英文尖括号
 			else if (beaf.charAt(prev) == '<' && beaf.charAt(end) == '>') {
 				return true;
 			}

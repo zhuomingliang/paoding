@@ -31,7 +31,15 @@
 	<target name="compile" description="编译所有java文件到classes目录中">
 		<delete dir="${classes}" />
 		<mkdir dir="${classes}" />
-		<javac destdir="${classes}" encoding="UTF-8" target="1.5" debug="true" deprecation="false" optimize="false" nowarn="true" failonerror="true">
+		<javac destdir="${classes}" 
+			encoding="UTF-8" 
+			source="1.2" 
+			target="1.1" 
+			debug="true" 
+			deprecation="false" 
+			optimize="false" 
+			nowarn="true" 
+			failonerror="true">
 			<src path="${src}" />
 			<src path="${examples}" />
 			<classpath refid="classpath" />

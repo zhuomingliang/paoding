@@ -19,8 +19,6 @@ import java.util.Iterator;
 
 import net.paoding.analysis.knife.Collector;
 
-import org.apache.lucene.analysis.Token;
-
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -33,5 +31,5 @@ public interface TokenCollector extends Collector {
 	 * 
 	 * @return
 	 */
-	public Iterator<Token> iterator();
+	public Iterator/* <Token> */ iterator();
 }

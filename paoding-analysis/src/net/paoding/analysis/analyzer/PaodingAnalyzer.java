@@ -158,7 +158,6 @@ public class PaodingAnalyzer extends Analyzer {
 
 	// -------------------------------------------------
 
-	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		if (knife == null) {
 			throw new NullPointerException("knife should be set before token");

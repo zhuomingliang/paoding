@@ -47,13 +47,13 @@ public class HashBinaryDictionary implements Dictionary {
 	/**
 	 * 首字符到分词典的映射
 	 */
-	private Map<Integer, SubDictionaryWrap> subs;
-	
+	private Map/* <Object, SubDictionaryWrap> */subs;
+
 	/**
 	 * 
 	 */
 	private final int hashIndex;
-	
+
 	private final int start;
 	private final int end;
 	private final int count;
@@ -71,15 +71,16 @@ public class HashBinaryDictionary implements Dictionary {
 			float loadFactor) {
 		this(ascWords, 0, 0, ascWords.length, initialCapacity, loadFactor);
 	}
-	
-	public HashBinaryDictionary(String[] ascWords, int hashIndex, int start, int end, int initialCapacity,
-			float loadFactor) {
+
+	public HashBinaryDictionary(String[] ascWords, int hashIndex, int start,
+			int end, int initialCapacity, float loadFactor) {
 		this.ascWords = ascWords;
 		this.start = start;
 		this.end = end;
 		this.count = end - start;
 		this.hashIndex = hashIndex;
-		subs = new HashMap<Integer, SubDictionaryWrap>(initialCapacity, loadFactor);
+		subs = new HashMap/* <Object, SubDictionaryWrap> */(initialCapacity,
+				loadFactor);
 		createSubDictionaries();
 	}
 
@@ -105,10 +106,10 @@ public class HashBinaryDictionary implements Dictionary {
 		}
 		addSubDictionary(beginHashChar, beginIndex, this.end);
 	}
-	
+
 	protected char getChar(String s, int index) {
 		if (index >= s.length()) {
-			return (char)0;
+			return (char) 0;
 		}
 		return s.charAt(index);
 	}
@@ -121,11 +122,9 @@ public class HashBinaryDictionary implements Dictionary {
 	 * @param endIndex
 	 */
 	protected void addSubDictionary(char hashChar, int beginIndex, int endIndex) {
-		SubDictionaryWrap subDic = new SubDictionaryWrap(
-				hashChar,
-				createSubDictionary(ascWords, beginIndex, endIndex), 
-				beginIndex);
-		Integer key = keyOf(hashChar);
+		SubDictionaryWrap subDic = new SubDictionaryWrap(hashChar,
+				createSubDictionary(ascWords, beginIndex, endIndex), beginIndex);
+		Object key = keyOf(hashChar);
 		if (subs.containsKey(key)) {
 			System.out.println("出现这个文字，表示输入的词语排序错误，请确保词典排序正确>>>>>>>>>"
 					+ hashChar);
@@ -133,26 +132,20 @@ public class HashBinaryDictionary implements Dictionary {
 		subs.put(key, subDic);
 	}
 
-
-	
-	protected Dictionary createSubDictionary(String[] ascWords, int beginIndex, int endIndex) {
-		int count = endIndex - beginIndex; 
-		if (count < 16 ) {
+	protected Dictionary createSubDictionary(String[] ascWords, int beginIndex,
+			int endIndex) {
+		int count = endIndex - beginIndex;
+		if (count < 16) {
 			return new BinaryDictionary(ascWords, beginIndex, endIndex);
-		}
-		else {
-			return new HashBinaryDictionary(
-					ascWords, 
-					hashIndex + 1,
-					beginIndex, 
-					endIndex, 
-					getCapacity(count), 
-					0.75f);
+		} else {
+			return new HashBinaryDictionary(ascWords, hashIndex + 1,
+					beginIndex, endIndex, getCapacity(count), 0.75f);
 		}
 	}
-	
-	protected static final int [] capacityCandiate = {16, 32, 64, 128,256,512,1024,2048,4096,10192};
-	
+
+	protected static final int[] capacityCandiate = { 16, 32, 64, 128, 256,
+			512, 1024, 2048, 4096, 10192 };
+
 	protected int getCapacity(int count) {
 		int capacity = -1;
 		count <<= 2;
@@ -177,27 +170,27 @@ public class HashBinaryDictionary implements Dictionary {
 	}
 
 	public Hit search(CharSequence input, int begin, int count) {
-		SubDictionaryWrap subDic = subs.get(keyOf(input.charAt(hashIndex + begin)));
+		SubDictionaryWrap subDic = (SubDictionaryWrap) subs.get(keyOf(input
+				.charAt(hashIndex + begin)));
 		if (subDic == null) {
 			return Hit.UNDEFINED;
 		}
 		Dictionary dic = subDic.dic;
-		//对count==hashIndex + 1的处理
+		// 对count==hashIndex + 1的处理
 		if (count == hashIndex + 1) {
 			String header = dic.get(0);
 			if (header.length() == hashIndex + 1) {
 				if (subDic.wordIndexOffset + 1 < this.ascWords.length) {
-					return new Hit(subDic.wordIndexOffset, header, this.ascWords[subDic.wordIndexOffset + 1]);
-				}
-				else {
+					return new Hit(subDic.wordIndexOffset, header,
+							this.ascWords[subDic.wordIndexOffset + 1]);
+				} else {
 					return new Hit(subDic.wordIndexOffset, header, null);
 				}
-			}
-			else {
+			} else {
 				return new Hit(Hit.UNCLOSED_INDEX, null, header);
 			}
 		}
-		//count > hashIndex + 1
+		// count > hashIndex + 1
 		Hit word = dic.search(input, begin, count);
 		if (word.isHit()) {
 			int index = subDic.wordIndexOffset + word.getIndex();
@@ -223,9 +216,9 @@ public class HashBinaryDictionary implements Dictionary {
 	 * 
 	 * @see #subs
 	 */
-	protected int keyOf(char theChar) {
+	protected Object keyOf(char theChar) {
 		// return theChar - 0x4E00;// '一'==0x4E00
-		return theChar;
+		return new Integer(theChar);
 	}
 
 	/**
@@ -247,7 +240,8 @@ public class HashBinaryDictionary implements Dictionary {
 		 */
 		int wordIndexOffset;
 
-		public SubDictionaryWrap(char hashChar, Dictionary dic, int wordIndexOffset) {
+		public SubDictionaryWrap(char hashChar, Dictionary dic,
+				int wordIndexOffset) {
 			this.hashChar = hashChar;
 			this.dic = dic;
 			this.wordIndexOffset = wordIndexOffset;

@@ -15,7 +15,6 @@
  */
 package net.paoding.analysis.knife;
 
-
 /**
  * Knife规定如何分解字符串成词语，并将分解成的词语告知{@link Collector}接口。
  * <p>

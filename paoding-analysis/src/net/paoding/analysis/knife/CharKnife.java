@@ -26,7 +26,7 @@ import java.util.HashSet;
  */
 public abstract class CharKnife implements Knife {
 
-	private HashSet<String> noiseTable;
+	private HashSet/*<String>*/ noiseTable;
 
 	public CharKnife() {
 	}
@@ -37,7 +37,7 @@ public abstract class CharKnife implements Knife {
 
 	public void setNoiseWords(String[] noiseWords) {
 		Arrays.sort(noiseWords);
-		noiseTable = new HashSet<String>((int)(noiseWords.length * 1.5));
+		noiseTable = new HashSet/*<String>*/((int)(noiseWords.length * 1.5));
 		for (int i = 0; i < noiseWords.length; i++) {
 			noiseTable.add(noiseWords[i]);
 		}

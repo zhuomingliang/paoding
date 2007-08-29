@@ -131,12 +131,10 @@ public class Beef implements CharSequence {
 
 	// -------------------------------------------------
 	
-	@Override
 	public String toString() {
 		return new String(value, offset, count);
 	}
 
-	@Override
 	public int hashCode() {
 		int h = hash;
 		if (h == 0) {

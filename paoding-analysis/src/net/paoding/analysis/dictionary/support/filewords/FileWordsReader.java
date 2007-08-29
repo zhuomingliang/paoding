@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 import net.paoding.analysis.knife.CharSet;
 
@@ -38,7 +38,7 @@ import net.paoding.analysis.knife.CharSet;
  */
 public class FileWordsReader {
 
-	public static Map<String, Set<String>> readWords(
+	public static Map/*<String, Set<String>>*/ readWords(
 			String fileOrDirectory, String charsetName) throws IOException {
 		SimpleReadListener l = new SimpleReadListener();
 		readWords(fileOrDirectory, l, charsetName);
@@ -62,8 +62,8 @@ public class FileWordsReader {
 				throw new FileNotFoundException("file \"" + fileOrDirectory + "\" not found!");
 			}
 		}
-		ArrayList<File> dirs = new ArrayList<File>();
-		LinkedList<File> dics = new LinkedList<File>();
+		ArrayList/*<File>*/ dirs = new ArrayList/*<File>*/();
+		LinkedList/*<File>*/ dics = new LinkedList/*<File>*/();
 		String dir;
 		if (file.isDirectory()) {
 			dirs.add(file);
@@ -74,9 +74,10 @@ public class FileWordsReader {
 		}
 		int index = 0;
 		while (index < dirs.size()) {
-			File cur = dirs.get(index++);
+			File cur = (File) dirs.get(index++);
 			File[] files = cur.listFiles();
-			for (File f : files) {
+			for (int i = 0; i < files.length; i ++) {
+				File f = files[i];
 				if (f.isDirectory()) {
 					dirs.add(f);
 				} else {
@@ -84,7 +85,8 @@ public class FileWordsReader {
 				}
 			}
 		}
-		for (File f : dics) {
+		for (Iterator iter = dics.iterator(); iter.hasNext();) {
+			File f = (File) iter.next();
 			String name = f.getAbsolutePath().substring(
 						dir.length() + 1);
 			name = name.replace('\\', '/');
@@ -114,8 +116,4 @@ public class FileWordsReader {
 		}
 	}
 	
-	public static void main(String[] args) {
-		int i =0xFEFF;
-		System.out.println(i);
-	}
 }

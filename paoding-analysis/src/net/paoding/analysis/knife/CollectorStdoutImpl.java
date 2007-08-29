@@ -18,19 +18,19 @@ package net.paoding.analysis.knife;
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
- *
+ * 
  */
 public class CollectorStdoutImpl implements Collector {
 
-	private static ThreadLocal<Integer> tl = new ThreadLocal<Integer>(){
-		@Override
-		protected Integer initialValue() {
-			return 0;
+	private static ThreadLocal/* <Integer> */tl = new ThreadLocal/* <Integer> */() {
+		protected Object/* Integer */initialValue() {
+			return new Integer(0);
 		}
 	};
-	
+
 	public void collect(String word, int begin, int end) {
-		int c = tl.get() + 1;
+		int last = ((Integer) tl.get()).intValue();
+		Integer c = new Integer(last + 1);
 		tl.set(c);
 		System.out.println(c + ":\t[" + begin + ", " + end + ")=" + word);
 	}

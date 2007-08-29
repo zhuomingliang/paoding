@@ -15,8 +15,6 @@
  */
 package net.paoding.analysis.dictionary;
 
-import static net.paoding.analysis.dictionary.Hit.UNDEFINED;
-
 /**
  * Dictionary的二叉查找实现。
  * <p>
@@ -94,7 +92,7 @@ public class BinaryDictionary implements Dictionary {
 		}
 		//
 		if (left >= ascWords.length) {
-			return UNDEFINED;
+			return Hit.UNDEFINED;
 		}
 		//
 		boolean asPrex = true;
@@ -108,7 +106,8 @@ public class BinaryDictionary implements Dictionary {
 				asPrex = false;
 			}
 		}
-		return asPrex ? new Hit(Hit.UNCLOSED_INDEX, null, nextWord) : UNDEFINED;
+		return asPrex ? new Hit(Hit.UNCLOSED_INDEX, null, nextWord)
+				: Hit.UNDEFINED;
 	}
 
 	public static int compare(CharSequence one, int begin, int count,
