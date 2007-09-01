@@ -122,14 +122,10 @@ public class HashBinaryDictionary implements Dictionary {
 	 * @param endIndex
 	 */
 	protected void addSubDictionary(char hashChar, int beginIndex, int endIndex) {
-		SubDictionaryWrap subDic = new SubDictionaryWrap(hashChar,
-				createSubDictionary(ascWords, beginIndex, endIndex), beginIndex);
-		Object key = keyOf(hashChar);
-		if (subs.containsKey(key)) {
-			System.out.println("出现这个文字，表示输入的词语排序错误，请确保词典排序正确>>>>>>>>>"
-					+ hashChar);
-		}
-		subs.put(key, subDic);
+		Dictionary subDic = createSubDictionary(ascWords, beginIndex, endIndex);
+		SubDictionaryWrap subDicWrap = new SubDictionaryWrap(hashChar,
+				subDic, beginIndex);
+		subs.put(keyOf(hashChar), subDicWrap);
 	}
 
 	protected Dictionary createSubDictionary(String[] ascWords, int beginIndex,
