@@ -10,8 +10,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
-import net.paoding.analysis.knife.PaodingMaker;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
@@ -66,7 +64,7 @@ public class Estimate {
 			File f;
 			if (path.startsWith("classpath:")) {
 				path = path.substring("classpath:".length());
-				URL url = PaodingMaker.class.getClassLoader().getResource(path);
+				URL url = Estimate.class.getClassLoader().getResource(path);
 				if (url == null) {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in classpath.");
