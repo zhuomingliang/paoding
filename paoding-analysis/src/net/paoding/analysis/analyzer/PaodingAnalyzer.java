@@ -66,7 +66,7 @@ public class PaodingAnalyzer extends Analyzer {
 	public static final int MAX_MODE = 2;
 	
 	/**
-	 * @deprecated 请使用DEFAULT_MODE
+	 * @deprecated 请使用MAX_MODE
 	 */
 	public static final int QUERY_MODE = MAX_MODE;
 
