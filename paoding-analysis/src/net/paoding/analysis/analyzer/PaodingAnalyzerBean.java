@@ -81,35 +81,6 @@ public class PaodingAnalyzerBean extends Analyzer {
 		this.setMode(mode);
 	}
 
-	public static Analyzer defaultMode(Knife knife) {
-		return new PaodingAnalyzerBean(knife, DEFAULT_MODE);
-	}
-
-	public static Analyzer maxMode(Knife knife) {
-		return new PaodingAnalyzerBean(knife, MAX_MODE);
-	}
-
-	/**
-	 * 
-	 * @param knife
-	 * @return
-	 * @deprecated 请使用defaultMode替代
-	 * 
-	 */
-	public static Analyzer writerMode(Knife knife) {
-		return defaultMode(knife);
-	}
-
-	/**
-	 * 
-	 * @param knife
-	 * @return
-	 * @deprecated 请使用maxMode替代
-	 */
-	public static Analyzer queryMode(Knife knife) {
-		return maxMode(knife);
-	}
-
 	// -------------------------------------------------
 
 	public Knife getKnife() {
