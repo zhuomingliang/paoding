@@ -124,14 +124,14 @@ public class PaodingMaker {
 				path = path.substring("classpath:".length());
 				URL url = PaodingMaker.class.getClassLoader().getResource(path);
 				if (url == null) {
-					throw new PaodingAnalysisException("Not found " + path
+					throw new IllegalArgumentException("Not found " + path
 							+ " in classpath.");
 				}
 				f = new File(url.getFile());
 			} else {
 				f = new File(path);
 				if (!f.exists()) {
-					throw new PaodingAnalysisException("Not found " + path
+					throw new IllegalArgumentException("Not found " + path
 							+ " in system.");
 				}
 			}
@@ -159,7 +159,7 @@ public class PaodingMaker {
 			//!!
 			postPropertiesLoaded(p);
 			return p;
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new PaodingAnalysisException(e);
 		} finally {
 			if (in != null) {
