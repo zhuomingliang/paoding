@@ -56,9 +56,19 @@ public class PaodingAnalyzer extends Analyzer {
 	public static final int DEFAULT_MODE = 1;
 
 	/**
+	 * @deprecated 请使用DEFAULT_MODE
+	 */
+	public static final int WRITER_MODE = DEFAULT_MODE;
+
+	/**
 	 * 按最大切分
 	 */
 	public static final int MAX_MODE = 2;
+	
+	/**
+	 * @deprecated 请使用DEFAULT_MODE
+	 */
+	public static final int QUERY_MODE = MAX_MODE;
 
 	// -------------------------------------------------
 	/**
@@ -98,8 +108,6 @@ public class PaodingAnalyzer extends Analyzer {
 		this.knife = knife;
 		this.mode = mode;
 	}
-	
-
 
 	/**
 	 * @see #setKnife(Knife)
@@ -111,11 +119,11 @@ public class PaodingAnalyzer extends Analyzer {
 		this.knife = knife;
 		this.setMode(mode);
 	}
+
 	public static PaodingAnalyzer defaultMode(Knife knife) {
 		return new PaodingAnalyzer(knife, DEFAULT_MODE);
 	}
-	
-	
+
 	public static PaodingAnalyzer maxMode(Knife knife) {
 		return new PaodingAnalyzer(knife, MAX_MODE);
 	}
@@ -130,17 +138,16 @@ public class PaodingAnalyzer extends Analyzer {
 	public static PaodingAnalyzer writerMode(Knife knife) {
 		return defaultMode(knife);
 	}
-	
+
 	/**
 	 * 
 	 * @param knife
 	 * @return
-	 * @deprecated  请使用maxMode替代
+	 * @deprecated 请使用maxMode替代
 	 */
 	public static PaodingAnalyzer queryMode(Knife knife) {
 		return maxMode(knife);
 	}
-
 
 	// -------------------------------------------------
 
@@ -167,12 +174,13 @@ public class PaodingAnalyzer extends Analyzer {
 	public void setMode(int mode) {
 		this.mode = mode;
 	}
-	
+
 	public void setMode(String mode) {
-		if ("default".equalsIgnoreCase(mode) || "writer".equalsIgnoreCase(mode) || "index".equalsIgnoreCase(mode)){
+		if ("default".equalsIgnoreCase(mode) || "writer".equalsIgnoreCase(mode)
+				|| "index".equalsIgnoreCase(mode)) {
 			this.mode = DEFAULT_MODE;
-		}
-		else if ("max".equalsIgnoreCase(mode) || "query".equalsIgnoreCase(mode)){
+		} else if ("max".equalsIgnoreCase(mode)
+				|| "query".equalsIgnoreCase(mode)) {
 			this.mode = MAX_MODE;
 		}
 	}
