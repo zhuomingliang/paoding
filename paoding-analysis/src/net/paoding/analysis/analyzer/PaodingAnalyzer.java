@@ -148,10 +148,10 @@ public class PaodingAnalyzer extends Analyzer {
 	}
 	
 	public void setMode(String mode) {
-		if ("default".equalsIgnoreCase(mode)){
+		if ("default".equalsIgnoreCase(mode) || "writer".equalsIgnoreCase(mode) || "index".equalsIgnoreCase(mode)){
 			this.mode = DEFAULT_MODE;
 		}
-		else if ("max".equalsIgnoreCase(mode)){
+		else if ("max".equalsIgnoreCase(mode) || "query".equalsIgnoreCase(mode)){
 			this.mode = MAX_MODE;
 		}
 	}
