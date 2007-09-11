@@ -49,7 +49,6 @@ public class PaodingAnalyzerBean extends Analyzer {
 	// -------------------------------------------------
 
 	public PaodingAnalyzerBean() {
-		init();
 	}
 
 	/**
@@ -58,7 +57,6 @@ public class PaodingAnalyzerBean extends Analyzer {
 	 */
 	public PaodingAnalyzerBean(Knife knife) {
 		this.knife = knife;
-		init();
 	}
 
 	/**
@@ -70,7 +68,6 @@ public class PaodingAnalyzerBean extends Analyzer {
 	public PaodingAnalyzerBean(Knife knife, int mode) {
 		this.knife = knife;
 		this.mode = mode;
-		init();
 	}
 
 	/**
@@ -82,14 +79,6 @@ public class PaodingAnalyzerBean extends Analyzer {
 	public PaodingAnalyzerBean(Knife knife, String mode) {
 		this.knife = knife;
 		this.setMode(mode);
-		init();
-	}
-	
-	/**
-	 * 由子类覆盖，被构造函数调用
-	 */
-	protected void init() {
-		//do nothing here
 	}
 
 	public static Analyzer defaultMode(Knife knife) {
