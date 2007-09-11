@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import net.paoding.analysis.Constants;
+import net.paoding.analysis.knife.Knife;
 import net.paoding.analysis.knife.Paoding;
 import net.paoding.analysis.knife.PaodingMaker;
 
@@ -53,12 +54,12 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 		// 2、相同的properties实例，PaodingMaker也将返回同一个Paoding实例
 		// 根据以上1、2点说明，在此能够保证多次创建PaodingAnalyzer并不会多次装载属性文件和词典
 		Properties properties = PaodingMaker.getProperties();
-		String mode = Constants
-				.getProperty(properties, Constants.ANALYZER_MODE);
+		String mode = Constants.getProperty(properties, Constants.ANALYZER_MODE);
 		Paoding paoding = PaodingMaker.make(properties);
 		setKnife(paoding);
 		setMode(mode);
 	}
+
 
 	/**
 	 * 本方法为PaodingAnalyzer附带的测试评估方法。 <br>
@@ -96,4 +97,57 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 
 	// --------------------------------------------------
 
+
+	
+	/**
+	 * @param knife
+	 * @param default_mode
+	 * @deprecated
+	 */
+	public PaodingAnalyzer(Knife knife, int mode) {
+		super(knife, mode);
+	}
+	
+	/**
+	 * 等价于maxMode()
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated
+	 */
+	public static PaodingAnalyzer queryMode(Knife knife) {
+		return maxMode(knife);
+	}
+
+	/**
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated
+	 */
+	public static PaodingAnalyzer defaultMode(Knife knife) {
+		return new PaodingAnalyzer(knife, DEFAULT_MODE);
+	}
+
+	/**
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated
+	 */
+	public static PaodingAnalyzer maxMode(Knife knife) {
+		return new PaodingAnalyzer(knife, MAX_MODE);
+	}
+
+	/**
+	 * 等价于defaultMode()
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated
+	 * 
+	 */
+	public static PaodingAnalyzer writerMode(Knife knife) {
+		return defaultMode(knife);
+	}
 }
