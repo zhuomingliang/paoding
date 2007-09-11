@@ -49,6 +49,10 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * 在一个JVM中，可多次创建，而并不会多次读取属性文件，不会重复读取字典。
 	 */
 	public PaodingAnalyzer() {
+		init();
+	}
+
+	protected void init() {
 		// 根据PaodingMaker说明，
 		// 1、多次调用getProperties()，返回的都是同一个properties实例(只要属性文件没发生过修改)
 		// 2、相同的properties实例，PaodingMaker也将返回同一个Paoding实例
