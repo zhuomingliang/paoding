@@ -15,14 +15,11 @@
  */
 package net.paoding.analysis.analyzer;
 
-import java.io.Reader;
+import java.util.Properties;
 
-import net.paoding.analysis.knife.CJKKnife;
-import net.paoding.analysis.knife.Knife;
+import net.paoding.analysis.Constants;
 import net.paoding.analysis.knife.Paoding;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import net.paoding.analysis.knife.PaodingMaker;
 
 /**
  * PaodingAnalyzer是基于“庖丁解牛”框架的Lucene词语分析器，是“庖丁解牛”框架对Lucene的适配器。
@@ -32,178 +29,23 @@ import org.apache.lucene.analysis.TokenStream;
  * PaodingAnalyzer是可复用的：推荐多次同一个PaodingAnalyzer实例。
  * <p>
  * 
- * 如有需要特别调整，应通过构造函数或knife设置器(setter)配置自订制的Knife实例。
+ * PaodingAnalyzer自动读取类路径下的paoding-analysis.properties属性文件，装配PaodingAnalyzer
  * <p>
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 
- * @see PaodingTokenizer
- * @see Knife
- * @see Paoding
- * @see CJKKnife
- * @see TokenCollector
+ * @see PaodingAnalyzerBean
  * 
  * @since 1.0
  * 
  */
-public class PaodingAnalyzer extends Analyzer {
+public class PaodingAnalyzer extends PaodingAnalyzerBean {
 
-	// -------------------------------------------------
-
-	/**
-	 * 最大切分和最小切分兼有
-	 */
-	public static final int DEFAULT_MODE = 1;
-
-	/**
-	 * @deprecated 请使用DEFAULT_MODE
-	 */
-	public static final int WRITER_MODE = DEFAULT_MODE;
-
-	/**
-	 * 按最大切分
-	 */
-	public static final int MAX_MODE = 2;
-	
-	/**
-	 * @deprecated 请使用MAX_MODE
-	 */
-	public static final int QUERY_MODE = MAX_MODE;
-
-	// -------------------------------------------------
-	/**
-	 * 用于向PaodingTokenizer提供，分解文本字符
-	 * 
-	 * @see PaodingTokenizer#next()
-	 * 
-	 */
-	private Knife knife;
-
-	/**
-	 * @see #DEFAULT_MODE
-	 * @see #MAX_MODE
-	 */
-	private int mode = DEFAULT_MODE;
-
-	// -------------------------------------------------
-
-	public PaodingAnalyzer() {
+	protected void init() {
+		Properties properties = PaodingMaker.getProperties();
+		String mode = Constants.getProperty(properties, Constants.ANALYZER_MODE);
+		Paoding paoding = PaodingMaker.make(properties);
+		setKnife(paoding);
+		setMode(mode);
 	}
-
-	/**
-	 * @see #setKnife(Knife)
-	 * @param knife
-	 */
-	public PaodingAnalyzer(Knife knife) {
-		this.knife = knife;
-	}
-
-	/**
-	 * @see #setKnife(Knife)
-	 * @see #setMode(int)
-	 * @param knife
-	 * @param mode
-	 */
-	public PaodingAnalyzer(Knife knife, int mode) {
-		this.knife = knife;
-		this.mode = mode;
-	}
-
-	/**
-	 * @see #setKnife(Knife)
-	 * @see #setMode(int)
-	 * @param knife
-	 * @param mode
-	 */
-	public PaodingAnalyzer(Knife knife, String mode) {
-		this.knife = knife;
-		this.setMode(mode);
-	}
-
-	public static PaodingAnalyzer defaultMode(Knife knife) {
-		return new PaodingAnalyzer(knife, DEFAULT_MODE);
-	}
-
-	public static PaodingAnalyzer maxMode(Knife knife) {
-		return new PaodingAnalyzer(knife, MAX_MODE);
-	}
-
-	/**
-	 * 
-	 * @param knife
-	 * @return
-	 * @deprecated 请使用defaultMode替代
-	 * 
-	 */
-	public static PaodingAnalyzer writerMode(Knife knife) {
-		return defaultMode(knife);
-	}
-
-	/**
-	 * 
-	 * @param knife
-	 * @return
-	 * @deprecated 请使用maxMode替代
-	 */
-	public static PaodingAnalyzer queryMode(Knife knife) {
-		return maxMode(knife);
-	}
-
-	// -------------------------------------------------
-
-	public Knife getKnife() {
-		return knife;
-	}
-
-	public void setKnife(Knife knife) {
-		this.knife = knife;
-	}
-
-	public int getMode() {
-		return mode;
-	}
-
-	/**
-	 * 设置分析器模式。写模式(WRITER_MODE)或检索模式(QUERY_MODE)其中一种。默认为写模式。
-	 * <p>
-	 * WRITER_MODE在建立索引时使用，能够使分析器对每个可能的词语建立索引<br>
-	 * QUERY_MODE在用户搜索时使用，使用户检索的结果匹配度最大化
-	 * 
-	 * @param mode
-	 */
-	public void setMode(int mode) {
-		this.mode = mode;
-	}
-
-	public void setMode(String mode) {
-		if ("default".equalsIgnoreCase(mode) || "writer".equalsIgnoreCase(mode)
-				|| "index".equalsIgnoreCase(mode)) {
-			this.mode = DEFAULT_MODE;
-		} else if ("max".equalsIgnoreCase(mode)
-				|| "query".equalsIgnoreCase(mode)) {
-			this.mode = MAX_MODE;
-		}
-	}
-
-	// -------------------------------------------------
-
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		if (knife == null) {
-			throw new NullPointerException("knife should be set before token");
-		}
-		// PaodingTokenizer是TokenStream实现，使用knife解析reader流入的文本
-		return new PaodingTokenizer(reader, knife, createTokenCollector());
-	}
-
-	protected TokenCollector createTokenCollector() {
-		switch (mode) {
-		case DEFAULT_MODE:
-			return new DefaultTokenCollector();
-		case MAX_MODE:
-			return new MaxTokenCollector();
-		default:
-			throw new IllegalArgumentException("wrong mode");
-		}
-	}
-
 }

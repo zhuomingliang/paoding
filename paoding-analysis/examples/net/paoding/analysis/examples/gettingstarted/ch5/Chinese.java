@@ -3,8 +3,6 @@ package net.paoding.analysis.examples.gettingstarted.ch5;
 import net.paoding.analysis.analyzer.PaodingAnalyzer;
 import net.paoding.analysis.examples.gettingstarted.BoldFormatter;
 import net.paoding.analysis.examples.gettingstarted.ContentReader;
-import net.paoding.analysis.knife.Paoding;
-import net.paoding.analysis.knife.PaodingMaker;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -34,8 +32,7 @@ public class Chinese {
 			QUERY = args[0];
 		}
 		// 将庖丁封装成符合Lucene要求的Analyzer规范
-		Paoding paoding = PaodingMaker.make();
-		Analyzer analyzer = PaodingAnalyzer.defaultMode(paoding);
+		Analyzer analyzer = new PaodingAnalyzer();
 		
 		//读取本类目录下的text.txt文件
 		String content = ContentReader.readText(Chinese.class);
