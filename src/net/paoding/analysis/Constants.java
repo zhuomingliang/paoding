@@ -43,6 +43,10 @@ public class Constants {
 	// like "Wang", "Zhang", ...
 	public static final String DIC_DETECTOR_INTERVAL = "paoding.dic.detector.interval";
 	public static final String DIC_DETECTOR_INTERVAL_DEFAULT = "60";
+	
+	// like "default", "max", ...
+	public static final String ANALYZER_MODE = "paoding.analyzer.mode";
+	public static final String ANALYZER_MOE_DEFAULT = "default";
 
 	private static final Map/* <String, String> */ map = new HashMap/* <String, String> */();
 	
@@ -55,6 +59,7 @@ public class Constants {
 		map.put(DIC_UNIT, DIC_UNIT_DEFAULT);
 		map.put(DIC_CONFUCIAN_FAMILY_NAME, DIC_CONFUCIAN_FAMILY_NAME_DEFAULT);
 		map.put(DIC_DETECTOR_INTERVAL, DIC_DETECTOR_INTERVAL_DEFAULT);
+		map.put(ANALYZER_MODE, ANALYZER_MODE);
 	}
 
 	//

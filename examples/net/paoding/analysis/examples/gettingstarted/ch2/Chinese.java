@@ -3,8 +3,6 @@ package net.paoding.analysis.examples.gettingstarted.ch2;
 import net.paoding.analysis.analyzer.PaodingAnalyzer;
 import net.paoding.analysis.examples.gettingstarted.BoldFormatter;
 import net.paoding.analysis.examples.gettingstarted.ContentReader;
-import net.paoding.analysis.knife.Paoding;
-import net.paoding.analysis.knife.PaodingMaker;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -25,7 +23,7 @@ import org.apache.lucene.search.highlight.TokenSources;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
-public class PeopleRepublicOfChina {
+public class Chinese {
 	private static String FIELD_NAME = "content";
 	private static String QUERY = "共和国";
 
@@ -34,11 +32,10 @@ public class PeopleRepublicOfChina {
 			QUERY = args[0];
 		}
 		// 将庖丁封装成符合Lucene要求的Analyzer规范
-		Paoding paoding = PaodingMaker.make();
-		Analyzer analyzer = PaodingAnalyzer.defaultMode(paoding);
+		Analyzer analyzer = new PaodingAnalyzer();
 		
 		//读取本类目录下的text.txt文件
-		String content = ContentReader.readText(PeopleRepublicOfChina.class);
+		String content = ContentReader.readText(Chinese.class);
 
 		//接下来是标准的Lucene建立索引和检索的代码
 		Directory ramDir = new RAMDirectory();

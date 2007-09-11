@@ -38,6 +38,9 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0.0
  */
 public class PaodingMaker {
+	
+	public static final String DEFAULT_PROPERTIES_PATH = "classpath:paoding-analysis.properties";
+
 	private PaodingMaker() {
 	}
 
@@ -65,7 +68,7 @@ public class PaodingMaker {
 	 * @return
 	 */
 	public static Paoding make() {
-		return make("classpath:paoding-analysis.properties");
+		return make(DEFAULT_PROPERTIES_PATH);
 	}
 
 	/**
@@ -83,7 +86,7 @@ public class PaodingMaker {
 	 * @return
 	 */
 	public static Paoding make(String propertiesPath) {
-		return make(loadProperties(propertiesPath));
+		return make(getProperties(propertiesPath));
 	}
 
 	/**
@@ -94,7 +97,7 @@ public class PaodingMaker {
 	 * @return
 	 */
 	public static Paoding make(Properties p) {
-		preheatProperties(p);
+		postPropertiesLoaded(p);
 		return implMake(p);
 	}
 
@@ -104,34 +107,13 @@ public class PaodingMaker {
 		return Constants.getProperty(p, name);
 	}
 
-	private static void preheatProperties(Properties p) {
-
-		if (p.getProperty("paoding.dic.home.absolute.path") == null) {
-			String dicHome = getProperty(p, Constants.DIC_HOME);
-			File dicHomeFile;
-			if (dicHome.startsWith("classpath:")) {
-				String name = dicHome.substring("classpath:".length());
-				URL url = PaodingMaker.class.getClassLoader().getResource(name);
-				if (url == null) {
-					throw new PaodingAnalysisException("file \"" + name
-							+ "\" not found in classpath!");
-				}
-				dicHomeFile = new File(url.getFile());
-			} else {
-				dicHomeFile = new File(dicHome);
-				if (!dicHomeFile.exists()) {
-					throw new PaodingAnalysisException("Not found " + dicHome
-							+ " in system.");
-				}
-			}
-			p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
-					.getAbsolutePath());
-		}
+	// --------------------------------------------------
+	
+	public static Properties getProperties() {
+		return getProperties(DEFAULT_PROPERTIES_PATH);
 	}
 
-	// --------------------------------------------------
-
-	private static Properties loadProperties(String path) {
+	public static Properties getProperties(String path) {
 		if (path == null) {
 			return new Properties();
 		}
@@ -174,6 +156,8 @@ public class PaodingMaker {
 					+ f.lastModified());
 			p.load(in);
 			propertiesHolder.set(f.getAbsolutePath(), p);
+			//!!
+			postPropertiesLoaded(p);
 			return p;
 		} catch (Exception e) {
 			throw new PaodingAnalysisException(e);
@@ -184,6 +168,30 @@ public class PaodingMaker {
 				} catch (IOException e) {
 				}
 			}
+		}
+	}
+
+	private static void postPropertiesLoaded(Properties p) {
+		if (p.getProperty("paoding.dic.home.absolute.path") == null) {
+			String dicHome = getProperty(p, Constants.DIC_HOME);
+			File dicHomeFile;
+			if (dicHome.startsWith("classpath:")) {
+				String name = dicHome.substring("classpath:".length());
+				URL url = PaodingMaker.class.getClassLoader().getResource(name);
+				if (url == null) {
+					throw new PaodingAnalysisException("file \"" + name
+							+ "\" not found in classpath!");
+				}
+				dicHomeFile = new File(url.getFile());
+			} else {
+				dicHomeFile = new File(dicHome);
+				if (!dicHomeFile.exists()) {
+					throw new PaodingAnalysisException("Not found " + dicHome
+							+ " in system.");
+				}
+			}
+			p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
+					.getAbsolutePath());
 		}
 	}
 
