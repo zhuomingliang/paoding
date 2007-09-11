@@ -111,7 +111,6 @@ public class PaodingAnalyzer extends Analyzer {
 		this.knife = knife;
 		this.setMode(mode);
 	}
-
 	public static PaodingAnalyzer defaultMode(Knife knife) {
 		return new PaodingAnalyzer(knife, DEFAULT_MODE);
 	}
@@ -120,6 +119,28 @@ public class PaodingAnalyzer extends Analyzer {
 	public static PaodingAnalyzer maxMode(Knife knife) {
 		return new PaodingAnalyzer(knife, MAX_MODE);
 	}
+
+	/**
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated 请使用defaultMode替代
+	 * 
+	 */
+	public static PaodingAnalyzer writerMode(Knife knife) {
+		return defaultMode(knife);
+	}
+	
+	/**
+	 * 
+	 * @param knife
+	 * @return
+	 * @deprecated  请使用maxMode替代
+	 */
+	public static PaodingAnalyzer queryMode(Knife knife) {
+		return maxMode(knife);
+	}
+
 
 	// -------------------------------------------------
 
