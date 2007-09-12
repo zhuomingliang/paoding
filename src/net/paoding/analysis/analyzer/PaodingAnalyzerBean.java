@@ -46,6 +46,8 @@ public class PaodingAnalyzerBean extends Analyzer {
 	 */
 	private int mode = DEFAULT_MODE;
 
+	private Class modeClass;
+
 	// -------------------------------------------------
 
 	public PaodingAnalyzerBean() {
@@ -96,26 +98,51 @@ public class PaodingAnalyzerBean extends Analyzer {
 	}
 
 	/**
-	 * 设置分析器模式。写模式(WRITER_MODE)或检索模式(QUERY_MODE)其中一种。默认为写模式。
+	 * 设置分析器模式.
 	 * <p>
-	 * WRITER_MODE在建立索引时使用，能够使分析器对每个可能的词语建立索引<br>
-	 * QUERY_MODE在用户搜索时使用，使用户检索的结果匹配度最大化
 	 * 
 	 * @param mode
 	 */
 	public void setMode(int mode) {
+		if (mode != DEFAULT_MODE && mode != MAX_MODE) {
+			throw new IllegalArgumentException("wrong mode:" + mode);
+		}
 		this.mode = mode;
+		this.modeClass = null;
+	}
+
+	/**
+	 * 设置分析器模式类。
+	 * 
+	 * @param modeClass
+	 *            TokenCollector的实现类。
+	 */
+	public void setModeClass(Class modeClass) {
+		this.modeClass = modeClass;
+	}
+
+	public void setModeClass(String modeClass) {
+		try {
+			this.modeClass = Class.forName(modeClass);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("not found mode class", e);
+		}
 	}
 
 	public void setMode(String mode) {
-		if ("default".equalsIgnoreCase(mode) || "writer".equalsIgnoreCase(mode)
-				|| "index".equalsIgnoreCase(mode)
-				|| ("" + DEFAULT_MODE).equals(mode)) {
-			this.mode = DEFAULT_MODE;
-		} else if ("max".equalsIgnoreCase(mode)
-				|| "query".equalsIgnoreCase(mode)
-				|| ("" + MAX_MODE).equals(mode)) {
-			this.mode = MAX_MODE;
+		if (mode.startsWith("class:")) {
+			setModeClass(mode.substring("class:".length()));
+		} else {
+			if ("default".equalsIgnoreCase(mode)
+					|| "writer".equalsIgnoreCase(mode)
+					|| "index".equalsIgnoreCase(mode)
+					|| ("" + DEFAULT_MODE).equals(mode)) {
+				setMode(DEFAULT_MODE);
+			} else if ("max".equalsIgnoreCase(mode)
+					|| "query".equalsIgnoreCase(mode)
+					|| ("" + MAX_MODE).equals(mode)) {
+				setMode(MAX_MODE);
+			}
 		}
 	}
 
@@ -130,13 +157,22 @@ public class PaodingAnalyzerBean extends Analyzer {
 	}
 
 	protected TokenCollector createTokenCollector() {
+		if (modeClass != null) {
+			try {
+				return (TokenCollector) modeClass.newInstance();
+			} catch (InstantiationException e) {
+				throw new IllegalArgumentException("wrong mode class", e);
+			} catch (IllegalAccessException e) {
+				throw new IllegalArgumentException("wrong mode class", e);
+			}
+		}
 		switch (mode) {
 		case DEFAULT_MODE:
 			return new DefaultTokenCollector();
 		case MAX_MODE:
 			return new MaxTokenCollector();
 		default:
-			throw new IllegalArgumentException("wrong mode");
+			throw new Error("never happened");
 		}
 	}
 }

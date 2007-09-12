@@ -66,13 +66,6 @@ public class Constants {
 	public static final String KNIFE_CLASS = "paoding.knife.class";
 
 	public static String getProperty(Properties p, String name) {
-		String value = p.getProperty(name, (String) map.get(name));
-		if (name.equals("paoding.dic.home")) {
-			value = value.replace('\\', '/');
-			if (!value.endsWith("/")) {
-				value = value + "/";
-			}
-		}
-		return value;
+		return p.getProperty(name, (String) map.get(name));
 	}
 }

@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0.0
  */
 public class PaodingMaker {
-	
+
 	public static final String DEFAULT_PROPERTIES_PATH = "classpath:paoding-analysis.properties";
 
 	private PaodingMaker() {
@@ -108,7 +108,7 @@ public class PaodingMaker {
 	}
 
 	// --------------------------------------------------
-	
+
 	public static Properties getProperties() {
 		return getProperties(DEFAULT_PROPERTIES_PATH);
 	}
@@ -156,7 +156,7 @@ public class PaodingMaker {
 					+ f.lastModified());
 			p.load(in);
 			propertiesHolder.set(f.getAbsolutePath(), p);
-			//!!
+			// !!
 			postPropertiesLoaded(p);
 			return p;
 		} catch (IOException e) {
@@ -172,27 +172,72 @@ public class PaodingMaker {
 	}
 
 	private static void postPropertiesLoaded(Properties p) {
-		if (p.getProperty("paoding.dic.home.absolute.path") == null) {
-			String dicHome = getProperty(p, Constants.DIC_HOME);
-			File dicHomeFile;
-			if (dicHome.startsWith("classpath:")) {
-				String name = dicHome.substring("classpath:".length());
-				URL url = PaodingMaker.class.getClassLoader().getResource(name);
-				if (url == null) {
-					throw new PaodingAnalysisException("file \"" + name
-							+ "\" not found in classpath!");
+		if (p.getProperty("paoding.dic.home.absolute.path") != null) {
+			return;
+		}
+		// 获取词典安装目录配置：
+		// 如配置了PAODING_DIC_HOME环境变量，则将其作为字典的安装主目录
+		// 否则使用属性文件的paoding.dic.home配置
+		// 但是如果属性文件中强制配置paoding.dic.home.config-first=this，
+		// 则优先考虑属性文件的paoding.dic.home配置，
+		// 此时只有当属性文件没有配置paoding.dic.home时才会采用环境变量的配置
+		String dicHomeBySystemEnv = System.getenv("PAODING_DIC_HOME");
+		String dicHome = getProperty(p, Constants.DIC_HOME);
+		if (dicHomeBySystemEnv != null) {
+			String first = getProperty(p, "paoding.dic.home.config-first");
+			if (first != null && first.equalsIgnoreCase("this")) {
+				if (dicHome == null) {
+					dicHome = dicHomeBySystemEnv;
 				}
-				dicHomeFile = new File(url.getFile());
 			} else {
-				dicHomeFile = new File(dicHome);
-				if (!dicHomeFile.exists()) {
-					throw new PaodingAnalysisException("Not found " + dicHome
-							+ " in system.");
+				dicHome = dicHomeBySystemEnv;
+			}
+		}
+		// 如果环境变量和属性文件都没有配置词典安转目录
+		// 则尝试在当前目录和类路径下寻找是否有dic目录，
+		// 若有，则采纳他为paoding.dic.home
+		// 如果尝试后均失败，则抛出PaodingAnalysisException异常
+		if (dicHome == null) {
+			File f = new File("dic");
+			if (f.exists()) {
+				dicHome = "dic/";
+			} else {
+				URL url = PaodingMaker.class.getClassLoader()
+						.getResource("dic");
+				if (url != null) {
+					dicHome = "classpath:dic/";
 				}
 			}
-			p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
-					.getAbsolutePath());
 		}
+		if (dicHome == null) {
+			throw new PaodingAnalysisException(
+					"please set a system env PAODING_DIC_HOME or Config paoding.dic.home in paoding-analysis.properties point to the dictionaries!");
+		}
+		// 规范化dicHome，并设置到属性文件对象中
+		dicHome = dicHome.replace('\\', '/');
+		if (!dicHome.endsWith("/")) {
+			dicHome = dicHome + "/";
+		}
+		p.setProperty(Constants.DIC_HOME, dicHome);// writer to the properites object
+		// 将dicHome转化为一个系统唯一的绝对路径，记录在属性对象中
+		File dicHomeFile;
+		if (dicHome.startsWith("classpath:")) {
+			String name = dicHome.substring("classpath:".length());
+			URL url = PaodingMaker.class.getClassLoader().getResource(name);
+			if (url == null) {
+				throw new PaodingAnalysisException("file \"" + name
+						+ "\" not found in classpath!");
+			}
+			dicHomeFile = new File(url.getFile());
+		} else {
+			dicHomeFile = new File(dicHome);
+			if (!dicHomeFile.exists()) {
+				throw new PaodingAnalysisException("Not found " + dicHome
+						+ " in system.");
+			}
+		}
+		p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
+				.getAbsolutePath());
 	}
 
 	private static Paoding implMake(Properties p) {
