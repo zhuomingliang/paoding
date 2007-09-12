@@ -181,10 +181,10 @@ public class PaodingMaker {
 		// 但是如果属性文件中强制配置paoding.dic.home.config-first=this，
 		// 则优先考虑属性文件的paoding.dic.home配置，
 		// 此时只有当属性文件没有配置paoding.dic.home时才会采用环境变量的配置
-		String dicHomeBySystemEnv = System.getenv("PAODING_DIC_HOME");
+		String dicHomeBySystemEnv = System.getenv(Constants.ENV_PAODING_DIC_HOME);
 		String dicHome = getProperty(p, Constants.DIC_HOME);
 		if (dicHomeBySystemEnv != null) {
-			String first = getProperty(p, "paoding.dic.home.config-first");
+			String first = getProperty(p, Constants.DIC_HOME_CONFIG_FIRST);
 			if (first != null && first.equalsIgnoreCase("this")) {
 				if (dicHome == null) {
 					dicHome = dicHomeBySystemEnv;
