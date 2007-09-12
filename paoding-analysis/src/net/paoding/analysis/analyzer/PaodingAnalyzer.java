@@ -81,7 +81,7 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 		PaodingAnalyzer analyzer = new PaodingAnalyzer();
 		String input = "有一次考试的作文题，我用地方成语(闽南语)写作文答题，"
 				+ "老师看不懂然后给不及格，批评说作为一个中国人应该写规范汉语！" + "我无语良久。。。";
-		if (args[0].length() > 0) {
+		if (args.length > 0) {
 			input = args[0];
 		}
 		String prefix = "file=";
