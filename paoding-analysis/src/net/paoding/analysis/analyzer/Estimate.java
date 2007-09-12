@@ -61,7 +61,7 @@ public class Estimate {
 
 	static class Helper {
 		static String readText(String path, String encoding) throws IOException {
-			File f;
+			InputStream in;
 			if (path.startsWith("classpath:")) {
 				path = path.substring("classpath:".length());
 				URL url = Estimate.class.getClassLoader().getResource(path);
@@ -69,15 +69,18 @@ public class Estimate {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in classpath.");
 				}
-				f = new File(url.getFile());
+				System.out.println("read content from:" + url.getFile());
+				in = url.openStream();
 			} else {
-				f = new File(path);
+				File f = new File(path);
 				if (!f.exists()) {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in system.");
 				}
+				System.out.println("read content from:" + f.getAbsolutePath());
+				in = new FileInputStream(f);
 			}
-			InputStream in = new FileInputStream(f);
+			
 			Reader re;
 			if (encoding != null) {
 				re = new InputStreamReader(in, encoding);
