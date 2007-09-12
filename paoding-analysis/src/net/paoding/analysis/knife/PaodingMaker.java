@@ -118,11 +118,12 @@ public class PaodingMaker {
 			return new Properties();
 		}
 		File f = null;
+		URL url = null;
 		InputStream in = null;
 		try {
 			if (path.startsWith("classpath:")) {
 				path = path.substring("classpath:".length());
-				URL url = PaodingMaker.class.getClassLoader().getResource(path);
+				url = PaodingMaker.class.getClassLoader().getResource(path);
 				if (url == null) {
 					throw new IllegalArgumentException("Not found " + path
 							+ " in classpath.");
@@ -148,9 +149,18 @@ public class PaodingMaker {
 				}
 			}
 			p = new Properties();
-			in = new FileInputStream(f);
+			//当url不为null时表示从classpath读取，
+			//此时配置文件可能在jar文件中，使用url.openStream()方能正常读取之
+			if (url != null) {
+				in = url.openStream();
+			}
+			else {
+				in = new FileInputStream(f);
+			}
 			// 保存字典安装目录的绝对路径
-			p.setProperty("paoding.dic.properties.path", f.getAbsolutePath());
+			String absolutePath = f.getAbsolutePath();
+			p.setProperty("paoding.dic.properties.path", absolutePath);
+			log.info("analysis properites absolute path = " + absolutePath);
 			// 保存属性文件最后更新时间
 			p.setProperty("paoding.dic.properties.lastModified", ""
 					+ f.lastModified());
