@@ -58,12 +58,12 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 		// 2、相同的properties实例，PaodingMaker也将返回同一个Paoding实例
 		// 根据以上1、2点说明，在此能够保证多次创建PaodingAnalyzer并不会多次装载属性文件和词典
 		Properties properties = PaodingMaker.getProperties();
-		String mode = Constants.getProperty(properties, Constants.ANALYZER_MODE);
+		String mode = Constants
+				.getProperty(properties, Constants.ANALYZER_MODE);
 		Paoding paoding = PaodingMaker.make(properties);
 		setKnife(paoding);
 		setMode(mode);
 	}
-
 
 	/**
 	 * 本方法为PaodingAnalyzer附带的测试评估方法。 <br>
@@ -72,8 +72,10 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * 
 	 * java net.paoding.analysis.analyzer.PaodingAnalyzer<br>
 	 * java net.paoding.analysis.analyzer.PaodingAnalyzer 中华人民共和国<br>
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer file=c:/text.txt<br>
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer file=c:/text.txt utf-8<br>
+	 * java net.paoding.analysis.analyzer.PaodingAnalyzer "file=c:/text.txt"<br>
+	 * java net.paoding.analysis.analyzer.PaodingAnalyzer "file=c:/text.txt" utf-8<br>
+	 * 
+	 * !!!file=xxx这样的参数需要加引号
 	 * 
 	 * @param args
 	 */
@@ -96,13 +98,13 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 			}
 		}
 		Estimate estimate = new Estimate(analyzer);
+		System.out.println("input:\n" + input);
+		System.out.println("result:");
 		estimate.test(input);
 	}
 
 	// --------------------------------------------------
 
-
-	
 	/**
 	 * @param knife
 	 * @param default_mode
@@ -111,7 +113,7 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	public PaodingAnalyzer(Knife knife, int mode) {
 		super(knife, mode);
 	}
-	
+
 	/**
 	 * 等价于maxMode()
 	 * 
