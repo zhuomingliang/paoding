@@ -91,14 +91,14 @@ public class TryPaodingAnalyzer {
 			analyzer.setMode(mode);
 		}
 		Estimate estimate = new Estimate(analyzer);
-		System.out.println("input:\n" + input);
 		System.out.println("result:");
+		System.out.println("--------------------------------------------------");
 		estimate.test(input);
 	}
 
 	public static String getInputFromConsole() throws IOException {
 		String input = null;
-		System.out.println("Input the content to be analyzed below, Enter an empty line when end typing:");
+		System.out.println("Input the content to be analyzed below, ended by \";\", \"\\g\", \"go\":");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
 		String line;
@@ -106,7 +106,7 @@ public class TryPaodingAnalyzer {
 			System.out.print("> ");
 			line = reader.readLine();
 			if (line == null || line.length() == 0) {
-				break;
+				continue;
 			}
 			if (line.equals("clear") || line.equals("\\c")) {
 				input = null;
@@ -119,6 +119,9 @@ public class TryPaodingAnalyzer {
 				} else {
 					input = input + "\n" + line;
 				}
+			}
+			if (line.endsWith(";") || line.endsWith("\\g") || line.endsWith("\\go")) {
+				break;
 			}
 		} while (true);
 		return input;

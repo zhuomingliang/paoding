@@ -46,10 +46,12 @@ public class Estimate {
 		Token token;
 		try {
 			int c = 0;
+			out.print(c + ":\t");
 			while ((token = ts.next()) != null) {
 				c ++;
 				if (c % 10 == 0) {
 					out.println();
+					out.print(c + ":\t");
 				}
 				out.print(token.termText() + "/");
 			}
