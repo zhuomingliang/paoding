@@ -1,21 +1,23 @@
 package net.paoding.analysis.analyzer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import net.paoding.analysis.knife.PaodingMaker;
 
 public class TryPaodingAnalyzer {
-	
+
 	public static void main(String[] args) {
-	
-		String input = "有一次考试的作文题，我用地方成语(闽南语)写作文答题，"
-				+ "老师看不懂然后给不及格，批评说作为一个中国人应该写规范汉语！" + "我无语良久。。。";
+
+		String input = null;
 		String file = null;
 		String charset = null;
 		String mode = null;
 		String properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
+		int inInput = 0;
 		for (int i = 0; i < args.length; i++) {
-			if (args[i] == null || (args[i] = args[i].trim()).length() == 0){
+			if (args[i] == null || (args[i] = args[i].trim()).length() == 0) {
 				continue;
 			}
 			if (args[i].equals("--file") || args[i].equals("-f")) {
@@ -24,20 +26,20 @@ public class TryPaodingAnalyzer {
 				charset = args[++i];
 			} else if (args[i].equals("--mode") || args[i].equals("-m")) {
 				mode = args[++i];
-			}
-			else if (args[i].equals("--properties") || args[i].equals("-p")) {
+			} else if (args[i].equals("--properties") || args[i].equals("-p")) {
 				properties = args[++i];
-			}
-			else if (args[i].equals("--input") || args[i].equals("-i")) {
-				input = args[++i];
-			}
-			else if (args[i].equals("--help") || args[i].equals("-h") || args[i].equals("?")) {
-				String app = System.getProperty("paoding.try.app", TryPaodingAnalyzer.class.getSimpleName());
-				String cmd = System.getProperty("paoding.try.cmd", "java " + TryPaodingAnalyzer.class.getName());
+			} else if (args[i].equals("--input") || args[i].equals("-i")) {
+				inInput++;
+			} else if (args[i].equals("--help") || args[i].equals("-h")
+					|| args[i].equals("?")) {
+				String app = System.getProperty("paoding.try.app",
+						TryPaodingAnalyzer.class.getSimpleName());
+				String cmd = System.getProperty("paoding.try.cmd", "java "
+						+ TryPaodingAnalyzer.class.getName());
 				System.out.println(app + "的用法:");
 				System.out.println("\t" + cmd + " 中华人民共和国");
 				System.out.println("OR:");
-				System.out.println("\t" + cmd + " [--help|-h|? ][--file|-f file ][--charset|-c charset ][--properties|-p path-of-properties ][--mode|-m mode ][--input|-i 中华人民共和国 ][ 中华人民共和国]");
+				System.out.println("\t" + cmd + " [--help|-h|? ][--file|-f file ][--charset|-c charset ][--properties|-p path-of-properties ][--mode|-m mode ][--input|-i ][中华人民共和国]");
 				System.out.println("\n选项说明:");
 				System.out.println("\t--file, -f:\n\t\t文章以文件的形式输入，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
 				System.out.println("\t--charset, -c:\n\t\t文章的字符集编码，比如gbk,utf-8等。如果没有设置该选项，则使用Java环境默认的字符集编码。");
@@ -51,9 +53,17 @@ public class TryPaodingAnalyzer {
 				System.out.println("\t" + cmd + " -f e:/content.txt -c gbk");
 				System.out.println("\t" + cmd + " -f e:/content.txt -c gbk -m max");
 				return;
-			}
-			else {
-				input = args[i];//!!没有++i
+			} else {
+				// 非选项的参数数组视为input
+				if (!args[i].startsWith("-")
+						&& (i == 0 || args[i - 1].equals("-i") || args[i - 1].equals("--input") || !args[i - 1].startsWith("-"))) {
+					if (inInput == 0) {
+						input = args[i];// !!没有++i
+					} else {
+						input = input + ' ' + args[i];// !!没有++i
+					}
+					inInput++;
+				}
 			}
 		}
 		if (file != null) {
@@ -63,6 +73,33 @@ public class TryPaodingAnalyzer {
 				e.printStackTrace();
 				return;
 			}
+		}
+		if (input == null) {
+			System.out.println("input the content below, enter an empty line when ended:");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					System.in));
+			String line;
+			try {
+				do {
+					System.out.print("> ");
+					line = reader.readLine();
+					if (line == null || line.length() == 0) {
+						break;
+					}
+					if (input == null) {
+						input = line;
+					} else {
+						input = input + "\n" + line;
+					}
+				} while (true);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+		if (input == null) {
+			System.out.println("您没有输入任何内容。查看帮助请加选项--help");
+			return;
 		}
 		PaodingAnalyzer analyzer = new PaodingAnalyzer(properties);
 		if (mode != null) {
