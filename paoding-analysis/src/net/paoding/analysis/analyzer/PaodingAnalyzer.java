@@ -52,8 +52,7 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	}
 
 	/**
-	 * @param propertiesPath
-	 *            null表示不读取任何属性文件，而使用默认配置
+	 * @param propertiesPath null表示使用类路径下的paoding-analysis.properties
 	 */
 	public PaodingAnalyzer(String propertiesPath) {
 		init(propertiesPath);
@@ -64,6 +63,9 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 		// 1、多次调用getProperties()，返回的都是同一个properties实例(只要属性文件没发生过修改)
 		// 2、相同的properties实例，PaodingMaker也将返回同一个Paoding实例
 		// 根据以上1、2点说明，在此能够保证多次创建PaodingAnalyzer并不会多次装载属性文件和词典
+		if (propertiesPath == null) {
+			propertiesPath = PaodingMaker.DEFAULT_PROPERTIES_PATH;
+		}
 		Properties properties = PaodingMaker.getProperties(propertiesPath);
 		String mode = Constants
 				.getProperty(properties, Constants.ANALYZER_MODE);
