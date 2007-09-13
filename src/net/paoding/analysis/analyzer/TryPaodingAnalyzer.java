@@ -7,9 +7,8 @@ import java.io.InputStreamReader;
 import net.paoding.analysis.knife.PaodingMaker;
 
 public class TryPaodingAnalyzer {
-
+	
 	public static void main(String[] args) {
-
 		String input = null;
 		String file = null;
 		String charset = null;
@@ -74,31 +73,40 @@ public class TryPaodingAnalyzer {
 				return;
 			}
 		}
-		if (input == null) {
-			try {
-				input = getInputFromConsole();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-		}
-		if (input == null) {
-			System.out.println("您没有输入任何内容。查看帮助请加选项--help");
-			return;
-		}
 		PaodingAnalyzer analyzer = new PaodingAnalyzer(properties);
 		if (mode != null) {
 			analyzer.setMode(mode);
 		}
 		Estimate estimate = new Estimate(analyzer);
-		System.out.println("result:");
-		System.out.println("--------------------------------------------------");
-		estimate.test(input);
+		boolean readInputFromConsle = false;
+		while (true) {
+			if (input == null || input.length() == 0 || readInputFromConsle) {
+				try {
+					input = getInputFromConsole();
+					readInputFromConsle = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+			}
+			if (input == null || input.length() == 0) {
+				System.out.println("Warn: none charactors you input!!");
+				continue;
+			}
+			else {
+				estimate.test(input);
+				System.out.println("--------------------------------------------------");
+			}
+			if (false == readInputFromConsle) {
+				System.exit(0);
+			}
+		}
 	}
 
 	public static String getInputFromConsole() throws IOException {
 		String input = null;
-		System.out.println("Input the content to be analyzed below, ended by \";\", \"\\g\", \"go\":");
+		System.out.println();
+		System.out.println("Type the content to be analyzed below, end by \";\", exit by \"exit\" or \"quit\":");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
 		String line;
@@ -108,22 +116,31 @@ public class TryPaodingAnalyzer {
 			if (line == null || line.length() == 0) {
 				continue;
 			}
-			if (line.equals("clear") || line.equals("\\c")) {
+			if (line.equals("clear") || line.equals("c")) {
 				input = null;
 				System.out.println("> Input Cleared");
 				return getInputFromConsole();
 			}
+			else if (line.equals("exit") || line.equals("quit") ) {
+				System.out.println("Bye!");
+				System.exit(0);
+			}
 			else {
-				if (input == null) {
-					input = line;
-				} else {
-					input = input + "\n" + line;
+				if (line.endsWith(";")) {
+					if (line.length() > ";".length()) {
+						input = line.substring(0, line.length() - ";".length());
+					}
+					break;
+				}
+				else {
+					if (input == null) {
+						input = line;
+					} else {
+						input = input + "\n" + line;
+					}
 				}
 			}
-			if (line.endsWith(";") || line.endsWith("\\g") || line.endsWith("\\go")) {
-				break;
-			}
 		} while (true);
-		return input;
+		return input == null ? null : input.trim();
 	}
 }

@@ -46,14 +46,18 @@ public class Estimate {
 		Token token;
 		try {
 			int c = 0;
-			out.print(c + ":\t");
 			while ((token = ts.next()) != null) {
-				c ++;
 				if (c % 10 == 0) {
-					out.println();
+					if (c != 0) {
+						out.println();
+					}
 					out.print(c + ":\t");
 				}
+				c ++;
 				out.print(token.termText() + "/");
+			}
+			if (c == 0) {
+				System.out.print("all are noise characters or words");
 			}
 			out.println();
 		} catch (IOException e) {
