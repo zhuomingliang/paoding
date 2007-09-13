@@ -15,7 +15,6 @@
  */
 package net.paoding.analysis.analyzer;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import net.paoding.analysis.Constants;
@@ -49,15 +48,23 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * 在一个JVM中，可多次创建，而并不会多次读取属性文件，不会重复读取字典。
 	 */
 	public PaodingAnalyzer() {
-		init();
+		this(PaodingMaker.DEFAULT_PROPERTIES_PATH);
 	}
 
-	protected void init() {
+	/**
+	 * @param propertiesPath
+	 *            null表示不读取任何属性文件，而使用默认配置
+	 */
+	public PaodingAnalyzer(String propertiesPath) {
+		init(propertiesPath);
+	}
+
+	protected void init(String propertiesPath) {
 		// 根据PaodingMaker说明，
 		// 1、多次调用getProperties()，返回的都是同一个properties实例(只要属性文件没发生过修改)
 		// 2、相同的properties实例，PaodingMaker也将返回同一个Paoding实例
 		// 根据以上1、2点说明，在此能够保证多次创建PaodingAnalyzer并不会多次装载属性文件和词典
-		Properties properties = PaodingMaker.getProperties();
+		Properties properties = PaodingMaker.getProperties(propertiesPath);
 		String mode = Constants
 				.getProperty(properties, Constants.ANALYZER_MODE);
 		Paoding paoding = PaodingMaker.make(properties);
@@ -70,37 +77,21 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * 执行之可以查看分词效果。以下任选一种方式进行:
 	 * <p>
 	 * 
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer<br>
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer 中华人民共和国<br>
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer "file=c:/text.txt"<br>
-	 * java net.paoding.analysis.analyzer.PaodingAnalyzer "file=c:/text.txt" utf-8<br>
-	 * 
-	 * !!!file=xxx这样的参数需要加引号
+	 * java net...PaodingAnalyzer<br>
+	 * java net...PaodingAnalyzer --help<br>
+	 * java net...PaodingAnalyzer 中华人民共和国<br>
+	 * java net...PaodingAnalyzer -m max 中华人民共和国<br>
+	 * java net...PaodingAnalyzer -f c:/text.txt<br>
+	 * java net...PaodingAnalyzer -f c:/text.txt -c utf-8<br>
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		PaodingAnalyzer analyzer = new PaodingAnalyzer();
-		String input = "有一次考试的作文题，我用地方成语(闽南语)写作文答题，"
-				+ "老师看不懂然后给不及格，批评说作为一个中国人应该写规范汉语！" + "我无语良久。。。";
-		if (args.length > 0) {
-			input = args[0];
+		if (System.getProperty("paoding.try.app") == null) {
+			System.setProperty("paoding.try.app", PaodingAnalyzer.class.getSimpleName());
+			System.setProperty("paoding.try.cmd", "java " + PaodingAnalyzer.class.getName());
 		}
-		String prefix = "file=";
-		if (input.startsWith(prefix)) {
-			String path = input.substring(prefix.length());
-			try {
-				input = Estimate.Helper.readText(path,
-						(args.length > 1 ? args[1] : null));
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-		}
-		Estimate estimate = new Estimate(analyzer);
-		System.out.println("input:\n" + input);
-		System.out.println("result:");
-		estimate.test(input);
+		TryPaodingAnalyzer.main(args);
 	}
 
 	// --------------------------------------------------
