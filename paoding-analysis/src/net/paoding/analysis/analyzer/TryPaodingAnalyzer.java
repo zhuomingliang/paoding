@@ -75,23 +75,8 @@ public class TryPaodingAnalyzer {
 			}
 		}
 		if (input == null) {
-			System.out.println("Input the content to be analyzed below, Enter an empty line when end typing:");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					System.in));
-			String line;
 			try {
-				do {
-					System.out.print("> ");
-					line = reader.readLine();
-					if (line == null || line.length() == 0) {
-						break;
-					}
-					if (input == null) {
-						input = line;
-					} else {
-						input = input + "\n" + line;
-					}
-				} while (true);
+				input = getInputFromConsole();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
@@ -109,5 +94,33 @@ public class TryPaodingAnalyzer {
 		System.out.println("input:\n" + input);
 		System.out.println("result:");
 		estimate.test(input);
+	}
+
+	public static String getInputFromConsole() throws IOException {
+		String input = null;
+		System.out.println("Input the content to be analyzed below, Enter an empty line when end typing:");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				System.in));
+		String line;
+		do {
+			System.out.print("> ");
+			line = reader.readLine();
+			if (line == null || line.length() == 0) {
+				break;
+			}
+			if (line.equals("clear") || line.equals("\\c")) {
+				input = null;
+				System.out.println("> Input Cleared");
+				return getInputFromConsole();
+			}
+			else {
+				if (input == null) {
+					input = line;
+				} else {
+					input = input + "\n" + line;
+				}
+			}
+		} while (true);
+		return input;
 	}
 }
