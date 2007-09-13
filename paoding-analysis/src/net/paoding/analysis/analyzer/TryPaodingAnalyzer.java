@@ -75,7 +75,7 @@ public class TryPaodingAnalyzer {
 			}
 		}
 		if (input == null) {
-			System.out.println("input the content below, enter an empty line when ended:");
+			System.out.println("Input the content to be analyzed below, Enter an empty line when end typing:");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					System.in));
 			String line;
