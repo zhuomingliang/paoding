@@ -1,0 +1,1 @@
+java -Dpaoding.try.app=./analyzer.sh -Dpaoding.try.cmd=./analyzer.sh  -cp .:paoding-analysis.jar:./lib/commons-logging.jar:./lib/lucene-core-2.2.0.jar:./lib/lucene-highlighter-2.2.0.jar net.paoding.analysis.analyzer.TryPaodingAnalyzer $1 $2 $3
