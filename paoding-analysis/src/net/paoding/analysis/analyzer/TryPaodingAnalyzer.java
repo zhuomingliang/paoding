@@ -10,14 +10,14 @@ public class TryPaodingAnalyzer {
 	
 		String input = "有一次考试的作文题，我用地方成语(闽南语)写作文答题，"
 				+ "老师看不懂然后给不及格，批评说作为一个中国人应该写规范汉语！" + "我无语良久。。。";
-		if (args.length == 1) {
-			input = args[0];
-		}
 		String file = null;
 		String charset = null;
 		String mode = null;
 		String properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
 		for (int i = 0; i < args.length; i++) {
+			if (args[i] == null || (args[i] = args[i].trim()).length() == 0){
+				continue;
+			}
 			if (args[i].equals("--file") || args[i].equals("-f")) {
 				file = args[++i];
 			} else if (args[i].equals("--charset") || args[i].equals("-c")) {
