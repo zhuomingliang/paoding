@@ -7,13 +7,29 @@ import java.io.InputStreamReader;
 import net.paoding.analysis.knife.PaodingMaker;
 
 public class TryPaodingAnalyzer {
+	private static final String ARGS_TIP = ":";
+	static String input = null;
+	static String file = null;
+	static String charset = null;
+	static String mode = null;
+	static String properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
 	
 	public static void main(String[] args) {
-		String input = null;
-		String file = null;
-		String charset = null;
-		String mode = null;
-		String properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
+		try {
+			handlerArgs(args);
+			analysing();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	private static void handlerArgs(String[] args) throws IOException {
+		input = null;
+		file = null;
+		charset = null;
+		mode = null;
+		properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
+		
 		int inInput = 0;
 		for (int i = 0; i < args.length; i++) {
 			if (args[i] == null || (args[i] = args[i].trim()).length() == 0) {
@@ -66,31 +82,29 @@ public class TryPaodingAnalyzer {
 			}
 		}
 		if (file != null) {
-			try {
-				input = Estimate.Helper.readText(file, charset);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
+			input = Estimate.Helper.readText(file, charset);
 		}
+	}
+	
+	private static void analysing() throws Exception {
 		PaodingAnalyzer analyzer = new PaodingAnalyzer(properties);
 		if (mode != null) {
 			analyzer.setMode(mode);
 		}
-		Estimate estimate = new Estimate(analyzer);
 		boolean readInputFromConsle = false;
+		Estimate estimate = new Estimate(analyzer);
 		while (true) {
 			if (input == null || input.length() == 0 || readInputFromConsle) {
-				try {
-					input = getInputFromConsole();
-					readInputFromConsle = true;
-				} catch (IOException e) {
-					e.printStackTrace();
-					return;
-				}
+				input = getInputFromConsole();
+				readInputFromConsle = true;
 			}
 			if (input == null || input.length() == 0) {
 				System.out.println("Warn: none charactors you input!!");
+				continue;
+			}
+			else if (input.startsWith(ARGS_TIP)) {
+				String argsStr = input.substring(ARGS_TIP.length());
+				main(argsStr.split(" "));
 				continue;
 			}
 			else {
@@ -98,32 +112,44 @@ public class TryPaodingAnalyzer {
 				System.out.println("--------------------------------------------------");
 			}
 			if (false == readInputFromConsle) {
-				System.exit(0);
+				return;
 			}
 		}
 	}
 
-	public static String getInputFromConsole() throws IOException {
+	private static String getInputFromConsole() throws IOException {
 		String input = null;
 		System.out.println();
-		System.out.println("Type the content to be analyzed below, end by \";\", exit by \"exit\" or \"quit\":");
+		System.out.println("Welcome to Paoding Analyser(2.0.2)");
+		System.out.println();
+		System.out.println("直接输入或粘贴要被分词的内容，以分号;结束，回车后开始分词。");
+		System.out.println("另起一行输入:clear或:c，使此次输入无效，用以重新输入。");
+		System.out.println("要使用命令行参数读入文件内容或其他参数请以冒号:开始，然后输入参数选项。");
+		System.out.println("退出，请输入:exit或:quit");
+		System.out.println("需要帮助，请输入:?");
+		System.out.println("注意：指定对文件分词之前要了解该文件的编码，如果系统编码和文件编码不一致，要通过-c指定文件的编码。");
+		System.out.println();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
 		String line;
 		do {
-			System.out.print("> ");
+			System.out.print("paoding> ");
 			line = reader.readLine();
 			if (line == null || line.length() == 0) {
 				continue;
 			}
-			if (line.equals("clear") || line.equals("c")) {
+			if (line.equals(ARGS_TIP + "clear") || line.equals(ARGS_TIP + "c")) {
 				input = null;
-				System.out.println("> Input Cleared");
+				System.out.println("paoding> Cleared");
 				return getInputFromConsole();
 			}
-			else if (line.equals("exit") || line.equals("quit") ) {
+			else if (line.equals(ARGS_TIP + "exit") || line.equals(ARGS_TIP + "quit") ) {
 				System.out.println("Bye!");
 				System.exit(0);
+			}
+			else if (input == null && line.startsWith(ARGS_TIP)) {
+				input = line;
+				break;
 			}
 			else {
 				if (line.endsWith(";")) {
