@@ -18,28 +18,45 @@ import org.apache.lucene.analysis.TokenStream;
 
 public class Estimate {
 	private Analyzer analyzer;
+	private String print;
+	private PrintGate printGate;
+	
 
 	public Estimate() {
+		this.setPrint("50");//默认只打印前50行分词效果
 	}
 
 	public Estimate(Analyzer analyzer) {
 		setAnalyzer(analyzer);
+		this.setPrint("50");//默认只打印前50行分词效果
 	}
 
 	public void setAnalyzer(Analyzer analyzer) {
 		this.analyzer = analyzer;
 	}
 
-	public void test() {
-		this.test(System.out);
+	public Analyzer getAnalyzer() {
+		return analyzer;
+	}
+
+	public void setPrint(String print) {
+		if (print == null || print.length() == 0 || print.equalsIgnoreCase("null") || print.equalsIgnoreCase("no")) {
+			printGate = null;
+			this.print = null;
+		}
+		else {
+			printGate = new LinePrintGate();
+			printGate.setPrint(print, 10);
+			this.print = print;
+		}
+	}
+
+	public String getPrint() {
+		return print;
 	}
 
 	public void test(String input) {
 		this.test(System.out, input);
-	}
-
-	public void test(PrintStream out) {
-		this.test(System.out, "3亿人喝脏水，两个报告直面水污染问题，全国人大常委会委员建议：加大水污染的责与罚!");
 	}
 
 	public void test(PrintStream out, String input) {
@@ -49,54 +66,118 @@ public class Estimate {
 			TokenStream ts = analyzer.tokenStream("", reader);
 			Token token;
 			LinkedList list = new LinkedList();
+			int wordsCount = 0;
 			while ((token = ts.next()) != null) {
-				list.add(token);
+				if (printGate != null && printGate.filter(wordsCount)) {
+					list.add(new CToken(token, wordsCount));
+				}
+				wordsCount++;
 			}
-			long end= System.currentTimeMillis();
+			long end = System.currentTimeMillis();
 			int c = 0;
-			Iterator iter = list.iterator();
-			int size = list.size();
-			int skipEnd = size - 500;
-			if (skipEnd < 0) {
-				skipEnd = size;
-			}
-			else {
-				skipEnd = skipEnd - skipEnd % 10;
-			}
-			boolean dotted = true;
-			while (iter.hasNext()) {
-				token = (Token) iter.next();
-				if (c < 500 || c >= skipEnd) {
+			if (list.size() > 0) {
+				Iterator iter = list.iterator();
+				CToken ctoken;
+				while (iter.hasNext()) {
+					ctoken = (CToken) iter.next();
+					c = ctoken.i;
+					token = ctoken.t;
 					if (c % 10 == 0) {
 						if (c != 0) {
 							out.println();
 						}
-						out.print(c + ":\t");
+						out.print((c/10 + 1)+ ":\t");
 					}
 					out.print(token.termText() + "/");
 				}
-				else if(dotted){
-					System.out.print("\n......  ......  ......");
-					dotted = false;
-				}
-				c ++;
 			}
-			if (c == 0) {
+			if (wordsCount == 0) {
 				System.out.println("\tAll are noise characters or words");
-			}
-			else {
+			} else {
 				if (c % 10 != 1) {
 					System.out.println();
 				}
 				System.out.println();
 				System.out.println("\t分词器" + analyzer.getClass().getName());
-				System.out.println("\t分词耗时 " + (end - begin) + "ms (不包括打印时间)");
+				System.out.println("\t内容长度 " + input.length() + "字符， 分 " + wordsCount
+						+ "个词");
+				System.out
+						.println("\t分词耗时 " + (end - begin) + "ms ");
 			}
 		} catch (IOException e) {
 			// nerver happen!
 		}
 	}
+	
+	static class CToken {
+		Token t;
+		int i;
+		
+		CToken(Token t, int i) {
+			this.t = t;
+			this.i = i;
+		}
+	}
 
+	static interface PrintGate {
+		public void setPrint(String print, int unitSize);
+		boolean filter(int count);
+	}
+	
+	static class PrintGateToken implements PrintGate {
+		private int begin;
+		private int end;
+		public void setBegin(int begin) {
+			this.begin = begin;
+		}
+		public void setEnd(int end) {
+			this.end = end;
+		}
+
+		public void setPrint(String print, int unitSize) {
+			int i = print.indexOf('-');
+			if (i > 0) {
+				int bv = Integer.parseInt(print.substring(0, i));
+				int ev = Integer.parseInt(print.substring(i + 1));
+				setBegin(unitSize * (Math.abs(bv) - 1) );//第5行，是从第40开始的
+				setEnd(unitSize * Math.abs(ev));//到第10行，是截止于100(不包含该边界)
+			}
+			else {
+				setBegin(0);
+				int v = Integer.parseInt(print);
+				setEnd(unitSize * (Math.abs(v)));
+			}
+		}
+		public boolean filter(int count) {
+			return count >= begin && count < end;
+		}
+	}
+	
+	static class LinePrintGate implements PrintGate {
+
+		private PrintGate[] list;
+		
+		public void setPrint(String print, int unitSize) {
+			String[] prints = print.split(",");
+			list = new PrintGate[prints.length];
+			for (int i = 0; i < prints.length; i++) {
+				PrintGateToken pg = new PrintGateToken();
+				pg.setPrint(prints[i], unitSize);
+				list[i] = pg;
+			}
+		}
+		
+		public boolean filter(int count) {
+			for (int i = 0; i < list.length; i++) {
+				if (list[i].filter(count)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+	}
+	
 	static class Helper {
 		static String readText(String path, String encoding) throws IOException {
 			InputStream in;
@@ -118,7 +199,7 @@ public class Estimate {
 				System.out.println("read content from:" + f.getAbsolutePath());
 				in = new FileInputStream(f);
 			}
-			
+
 			Reader re;
 			if (encoding != null) {
 				re = new InputStreamReader(in, encoding);
