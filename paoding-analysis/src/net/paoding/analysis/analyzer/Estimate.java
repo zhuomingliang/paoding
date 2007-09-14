@@ -89,6 +89,7 @@ public class Estimate {
 					System.out.println();
 				}
 				System.out.println();
+				System.out.println("\t分词器" + analyzer.getClass().getName());
 				System.out.println("\t分词耗时 " + (end - begin) + "ms (不包括打印时间)");
 			}
 		} catch (IOException e) {

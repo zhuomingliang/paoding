@@ -65,7 +65,7 @@ public class TryPaodingAnalyzer {
 				System.out.println("\t--properties, -p:\n\t\t不读取默认的类路径下的庖丁分词属性文件，而使用指定的文件，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
 				System.out.println("\t--mode, -m:\n\t\t强制使用给定的mode的分词器；可以设定为default,max或指定类名的其他mode(指定类名的，需要加前缀\"class:\")。");
 				System.out.println("\t--input, -i:\n\t\t要被分词的文章内容；当没有通过-f或--file指定文章输入文件时可选择这个选项指定要被分词的内容。");
-				System.out.println("\t--analyzer, -a:\n\t\t测试其他分词器，通过--analyzer或-a指定其完整类名。特别地，paoding、cjk、chinese分别对应PaodingAnalyzer、CJKAnalyzer、ChineseAnalyzer");
+				System.out.println("\t--analyzer, -a:\n\t\t测试其他分词器，通过--analyzer或-a指定其完整类名。特别地，paoding、cjk、chinese、st分别对应PaodingAnalyzer、CJKAnalyzer、ChineseAnalyzer、StandardAnalyzer");
 				System.out.println("\n示例:");
 				System.out.println("\t" + cmd + " ?");
 				System.out.println("\t" + cmd + " 中华人民共和国");
@@ -112,6 +112,9 @@ public class TryPaodingAnalyzer {
 			else if (analyzerName.equalsIgnoreCase("cn") || analyzerName.equalsIgnoreCase("chinese")) {
 				analyzerName = "org.apache.lucene.analysis.cn.ChineseAnalyzer";
 			}
+			else if (analyzerName.equalsIgnoreCase("st") || analyzerName.equalsIgnoreCase("standard")) {
+				analyzerName = "org.apache.lucene.analysis.standard.StandardAnalyzer";
+			}
 			clz = Class.forName(analyzerName);
 			analyzer = (Analyzer) clz.newInstance();
 		}
@@ -132,7 +135,7 @@ public class TryPaodingAnalyzer {
 				continue;
 			}
 			else {
-				estimate.test(input);
+				estimate.test(System.out, input);
 				System.out.println("--------------------------------------------------");
 			}
 			if (false == readInputFromConsle) {
