@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
@@ -41,25 +43,54 @@ public class Estimate {
 	}
 
 	public void test(PrintStream out, String input) {
-		Reader reader = new StringReader(input);
-		TokenStream ts = analyzer.tokenStream("", reader);
-		Token token;
 		try {
-			int c = 0;
+			Reader reader = new StringReader(input);
+			long begin = System.currentTimeMillis();
+			TokenStream ts = analyzer.tokenStream("", reader);
+			Token token;
+			LinkedList list = new LinkedList();
 			while ((token = ts.next()) != null) {
-				if (c % 10 == 0) {
-					if (c != 0) {
-						out.println();
+				list.add(token);
+			}
+			long end= System.currentTimeMillis();
+			int c = 0;
+			Iterator iter = list.iterator();
+			int size = list.size();
+			int skipEnd = size - 500;
+			if (skipEnd < 0) {
+				skipEnd = size;
+			}
+			else {
+				skipEnd = skipEnd - skipEnd % 10;
+			}
+			boolean dotted = true;
+			while (iter.hasNext()) {
+				token = (Token) iter.next();
+				if (c < 500 || c >= skipEnd) {
+					if (c % 10 == 0) {
+						if (c != 0) {
+							out.println();
+						}
+						out.print(c + ":\t");
 					}
-					out.print(c + ":\t");
+					out.print(token.termText() + "/");
+				}
+				else if(dotted){
+					System.out.print("\n......  ......  ......");
+					dotted = false;
 				}
 				c ++;
-				out.print(token.termText() + "/");
 			}
 			if (c == 0) {
-				System.out.print("all are noise characters or words");
+				System.out.println("\tAll are noise characters or words");
 			}
-			out.println();
+			else {
+				if (c % 10 != 1) {
+					System.out.println();
+				}
+				System.out.println();
+				System.out.println("\t分词耗时 " + (end - begin) + "ms (不包括打印时间)");
+			}
 		} catch (IOException e) {
 			// nerver happen!
 		}
