@@ -44,18 +44,28 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 
 	protected boolean isTokenChar(CharSequence beaf, int history, int index) {
 		char ch = beaf.charAt(index);
-		return CharSet.isArabianNumber(ch) || ch == '.';
+		return CharSet.isArabianNumber(ch) || CharSet.isLetter(ch) || ch == '.';
 	}
 
-	protected void collect(Collector collector, CharSequence beaf, int offset,
+	protected void collect(Collector collector, CharSequence beef, int offset,
 			int end, String word) {
-		super.collect(collector, beaf, offset, end, word);
-		if (units != null) {
+		super.collect(collector, beef, offset, end, word);
+		
+		if (units != null
+				&& end < beef.length() //后面不是cjk，则不用探索后面是单位词
+				&& CharSet.isCjkUnifiedIdeographs(beef.charAt(end))) {
+			//只要全为数字才需要继续探索是否后继字符是否是一个单位
+			for (int i = offset; i < end; i++) {
+				if (!CharSet.isArabianNumber(beef.charAt(i))) {
+					return;
+				}
+			}
+			//通过单位词典探索
 			Hit wd;
 			int i = end + 1;
-			while (i <= beaf.length()
-					&& (wd = units.search(beaf, end, i - end)).isHit()) {
-				collector.collect(word + beaf.subSequence(end, i), offset, i);
+			while (i <= beef.length()
+					&& (wd = units.search(beef, end, i - end)).isHit()) {
+				collector.collect(word + beef.subSequence(end, i), offset, i);
 				end++;
 				if (!wd.isUnclosed()) {
 					break;
