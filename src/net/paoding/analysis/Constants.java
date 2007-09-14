@@ -93,7 +93,7 @@ public class Constants {
 	}
 
 	//
-	public static final String KNIFE_CLASS = "paoding.knife.class";
+	public static final String KNIFE_CLASS = "paoding.knife.class.";
 
 	public static String getProperty(Properties p, String name) {
 		return p.getProperty(name, (String) map.get(name));
