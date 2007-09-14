@@ -58,22 +58,21 @@ public class TryPaodingAnalyzer {
 				String cmd = System.getProperty("paoding.try.cmd", "java "
 						+ TryPaodingAnalyzer.class.getName());
 				System.out.println(app + "的用法:");
-				System.out.println("\t" + cmd + " 中华人民共和国");
-				System.out.println("OR:");
-				System.out.println("\t" + cmd + " [--help|-h|? ][--file|-f file ][--charset|-c charset ][--properties|-p path-of-properties ][--mode|-m mode ][--input|-i ][中华人民共和国]");
-				System.out.println("\n选项说明:");
+				System.out.println("\t" + cmd + " [OPTIONS] [text_content]");
+				System.out.println("\nOPTIONS:");
 				System.out.println("\t--file, -f:\n\t\t文章以文件的形式输入，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
 				System.out.println("\t--charset, -c:\n\t\t文章的字符集编码，比如gbk,utf-8等。如果没有设置该选项，则使用Java环境默认的字符集编码。");
 				System.out.println("\t--properties, -p:\n\t\t不读取默认的类路径下的庖丁分词属性文件，而使用指定的文件，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
 				System.out.println("\t--mode, -m:\n\t\t强制使用给定的mode的分词器；可以设定为default,max或指定类名的其他mode(指定类名的，需要加前缀\"class:\")。");
 				System.out.println("\t--input, -i:\n\t\t要被分词的文章内容；当没有通过-f或--file指定文章输入文件时可选择这个选项指定要被分词的内容。");
-				System.out.println("\t--analyzer, -a:\n\t\t测试其他分词器，通过--analyzer或-a指定其完整类名。特别地，paoding、cjk、chinese分别对应PaodingAnalyzer、CJKAnalyzer，ChineseAnalyzer");
+				System.out.println("\t--analyzer, -a:\n\t\t测试其他分词器，通过--analyzer或-a指定其完整类名。特别地，paoding、cjk、chinese分别对应PaodingAnalyzer、CJKAnalyzer、ChineseAnalyzer");
 				System.out.println("\n示例:");
-				System.out.println("\t" + cmd + " -h");
+				System.out.println("\t" + cmd + " ?");
 				System.out.println("\t" + cmd + " 中华人民共和国");
 				System.out.println("\t" + cmd + " -m max 中华人民共和国");
-				System.out.println("\t" + cmd + " -f e:/content.txt -c gbk");
-				System.out.println("\t" + cmd + " -f e:/content.txt -c gbk -m max");
+				System.out.println("\t" + cmd + " -f e:/content.txt -c utf8");
+				System.out.println("\t" + cmd + " -f e:/content.txt -c utf8 -m max");
+				System.out.println("\t" + cmd + " -f e:/content.txt -c utf8 -a cjk");
 				return;
 			} else {
 				// 非选项的参数数组视为input
