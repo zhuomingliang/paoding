@@ -44,28 +44,28 @@ public abstract class CharKnife implements Knife {
 		
 	}
 
-	public int dissect(Collector collector, CharSequence beaf, int offset) {
+	public int dissect(Collector collector, CharSequence beef, int offset) {
 		int end = offset + 1;
-		for (; end < beaf.length()
-				&& isTokenChar(beaf, offset, end); end++) {
+		for (; end < beef.length()
+				&& isTokenChar(beef, offset, end); end++) {
 		}
-		if (end == beaf.length() && offset > 0) {
+		if (end == beef.length() && offset > 0) {
 			return -offset;
 		}
-		String word = beaf.subSequence(offset, end).toString();
+		String word = beef.subSequence(offset, end).toString();
 		if (noiseTable != null && noiseTable.contains(word)) {
 			word = null;
 		}
 		if (word != null) {
-			collect(collector, beaf, offset, end, word);
+			collect(collector, beef, offset, end, word);
 		}
 		return end;
 	}
 
-	protected void collect(Collector collector, CharSequence beaf, int offset, int end,String word) {
+	protected void collect(Collector collector, CharSequence beef, int offset, int end,String word) {
 		collector.collect(word, offset, end);
 	}
 
-	protected abstract boolean isTokenChar(CharSequence beaf, int history, int index);
+	protected abstract boolean isTokenChar(CharSequence beef, int history, int index);
 
 }

@@ -38,12 +38,12 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 		units = dictionaries.getUnitsDictionary();
 	}
 
-	public boolean assignable(CharSequence beaf, int index) {
-		return CharSet.isArabianNumber(beaf.charAt(index));
+	public boolean assignable(CharSequence beef, int index) {
+		return CharSet.isArabianNumber(beef.charAt(index));
 	}
 
-	protected boolean isTokenChar(CharSequence beaf, int history, int index) {
-		char ch = beaf.charAt(index);
+	protected boolean isTokenChar(CharSequence beef, int history, int index) {
+		char ch = beef.charAt(index);
 		return CharSet.isArabianNumber(ch) || CharSet.isLetter(ch) || ch == '.';
 	}
 
