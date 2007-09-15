@@ -124,6 +124,8 @@ public class PaodingMaker {
 				propertiesHolder.set(path, p);
 				paodingHolder.remove(path);
 				postPropertiesLoaded(p);
+				String absolutePaths = p.getProperty("paoding.analysis.properties.files.absolutepaths");
+				log.info("config paoding analysis from: " + absolutePaths);
 			}
 			return p;
 		} catch (IOException e) {
@@ -143,9 +145,7 @@ public class PaodingMaker {
 		String[] filesArray = files.split(";");
 		for (int i = 0; i < filesArray.length; i++) {
 			File file = getFile(filesArray[i]);
-			if (file.exists()
-					&& !String.valueOf(file.lastModified()).equals(
-							lastModifedsArray[i])) {
+			if (file.exists() && !String.valueOf(file.lastModified()).equals(lastModifedsArray[i])) {
 				return true;
 			}
 		}
@@ -156,6 +156,7 @@ public class PaodingMaker {
 			throws IOException {
 		URL url;
 		File file;
+		String absolutePath;
 		InputStream in;
 		// 若ifexists为真表示如果该文件存在则读取他的内容，不存在则忽略它
 		boolean skipWhenNotExists = false;
@@ -182,21 +183,25 @@ public class PaodingMaker {
 			}
 			in = new FileInputStream(file);
 		}
+		absolutePath = file.getAbsolutePath();
 		p.load(in);
 		in.close();
 		String lastModifieds = p.getProperty("paoding.analysis.properties.lastModifieds");
 		String files = p.getProperty("paoding.analysis.properties.files");
+		String absolutePaths = p.getProperty("paoding.analysis.properties.files.absolutepaths");
 		if (lastModifieds == null) {
 			p.setProperty("paoding.dic.properties.path", path);
 			lastModifieds = String.valueOf(file.lastModified());
 			files = path;
+			absolutePaths = absolutePath;
 		} else {
 			lastModifieds = lastModifieds + ";" + file.lastModified();
 			files = files + ";" + path;
+			absolutePaths = absolutePaths + ";" + absolutePath;
 		}
-		p.setProperty("paoding.analysis.properties.lastModifieds",
-				lastModifieds);
+		p.setProperty("paoding.analysis.properties.lastModifieds", lastModifieds);
 		p.setProperty("paoding.analysis.properties.files", files);
+		p.setProperty("paoding.analysis.properties.files.absolutepaths", absolutePaths);
 		String importsValue = p.getProperty("paoding.imports");
 		if (importsValue != null) {
 			p.remove("paoding.imports");
