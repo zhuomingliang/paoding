@@ -16,6 +16,7 @@
 package net.paoding.analysis.knife;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +32,8 @@ import java.util.List;
  */
 public class KnifeBox implements Knife {
 
-	private ArrayList/* <Knife> */knives = new ArrayList/* <Knife> */();
+	private Knife[] knives;
+
 	private int size;
 
 	public KnifeBox() {
@@ -41,30 +43,39 @@ public class KnifeBox implements Knife {
 		this.setKnives(knives);
 	}
 
-	public synchronized void addKnife(Knife k) {
-		knives.add(k);
-		size = knives.size();
-	}
-
-	public synchronized void removeKnife(Knife k) {
-		knives.remove(k);
-		size = knives.size();
+	public KnifeBox(Knife[] knives) {
+		this.setKnives(knives);
 	}
 
 	/**
 	 * 返回配置的所有Knife<br>
-	 * !!!不要去变更返回的List元素
+	 * !!!不要去变更返回数组中的元素
 	 * 
 	 * @return
 	 */
-	public List/* <Knife> */getKnives() {
+	public Knife[] getKnives() {
 		return knives;
 	}
 
-	public void setKnives(List/* <Knife> */knives) {
-		this.knives.clear();
-		this.knives.addAll(knives);
-		size = this.knives.size();
+	public void setKnives(List/* <Knife> */knifeList) {
+		if (knifeList == null) {
+			knifeList = new ArrayList(0);
+		}
+		size = knifeList.size();
+		this.knives = new Knife[size];
+		Iterator iter = knifeList.iterator();
+		for (int i = 0; i < size; i++) {
+			this.knives[i] = (Knife) iter.next();
+		}
+	}
+	
+	public void setKnives(Knife[] knives) {
+		if (knives == null) {
+			knives = new Knife[0];
+		}
+		size = knives.length;
+		this.knives = new Knife[size];
+		System.arraycopy(knives, 0, this.knives, 0, size);
 	}
 
 	public boolean assignable(CharSequence beef, int index) {
@@ -74,11 +85,12 @@ public class KnifeBox implements Knife {
 	public int dissect(Collector collector, CharSequence beef, int offset) {
 		Knife knife;
 		for (int i = 0; i < size; i++) {
-			knife = (Knife) knives.get(i);
+			knife = knives[i];
 			if (knife.assignable(beef, offset)) {
 				return knife.dissect(collector, beef, offset);
 			}
 		}
 		return ++offset;
 	}
+
 }

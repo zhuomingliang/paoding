@@ -315,7 +315,8 @@ public class PaodingMaker {
 					confucianFamilyName, charsetName);
 			paoding.setDictionaries(dictionaries);
 			//寻找传说中的Knife。。。。
-			final Map /* <String, Knife> */ knives = new HashMap /* <String, Knife> */ ();
+			final Map /* <String, Knife> */ knifeMap = new HashMap /* <String, Knife> */ ();
+			List /* <Knife> */ knifeList = new LinkedList/* <Knife> */();
 			List /* <Function> */ functions = new LinkedList/* <Function> */();
 			Iterator iter = p.entrySet().iterator();
 			while (iter.hasNext()) {
@@ -332,9 +333,8 @@ public class PaodingMaker {
 							((DictionariesWare) knife)
 									.setDictionaries(dictionaries);
 						}
-						// 把刀交给庖丁
-						paoding.addKnife(knife);
-						knives.put(key, knife);
+						knifeList.add(knife);
+						knifeMap.put(key, knife);
 						log.info("add knike: " + value);
 					}
 					else {
@@ -343,13 +343,13 @@ public class PaodingMaker {
 						functions.add(new Function() {
 							public void run() throws Exception {
 								String knifeName = key.substring(0, end);
-								Object obj = knives.get(knifeName);
+								Object obj = knifeMap.get(knifeName);
 								if (!obj.getClass().getName().equals("org.springframework.beans.BeanWrapperImpl")) {
 									Class beanWrapperImplClass = Class.forName("org.springframework.beans.BeanWrapperImpl");
 									Method setWrappedInstance = beanWrapperImplClass.getMethod("setWrappedInstance", new Class[]{Object.class});
 									Object beanWrapperImpl = beanWrapperImplClass.newInstance();
 									setWrappedInstance.invoke(beanWrapperImpl, new Object[]{obj});
-									knives.put(knifeName, beanWrapperImpl);
+									knifeMap.put(knifeName, beanWrapperImpl);
 									obj = beanWrapperImpl;
 								}
 								String propertyName = key.substring(end + 1);
@@ -365,6 +365,8 @@ public class PaodingMaker {
 				Function function = (Function) iterator.next();
 				function.run();
 			}
+			// 把刀交给庖丁
+			paoding.setKnives(knifeList);
 			
 			// Paoding对象创建成功！此时可以将它寄放到paodingHolder中，给下次重复利用
 			paodingHolder.set(paodingKey, paoding);

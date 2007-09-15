@@ -72,8 +72,9 @@ public class FileDictionariesDifferenceListener implements DifferenceListener {
 				dictionaries.refreshDicWords(node.getPath());
 			}
 		}
-		for (Iterator iter = knifeBox.getKnives().iterator(); iter.hasNext();) {
-			Knife knife = (Knife) iter.next();
+		Knife[] knives = knifeBox.getKnives();
+		for (int i = 0; i < knives.length; i ++) {
+			Knife knife = knives[i];
 			if (knife instanceof DictionariesWare) {
 				((DictionariesWare) knife).setDictionaries(dictionaries);
 			}
