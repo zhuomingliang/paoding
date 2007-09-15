@@ -212,6 +212,7 @@ public class Estimate {
 			while ((count = re.read(chs)) != -1) {
 				content.append(chs, 0, count);
 			}
+			re.close();
 			return content.toString();
 		}
 	}
