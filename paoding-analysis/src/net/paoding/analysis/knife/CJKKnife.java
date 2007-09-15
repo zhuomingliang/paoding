@@ -54,8 +54,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 	// -------------------------------------------------
 
-	public boolean assignable(CharSequence beaf, int index) {
-		return CharSet.isCjkUnifiedIdeographs(beaf.charAt(index));
+	public boolean assignable(CharSequence beef, int index) {
+		return CharSet.isCjkUnifiedIdeographs(beef.charAt(index));
 	}
 
 	public int dissect(Collector collector, CharSequence beef, int offset) {
@@ -134,27 +134,27 @@ public class CJKKnife implements Knife, DictionariesWare {
 	 * 对非词汇表中的字词分词
 	 * 
 	 * @param cellector
-	 * @param beaf
+	 * @param beef
 	 * @param offset
 	 * @param count
 	 */
-	protected void dissectUnidentified(Collector collector, CharSequence beaf,
+	protected void dissectUnidentified(Collector collector, CharSequence beef,
 			int offset, int count) {
 		int end = offset + count;
 		Hit word = null;
 		int nearEnd = end - 1;
 		for (int i = offset, j = i; i < end;) {
-			j = skipXword(beaf, i, end);
+			j = skipXword(beef, i, end);
 			if (j >= 0 && i != j) {
 				i = j;
 				continue;
 			}
-			j = collectNumber(collector, beaf, i, end);
+			j = collectNumber(collector, beef, i, end);
 			if (j >= 0 && i != j) {
 				i = j;
 				continue;
 			}
-			word = noiseCharactors.search(beaf, i, 1);
+			word = noiseCharactors.search(beef, i, 1);
 			if (word.isHit()) {
 				i++;
 				continue;
@@ -162,61 +162,61 @@ public class CJKKnife implements Knife, DictionariesWare {
 			// 头字
 			if (i == offset) {
 				// 百度门事件=百度+门+...!=百度+门事+...
-				collect(collector, beaf, offset, offset + 1);
+				collect(collector, beef, offset, offset + 1);
 			}
 			// 尾字
 			if (i == nearEnd) {
 				if (nearEnd != offset) {
-					collect(collector, beaf, nearEnd, end);
+					collect(collector, beef, nearEnd, end);
 				}
 			}
 			// 穷尽二元分词
 			else {
-				collect(collector, beaf, i, i + 2);
+				collect(collector, beef, i, i + 2);
 			}
 			i++;
 		}
 	}
 
-	protected boolean shouldAWord(CharSequence beaf, int offset, int end) {
-		if (offset > 0 && end < beaf.length()) {// 确保前有字符，后也有字符
+	protected boolean shouldAWord(CharSequence beef, int offset, int end) {
+		if (offset > 0 && end < beef.length()) {// 确保前有字符，后也有字符
 			int prev = offset - 1;
 			// 中文单双引号
-			if (beaf.charAt(prev) == '“' && beaf.charAt(end) == '”') {
+			if (beef.charAt(prev) == '“' && beef.charAt(end) == '”') {
 				return true;
-			} else if (beaf.charAt(prev) == '‘' && beaf.charAt(end) == '’') {
+			} else if (beef.charAt(prev) == '‘' && beef.charAt(end) == '’') {
 				return true;
 			}
 			// 英文单双引号
-			else if (beaf.charAt(prev) == '\'' && beaf.charAt(end) == '\'') {
+			else if (beef.charAt(prev) == '\'' && beef.charAt(end) == '\'') {
 				return true;
-			} else if (beaf.charAt(prev) == '\"' && beaf.charAt(end) == '\"') {
+			} else if (beef.charAt(prev) == '\"' && beef.charAt(end) == '\"') {
 				return true;
 			}
 			// 中文书名号
-			else if (beaf.charAt(prev) == '《' && beaf.charAt(end) == '》') {
+			else if (beef.charAt(prev) == '《' && beef.charAt(end) == '》') {
 				return true;
-			} else if (beaf.charAt(prev) == '〈' && beaf.charAt(end) == '〉') {
+			} else if (beef.charAt(prev) == '〈' && beef.charAt(end) == '〉') {
 				return true;
 			}
 			// 英文尖括号
-			else if (beaf.charAt(prev) == '<' && beaf.charAt(end) == '>') {
+			else if (beef.charAt(prev) == '<' && beef.charAt(end) == '>') {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private final void collect(Collector collector, CharSequence beaf,
+	private final void collect(Collector collector, CharSequence beef,
 			int offset, int end) {
 		collector
-				.collect(beaf.subSequence(offset, end).toString(), offset, end);
+				.collect(beef.subSequence(offset, end).toString(), offset, end);
 	}
 
-	private final int skipXword(CharSequence beaf, int offset, int end) {
+	private final int skipXword(CharSequence beef, int offset, int end) {
 		Hit word;
 		for (int k = offset + 2; k <= end; k++) {
-			word = noiseWords.search(beaf, offset, k - offset);
+			word = noiseWords.search(beef, offset, k - offset);
 			if (word.isHit()) {
 				offset = k;
 			}
@@ -227,7 +227,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		return offset;
 	}
 
-	private final int collectNumber(Collector collector, CharSequence beaf,
+	private final int collectNumber(Collector collector, CharSequence beef,
 			int offset, int end) {
 		int number1 = -1;
 		int number2 = -1;
@@ -235,9 +235,9 @@ public class CJKKnife implements Knife, DictionariesWare {
 		int bitValue = 0;
 		int maxUnit = 0;
 		boolean hasDigit = false;// 作用：去除没有数字只有单位的汉字，如“万”，“千”
-		for (; cur <= end && (bitValue = toNumber(beaf.charAt(cur))) >= 0; cur++) {
+		for (; cur <= end && (bitValue = toNumber(beef.charAt(cur))) >= 0; cur++) {
 			if (bitValue == 2
-					&& (beaf.charAt(cur) == '两' || beaf.charAt(cur) == '俩' || beaf
+					&& (beef.charAt(cur) == '两' || beef.charAt(cur) == '俩' || beef
 							.charAt(cur) == '倆')) {
 				if (cur != offset)
 					break;
@@ -271,8 +271,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 				number2 = -1;
 			}
 		}
-		if (!hasDigit && cur < beaf.length()
-				&& !units.search(beaf, cur, 1).isHit()) {
+		if (!hasDigit && cur < beef.length()
+				&& !units.search(beef, cur, 1).isHit()) {
 			return offset;
 		}
 		if (number2 > 0) {
@@ -288,10 +288,10 @@ public class CJKKnife implements Knife, DictionariesWare {
 			// 后面可能跟了计量单位
 			Hit wd;
 			int i = cur + 1;
-			while (i <= beaf.length()
-					&& (wd = units.search(beaf, cur, i - cur)).isHit()) {
+			while (i <= beef.length()
+					&& (wd = units.search(beef, cur, i - cur)).isHit()) {
 				collector.collect(String.valueOf(number1)
-						+ beaf.subSequence(cur, i), offset, i);
+						+ beef.subSequence(cur, i), offset, i);
 				cur++;
 				if (!wd.isUnclosed()) {
 					break;

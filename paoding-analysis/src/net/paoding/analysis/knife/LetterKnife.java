@@ -36,19 +36,19 @@ public class LetterKnife extends CharKnife {
 		super(noiseWords);
 	}
 
-	public boolean assignable(CharSequence beaf, int index) {
-		return CharSet.isLetter(beaf.charAt(index));
+	public boolean assignable(CharSequence beef, int index) {
+		return CharSet.isLetter(beef.charAt(index));
 	}
 
-	protected boolean isTokenChar(CharSequence beaf, int history, int index) {
-		char ch = beaf.charAt(index);
+	protected boolean isTokenChar(CharSequence beef, int history, int index) {
+		char ch = beef.charAt(index);
 		return CharSet.isLetter(ch) || (ch >= '0' && ch <= '9') || ch == '-';
 	}
 
-	protected void collect(Collector collector, CharSequence beaf, int offset,
+	protected void collect(Collector collector, CharSequence beef, int offset,
 			int end, String word) {
 		if (word.length() > 1) {
-			super.collect(collector, beaf, offset, end, word);
+			super.collect(collector, beef, offset, end, word);
 		}
 	}
 

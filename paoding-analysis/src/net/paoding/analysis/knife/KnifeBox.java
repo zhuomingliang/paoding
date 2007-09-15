@@ -67,16 +67,16 @@ public class KnifeBox implements Knife {
 		size = this.knives.size();
 	}
 
-	public boolean assignable(CharSequence beaf, int index) {
+	public boolean assignable(CharSequence beef, int index) {
 		return true;
 	}
 
-	public int dissect(Collector collector, CharSequence beaf, int offset) {
+	public int dissect(Collector collector, CharSequence beef, int offset) {
 		Knife knife;
 		for (int i = 0; i < size; i++) {
 			knife = (Knife) knives.get(i);
-			if (knife.assignable(beaf, offset)) {
-				return knife.dissect(collector, beaf, offset);
+			if (knife.assignable(beef, offset)) {
+				return knife.dissect(collector, beef, offset);
 			}
 		}
 		return ++offset;
