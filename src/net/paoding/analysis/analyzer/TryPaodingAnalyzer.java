@@ -1,8 +1,13 @@
 package net.paoding.analysis.analyzer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 
 import net.paoding.analysis.knife.PaodingMaker;
 
@@ -12,6 +17,7 @@ public class TryPaodingAnalyzer {
 	private static final String ARGS_TIP = ":";
 	static String input = null;
 	static String file = null;
+	static Reader reader = null;
 	static String charset = null;
 	static String mode = null;
 	static String analyzerName = null;
@@ -20,13 +26,7 @@ public class TryPaodingAnalyzer {
 	
 	public static void main(String[] args) {
 		try {
-			input = null;
-			file = null;
-			charset = null;
-			mode = null;
-			print = null;
-			analyzerName = null;
-			properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
+			resetArgs();
 			
 			int inInput = 0;
 			for (int i = 0; i < args.length; i++) {
@@ -65,13 +65,28 @@ public class TryPaodingAnalyzer {
 				}
 			}
 			if (file != null) {
-				input = Estimate.Helper.readText(file, charset);
+				input = null;
+				reader = getReader(file, charset);
 			}
 			//
 			analysing();
 		} catch (Exception e1) {
+			resetArgs();
 			e1.printStackTrace();
 		}
+	}
+
+
+
+	private static void resetArgs() {
+		input = null;
+		file = null;
+		reader = null;
+		charset = null;
+		mode = null;
+		print = null;
+		analyzerName = null;
+		properties = PaodingMaker.DEFAULT_PROPERTIES_PATH;
 	}
 	
 
@@ -108,23 +123,30 @@ public class TryPaodingAnalyzer {
 			estimate.setPrint(print);
 		}
 		while (true) {
-			if (input == null || input.length() == 0 || readInputFromConsle) {
-				input = getInputFromConsole();
-				readInputFromConsle = true;
+			if (reader == null) {
+				if (input == null || input.length() == 0 || readInputFromConsle) {
+					input = getInputFromConsole();
+					readInputFromConsle = true;
+				}
+				if (input == null || input.length() == 0) {
+					System.out.println("Warn: none charactors you input!!");
+					continue;
+				}
+				else if (input.startsWith(ARGS_TIP)) {
+					String argsStr = input.substring(ARGS_TIP.length());
+					main(argsStr.split(" "));
+					continue;
+				}
 			}
-			if (input == null || input.length() == 0) {
-				System.out.println("Warn: none charactors you input!!");
-				continue;
-			}
-			else if (input.startsWith(ARGS_TIP)) {
-				String argsStr = input.substring(ARGS_TIP.length());
-				main(argsStr.split(" "));
-				continue;
+			if (reader != null) {
+				estimate.test(System.out, reader);
+				reader = null;
 			}
 			else {
 				estimate.test(System.out, input);
-				System.out.println("--------------------------------------------------");
+				input = null;
 			}
+			System.out.println("--------------------------------------------------");
 			if (false == readInputFromConsle) {
 				return;
 			}
@@ -224,4 +246,52 @@ public class TryPaodingAnalyzer {
 			titlePrinted = true;
 		}
 	}
+	
+		
+	static String getContent(String path, String encoding) throws IOException {
+		return (String) read(path, encoding, true);
+	}
+	
+	static Reader getReader(String path, String encoding) throws IOException {
+		return (Reader) read(path, encoding, false);
+	}
+	
+	static Object read(String path, String encoding, boolean return_string) throws IOException {
+		InputStream in;
+		if (path.startsWith("classpath:")) {
+			path = path.substring("classpath:".length());
+			URL url = Estimate.class.getClassLoader().getResource(path);
+			if (url == null) {
+				throw new IllegalArgumentException("Not found " + path
+						+ " in classpath.");
+			}
+			System.out.println("read content from:" + url.getFile());
+			in = url.openStream();
+		} else {
+			File f = new File(path);
+			if (!f.exists()) {
+				throw new IllegalArgumentException("Not found " + path
+						+ " in system.");
+			}
+			System.out.println("read content from:" + f.getAbsolutePath());
+			in = new FileInputStream(f);
+		}
+		Reader re;
+		if (encoding != null) {
+			re = new InputStreamReader(in, encoding);
+		} else {
+			re = new InputStreamReader(in);
+		}
+		if (!return_string) {
+			return re;
+		}
+		char[] chs = new char[1024];
+		int count;
+		StringBuilder content = new StringBuilder();
+		while ((count = re.read(chs)) != -1) {
+			content.append(chs, 0, count);
+		}
+		re.close();
+		return content.toString();
+		}
 }

@@ -60,6 +60,11 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 	private final Reader input;
 	
 	/**
+	 * 从input读入的总字符数
+	 */
+	private int inputLength;
+	
+	/**
 	 * 
 	 */
 	private static final int bufferLength = 128;
@@ -158,6 +163,7 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 					System.arraycopy(buffer, -dissected, buffer, 0, remainning);
 				}
 				read = input.read(buffer, remainning, bufferLength - remainning);
+				inputLength += read;
 				int charCount = remainning + read;
 				if (charCount < 0) {
 					// reader已尽，按接口next()要求返回null.
@@ -178,6 +184,10 @@ public final class PaodingTokenizer extends TokenStream implements Collector {
 		}
 		// 返回tokensIteractor下一个Token对象
 		return (Token) tokenIteractor.next();
+	}
+	
+	public int getInputLength() {
+		return inputLength;
 	}
 
 	// -------------------------------------------------
