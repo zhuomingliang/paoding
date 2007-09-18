@@ -1,14 +1,9 @@
 package net.paoding.analysis.analyzer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -58,10 +53,14 @@ public class Estimate {
 	public void test(String input) {
 		this.test(System.out, input);
 	}
-
+	
 	public void test(PrintStream out, String input) {
+		Reader reader = new StringReaderEx(input);
+		this.test(out, reader);
+	}
+
+	public void test(PrintStream out, Reader reader) {
 		try {
-			Reader reader = new StringReader(input);
 			long begin = System.currentTimeMillis();
 			TokenStream ts = analyzer.tokenStream("", reader);
 			Token token;
@@ -97,17 +96,31 @@ public class Estimate {
 				if (c % 10 != 1) {
 					System.out.println();
 				}
+				String inputLength = "<未知>";
+				if (reader instanceof StringReaderEx) {
+					inputLength = "" + ((StringReaderEx) reader).inputLength;
+				}
+				else if (ts instanceof PaodingTokenizer) {
+					inputLength = "" + ((PaodingTokenizer) ts).getInputLength();
+				}
 				System.out.println();
 				System.out.println("\t分词器" + analyzer.getClass().getName());
-				System.out.println("\t内容长度 " + input.length() + "字符， 分 " + wordsCount
+				System.out.println("\t内容长度 " + inputLength + "字符， 分 " + wordsCount
 						+ "个词");
-				System.out
-						.println("\t分词耗时 " + (end - begin) + "ms ");
+				System.out.println("\t分词耗时 " + (end - begin) + "ms ");
 			}
 		} catch (IOException e) {
-			// nerver happen!
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+			}
 		}
 	}
+	
+	//-------------------------------------------
 	
 	static class CToken {
 		Token t;
@@ -178,42 +191,12 @@ public class Estimate {
 		
 	}
 	
-	static class Helper {
-		static String readText(String path, String encoding) throws IOException {
-			InputStream in;
-			if (path.startsWith("classpath:")) {
-				path = path.substring("classpath:".length());
-				URL url = Estimate.class.getClassLoader().getResource(path);
-				if (url == null) {
-					throw new IllegalArgumentException("Not found " + path
-							+ " in classpath.");
-				}
-				System.out.println("read content from:" + url.getFile());
-				in = url.openStream();
-			} else {
-				File f = new File(path);
-				if (!f.exists()) {
-					throw new IllegalArgumentException("Not found " + path
-							+ " in system.");
-				}
-				System.out.println("read content from:" + f.getAbsolutePath());
-				in = new FileInputStream(f);
-			}
-
-			Reader re;
-			if (encoding != null) {
-				re = new InputStreamReader(in, encoding);
-			} else {
-				re = new InputStreamReader(in);
-			}
-			char[] chs = new char[1024];
-			int count;
-			StringBuilder content = new StringBuilder();
-			while ((count = re.read(chs)) != -1) {
-				content.append(chs, 0, count);
-			}
-			re.close();
-			return content.toString();
+	static class StringReaderEx extends StringReader {
+		private int inputLength;
+		public StringReaderEx(String s) {
+			super(s);
+			inputLength = s.length();
 		}
 	}
+	
 }
