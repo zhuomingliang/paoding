@@ -309,10 +309,11 @@ public class PaodingMaker {
 			String noiseWord = getProperty(p, Constants.DIC_NOISE_WORD);
 			String unit = getProperty(p, Constants.DIC_UNIT);
 			String confucianFamilyName = getProperty(p, Constants.DIC_CONFUCIAN_FAMILY_NAME);
+			String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
 			String charsetName = getProperty(p, Constants.DIC_CHARSET);
 			Dictionaries dictionaries = new FileDictionaries(dicHomeAbsolutePath,
 					skipPrefix, noiseCharactor, noiseWord, unit,
-					confucianFamilyName, charsetName);
+					confucianFamilyName, combinatorics, charsetName);
 			paoding.setDictionaries(dictionaries);
 			//寻找传说中的Knife。。。。
 			final Map /* <String, Knife> */ knifeMap = new HashMap /* <String, Knife> */ ();

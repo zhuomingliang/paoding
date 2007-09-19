@@ -63,4 +63,10 @@ public interface Dictionaries {
 	 * @return
 	 */
 	public Dictionary getUnitsDictionary();
+	
+	/**
+	 * lantin+cjk, num+cjk
+	 * @return
+	 */
+	public Dictionary getCombinatoricsDictionary();
 }

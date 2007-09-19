@@ -28,7 +28,7 @@ public class CharSet {
 		return ch >= '0' && ch <= '9';
 	}
 
-	public static boolean isLetter(char ch) {
+	public static boolean isLantingLetter(char ch) {
 		return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z';
 	}
 

@@ -55,6 +55,11 @@ public class FileDictionaries implements Dictionaries {
 	 * 词汇表字典
 	 */
 	protected Dictionary vocabularyDictionary;
+	
+	/**
+	 * lantin+cjk的词典
+	 */
+	protected Dictionary combinatoricsDictionary;
 
 	/**
 	 * 姓氏字典
@@ -88,6 +93,7 @@ public class FileDictionaries implements Dictionaries {
 	protected String noiseWord;
 	protected String unit;
 	protected String confucianFamilyName;
+	protected String combinatorics;
 	protected String charsetName;
 
 	// ----------------------
@@ -97,13 +103,14 @@ public class FileDictionaries implements Dictionaries {
 
 	public FileDictionaries(String dicHome, String skipPrefix,
 			String noiseCharactor, String noiseWord, String unit,
-			String confucianFamilyName, String charsetName) {
+			String confucianFamilyName, String combinatorics, String charsetName) {
 		this.dicHome = dicHome;
 		this.skipPrefix = skipPrefix;
 		this.noiseCharactor = noiseCharactor;
 		this.noiseWord = noiseWord;
 		this.unit = unit;
 		this.confucianFamilyName = confucianFamilyName;
+		this.combinatorics = combinatorics;
 		this.charsetName = charsetName;
 	}
 
@@ -161,6 +168,14 @@ public class FileDictionaries implements Dictionaries {
 
 	public void setCharsetName(String charsetName) {
 		this.charsetName = charsetName;
+	}
+	
+	public void setLantinFllowedByCjk(String lantinFllowedByCjk) {
+		this.combinatorics = lantinFllowedByCjk;
+	}
+	
+	public String getLantinFllowedByCjk() {
+		return combinatorics;
 	}
 
 	// -------------------------------------------------
@@ -247,6 +262,21 @@ public class FileDictionaries implements Dictionaries {
 		}
 		return unitsDictionary;
 	}
+	
+
+	public synchronized Dictionary getCombinatoricsDictionary() {
+		if (combinatoricsDictionary == null) {
+			Set/* <String> */set = getCombinatoricsWords();
+			String[] words = (String[]) set.toArray(new String[set
+					.size()]);
+			for (int i = 0; i < words.length; i++) {
+				words[i] = words[i].toLowerCase();
+			}
+			Arrays.sort(words);
+			combinatoricsDictionary = new BinaryDictionary(words);
+		}
+		return combinatoricsDictionary;
+	}
 
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
@@ -282,7 +312,7 @@ public class FileDictionaries implements Dictionaries {
 	protected Set/* <String> */getConfucianFamilyNames() {
 		return getDictionaryWords(confucianFamilyName);
 	}
-
+	
 	protected Set/* <String> */getNoiseWords() {
 		return getDictionaryWords(noiseWord);
 	}
@@ -295,6 +325,10 @@ public class FileDictionaries implements Dictionaries {
 		return getDictionaryWords(unit);
 	}
 
+	protected Set/* <String> */getCombinatoricsWords() {
+		return getDictionaryWords(combinatorics);
+	}
+	
 	protected Set/* <String> */getDictionaryWords(String dicNameRelativeDicHome) {
 		Map/* <String, Set<String>> */dics = loadAllWordsIfNecessary();
 		Set/* <String> */ret = (Set/* <String> */) dics
@@ -348,25 +382,29 @@ public class FileDictionaries implements Dictionaries {
 			if (!isSkipForVacabulary(dicName)) {
 				this.vocabularyDictionary = null;
 			}
-			// 如果来的的是noiseWord
+			// 如果来的是noiseWord
 			if (isNoiseWordDicFile(dicName)) {
 				this.noiseWordsDictionary = null;
 				// noiseWord和vocabulary有关，所以需要更新vocabulary
 				this.vocabularyDictionary = null;
 			}
-			// 如果来的的是noiseCharactors
+			// 如果来的是noiseCharactors
 			else if (isNoiseCharactorDicFile(dicName)) {
 				this.noiseCharactorsDictionary = null;
 				// noiseCharactorsDictionary和vocabulary有关，所以需要更新vocabulary
 				this.vocabularyDictionary = null;
 			}
-			// 如果来的的是单元
+			// 如果来的是单元
 			else if (isUnitDicFile(dicName)) {
 				this.unitsDictionary = null;
 			}
-			// 如果来的的是亚洲人人姓氏
+			// 如果来的是亚洲人人姓氏
 			else if (isConfucianFamilyNameDicFile(dicName)) {
 				this.confucianFamilyNamesDictionary = null;
+			}
+			// 如果来的是以字母,数字等组合类语言为开头的词汇
+			else if (isLantinFollowedByCjkDicFile(dicName)) {
+				this.combinatoricsDictionary = null;
 			}
 		}
 	}
@@ -392,6 +430,10 @@ public class FileDictionaries implements Dictionaries {
 
 	protected boolean isConfucianFamilyNameDicFile(String dicName) {
 		return dicName.equals(this.confucianFamilyName);
+	}
+	
+	protected boolean isLantinFollowedByCjkDicFile(String dicName) {
+		return dicName.equals(this.combinatorics);
 	}
 
 	// --------------------------------------

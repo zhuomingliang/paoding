@@ -63,11 +63,11 @@ public class FakeKnife implements Knife, DictionariesWare {
 		return inner;
 	}
 
-	public boolean assignable(CharSequence beef, int index) {
-		return false;
+	public int assignable(Beef beef, int history, int index) {
+		return LIMIT;
 	}
 
-	public int dissect(Collector collector, CharSequence beef, int offset) {
+	public int dissect(Collector collector, Beef beef, int offset) {
 		throw new Error("this knife doesn't accept any beef");
 	}
 

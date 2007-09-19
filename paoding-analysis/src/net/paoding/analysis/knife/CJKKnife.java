@@ -52,80 +52,182 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 	// -------------------------------------------------
 
-	// -------------------------------------------------
-
-	public boolean assignable(CharSequence beef, int index) {
-		return CharSet.isCjkUnifiedIdeographs(beef.charAt(index));
+	/**
+	 * 分解以CJK字符开始的，后可带阿拉伯数字、英文字母、横线、下划线的字符组成的语句
+	 */
+	public int assignable(Beef beef, int history, int index) {
+		char ch = beef.charAt(index);
+		if (CharSet.isCjkUnifiedIdeographs(ch))
+			return ASSIGNED;
+		if (CharSet.isArabianNumber(ch) || CharSet.isLantingLetter(ch)
+				|| ch == '-' || ch == '_')
+			return POINT;
+		return LIMIT;
 	}
 
-	public int dissect(Collector collector, CharSequence beef, int offset) {
-		if (CharSet.isCjkUnifiedIdeographs(beef.charAt(beef.length() - 1))
-				&& offset > 0 && beef.length() - offset < 50) {
-			return -offset;
-		}
-		/* 例句:王宜家住在北京积水潭桥附近 */
-		// setup和end用于规定其之间的文字是否为词典词语
-		int setup, end;
-		// 为unidentifiedIndex服务，为已找出的词语结束位置的最大者，e.g '在','京','桥','近'
-		int identifiedEnd = offset;
-		// 用于定位未能分词的块的开始位置，e.g '王'
-		int unidentifiedIndex = -1;
-		// 用于辅助判断是否调用shouldAWord()方法
-		int maxWordLength = 0;
-		Hit word = null;
-		for (setup = offset, end = offset; setup < beef.length()
-				&& CharSet.isCjkUnifiedIdeographs(beef.charAt(setup)); end = ++setup) {
-			for (int count = 1; end < beef.length()
-					&& CharSet.isCjkUnifiedIdeographs(beef.charAt(end++)); count++) {
-				// 第一次for循环时，end=setup+1
-				word = vocabulary.search(beef, setup, count);
-				if (word.isUndefined()) {
-					if (unidentifiedIndex < 0 && setup >= identifiedEnd) {
-						unidentifiedIndex = setup;
-					}
-					break;
-				} else if (word.isHit()) {
-					if (identifiedEnd < end) {
-						identifiedEnd = end;
-					}
-					if (unidentifiedIndex >= 0) {
-						dissectUnidentified(collector, beef, unidentifiedIndex,
-								setup - unidentifiedIndex);
-						unidentifiedIndex = -1;
-					}
-					// 如果切出来的词是noise词，则抛弃-此功能在此被抛弃，
-					// 理由：避免每一个分出来的词还得在从noise词典去检索
-					// 约束：词汇表设置进来，就要把这些noise词、字移出去，使不会把noise词、字切出来
-					// 这样，这些noise词、字将被视为Unidentified的一部分，在dissectUnidentified中处理
-					// dissectUnidentified能够辨别哪些是noise词和字，不对他们进行二元切分。
-					// Hit noiseWordsHit = noiseWords.search(beef, setup,
-					// count);
-					// if (!noiseWordsHit.isHit()) {
-					collector.collect(word.getWord(), setup, end);
-					// }
-					if (setup == offset && maxWordLength < count) {
-						maxWordLength = count;
-					}
-					// gotoNextChar为true表示在词典中存在以当前词为开头的词，
-					// 比如：加入当前词是"中华"，词典存在"中华人民国和国"词以它为开头的
-					boolean gotoNextChar = word.isUnclosed()
-							&& end < beef.length()
-							&& beef.charAt(end) >= word.getNext().charAt(count);
-					if (!gotoNextChar) {
-						break;
-					}
+	public int dissect(Collector collector, Beef beef, int offset) {
+
+		// 当point == -1时表示本次分解没有遇到POINT性质的字符；
+		// 如果point != -1，该值表示POINT性质字符的开始位置，
+		// 这个位置将被返回，下一个Knife将从point位置开始分词
+		int point = -1;
+
+		// 记录同质字符分词结束极限位置(不包括limit位置的字符)-也就是assignable方法遇到LIMIT性质的字符的位置
+		// 如果point==-1，limit将被返回，下一个Knife将从limit位置开始尝试分词
+		int limit = offset + 1;
+
+		// 构建point和limit变量的值:
+		// 往前直到遇到LIMIT字符；
+		// 其中如果遇到第一次POINT字符，则会将它记录为point
+		GO_UNTIL_LIMIT: while (true) {
+			switch (assignable(beef, offset, limit)) {
+			case LIMIT:
+				break GO_UNTIL_LIMIT;
+			case POINT:
+				if (point == -1) {
+					point = limit;
 				}
 			}
+			limit++;
 		}
-		if (identifiedEnd != end) {
-			dissectUnidentified(collector, beef, identifiedEnd, end
-					- identifiedEnd);
+
+		// 如果从offset到beef.length()都是本次Knife的责任，则应读入更多的未读入字符，以支持一个词分在两次beef中的处理
+		// 魔幻逻辑：
+		// Beef承诺:如果以上GO_UNTIL_LIMIT循环最终把limit值设置为beef.length则表示还为未读入字符。
+		// 因为beef一定会在文本全部结束后加入一个char='\0'的值作为最后一个char标志结束。
+		// 这样以上的GO_UNTIL_LIMIT将在limit=beef.length()之前就已经break，此时limit!=beef.length
+		if (offset > 0 && limit == beef.length()) {
+			return -offset;
 		}
-		int len = end - offset;
-		if (len > 2 && len != maxWordLength && shouldAWord(beef, offset, end)) {
-			collect(collector, beef, offset, end);
+
+		// 记录当前正在检视(是否是词典词语)的字符串在beef中的始止位置(包含开始位置，不包含结束位置)
+		int curWordOffset = offset, curWordEnd;
+
+		// 记录当前被检视的字符串的长度，它的值恒等于(curWordEnd - curWordOffset)
+		int curWordLength;
+
+		// 当前检视的字符串的判断结果
+		Hit curWord = null;
+
+		// 限制要判断的字符串的最大开始位置
+		// 这个变量不随着程序的运行而变化
+		final int offsetLimit;
+		if (point != -1)
+			offsetLimit = point;
+		else
+			offsetLimit = limit;
+
+		// 记录到当前为止所分出的词典词语的最大结束位置
+		int maxDicWordEnd = offset;
+
+		// 记录最近的不在词典中的字符串(称为孤立字符串)在beef的位置，-1表示没有这个位置
+		int isolatedOffset = -1;
+
+		// 记录到当前为止经由词典所切出词的最大长度。
+		// 用于辅助判断是否调用shouldBeWord()方法，以把前后有如引号、书名号之类的，但还没有被切出的字符串当成一个词
+		// 详见本方法后面对maxDicWordLength的应用以及shouldBeWord()的实现
+		int maxDicWordLength = 0;
+
+		// 第1个循环定位被检视字符串的开始位置
+		// 被检视的字符串开始位置的极限是offsetLimit，而非limit
+		for (; curWordOffset < offsetLimit; curWordOffset++) {
+
+			// 第二个循环定位被检视字符串的结束位置(不包含该位置的字符)
+			// 它的起始状态是：被检视的字符串一长度为1，即结束位置为开始位置+1
+			curWordEnd = curWordOffset + 1;
+			curWordLength = 1;
+			for (; curWordEnd <= limit; curWordEnd++, curWordLength++) {
+
+				// 通过词汇表判断，返回判断结果curWord
+				curWord = vocabulary.search(beef, curWordOffset, curWordLength);
+
+				// ---------------分析返回的判断结果--------------------------
+
+				// 1)
+				// 从词汇表中找到了该词语...
+				if (curWord.isHit()) {
+
+					// 1.1)
+					// 确认孤立字符串的结束位置(也就是curWordOffset)，
+					// 并调用子方法先把之前的孤立字符串进行类似二元分词(但不完全一样，这里仅是为方便而简化说明)
+					// 孤立字符串分解完毕，将孤立字符串开始位置isolatedOffset清空
+					if (isolatedOffset >= 0) {
+						dissectIsolated(collector, beef, isolatedOffset,
+								curWordOffset - isolatedOffset);
+						isolatedOffset = -1;
+					}
+
+					// 1.2)
+					// 通知collector本次找到的词语
+					// 魔幻逻辑：
+					// 这里不需要执行过滤是否是noise词采用，直接通知collector便可：
+					// 为了性能考虑，词汇表已经承诺会过滤noise词汇表的词，这样就意味着从词汇表找到的词一定不是noise词汇
+					// 参见：FileDictionaries.getVocabularyWords()方法
+					collector.collect(curWord.getWord(), curWordOffset,
+							curWordEnd);
+
+					// 1.3)
+					// 更新最大结束位置
+					if (maxDicWordEnd < curWordEnd) {
+						maxDicWordEnd = curWordEnd;
+					}
+
+					// 1.4)
+					// 更新词语最大长度变量的值
+					if (curWordOffset == offset
+							&& maxDicWordLength < curWordLength) {
+						maxDicWordLength = curWordLength;
+					}
+				}
+
+				// 若isolatedFound==true，表示词典没有该词语
+				boolean isolatedFound = curWord.isUndefined();
+
+				// 若isolatedFound==false，则通过Hit的next属性检视词典没有beef的从offset到curWordEnd
+				// + 1位置的词
+				// 这个判断完全是为了减少一次词典检索而设计的，
+				// 如果去掉这个if判断，并不影响程序的正确性(但是会多一次词典检索)
+				if (!isolatedFound && !curWord.isHit()) {
+					isolatedFound = curWordEnd >= limit
+							|| beef.charAt(curWordEnd) < curWord.getNext()
+									.charAt(curWordLength);
+				}
+				// 2)
+				// 词汇表中没有该词语，且没有以该词语开头的词汇...
+				// -->讲它记录为孤立词语
+				if (isolatedFound) {
+					if (isolatedOffset < 0 && curWordOffset >= maxDicWordEnd) {
+						isolatedOffset = curWordOffset;
+					}
+					break;
+				}
+
+				// ^^^^^^^^^^^^^^^^^^分析返回的判断结果^^^^^^^^^^^^^^^^^^^^^^^^
+			}
 		}
-		return setup;// 此时end=start
+
+		// 上面循环分词结束后，可能存在最后的几个未能从词典检索成词的孤立字符串，
+		// 此时isolatedOffset不一定等于一个有效值(因为这些孤立字虽然不是词语，但是词典可能存在以它为开始的词语，
+		// 只要执行到此才能知道这些虽然是前缀的字符串已经没有机会成为词语了)
+		// 所以不能通过isolatedOffset来判断是否此时存在有孤立词，判断依据转换为：
+		// 最后一个词典的词的结束位置是否小于offsetLimit(!!offsetLimit, not Limit!!)
+		if (maxDicWordEnd < offsetLimit) {
+			dissectIsolated(collector, beef, maxDicWordEnd, offsetLimit
+					- maxDicWordEnd);
+		}
+
+		// 现在是利用maxDicWordLength的时候了
+		// 如果本次负责的所有字符串文本没有作为一个词被切分出(包括词典切词和孤立串切分)，
+		// 那如果它被showAsWord方法认定为应该作为一个词切分，则将它切出来
+		int len = limit - offset;
+		if (len > 2 && len != maxDicWordLength
+				&& shouldBeWord(beef, offset, limit)) {
+			collector.collect(beef.subSequence(offset, limit).toString(),
+					offset, limit);
+		}
+
+		// 按照point和limit的语义，返回下一个Knife开始切词的开始位置
+		return point == -1 ? limit : point;
 	}
 
 	// -------------------------------------------------
@@ -138,8 +240,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 	 * @param offset
 	 * @param count
 	 */
-	protected void dissectUnidentified(Collector collector, CharSequence beef,
-			int offset, int count) {
+	protected void dissectIsolated(Collector collector, Beef beef, int offset,
+			int count) {
 		int end = offset + count;
 		Hit word = null;
 		int nearEnd = end - 1;
@@ -162,23 +264,24 @@ public class CJKKnife implements Knife, DictionariesWare {
 			// 头字
 			if (i == offset) {
 				// 百度门事件=百度+门+...!=百度+门事+...
-				collect(collector, beef, offset, offset + 1);
+				// collect(collector, beef, offset, offset + 1);
 			}
 			// 尾字
 			if (i == nearEnd) {
-				if (nearEnd != offset) {
-					collect(collector, beef, nearEnd, end);
-				}
+				// if (nearEnd != offset) {
+				// collect(collector, beef, nearEnd, end);
+				// }
 			}
 			// 穷尽二元分词
 			else {
-				collect(collector, beef, i, i + 2);
+				collector.collect(beef.subSequence(i, i + 2).toString(), i,
+						i + 2);
 			}
 			i++;
 		}
 	}
 
-	protected boolean shouldAWord(CharSequence beef, int offset, int end) {
+	protected boolean shouldBeWord(Beef beef, int offset, int end) {
 		if (offset > 0 && end < beef.length()) {// 确保前有字符，后也有字符
 			int prev = offset - 1;
 			// 中文单双引号
@@ -207,13 +310,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		return false;
 	}
 
-	private final void collect(Collector collector, CharSequence beef,
-			int offset, int end) {
-		collector
-				.collect(beef.subSequence(offset, end).toString(), offset, end);
-	}
-
-	private final int skipXword(CharSequence beef, int offset, int end) {
+	private final int skipXword(Beef beef, int offset, int end) {
 		Hit word;
 		for (int k = offset + 2; k <= end; k++) {
 			word = noiseWords.search(beef, offset, k - offset);
@@ -227,8 +324,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 		return offset;
 	}
 
-	private final int collectNumber(Collector collector, CharSequence beef,
-			int offset, int end) {
+	private final int collectNumber(Collector collector, Beef beef, int offset,
+			int end) {
 		int number1 = -1;
 		int number2 = -1;
 		int cur = offset;

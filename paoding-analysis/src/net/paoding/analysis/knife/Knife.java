@@ -24,7 +24,7 @@ package net.paoding.analysis.knife;
  * @see Collector
  * @see Paoding
  * @see CJKKnife
- * @see CharKnife
+ * @see CombinatoricsKnife
  * @see NumberKnife
  * @see LetterKnife
  * 
@@ -32,13 +32,19 @@ package net.paoding.analysis.knife;
  * 
  */
 public interface Knife {
+	int LIMIT = -1;
+	int ASSIGNED = 1;
+	int POINT = 0;
+	
 	/**
 	 * 
 	 * @param beef
+	 * @param history
 	 * @param index
 	 * @return
 	 */
-	public boolean assignable(CharSequence beef, int index);
+	public int assignable(Beef beef, int history, int index);
+	//public boolean assignable(Beef beef, int index);
 
 	/**
 	 * 分解词语，并将分解成的词语相关信息告知{@link Collector}接口。
@@ -62,5 +68,5 @@ public interface Knife {
 	 * 
 	 * 
 	 */
-	public int dissect(Collector collector, CharSequence beef, int offset);
+	public int dissect(Collector collector, Beef beef, int offset);
 }

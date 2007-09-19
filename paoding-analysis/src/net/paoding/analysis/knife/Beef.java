@@ -126,7 +126,7 @@ public class Beef implements CharSequence {
 	}
 
 	public CharSequence subSequence(int start, int end) {
-		return new Beef(value, offset + start, end - start);
+		return new String(value, offset + start, end - start);
 	}
 
 	// -------------------------------------------------

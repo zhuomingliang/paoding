@@ -78,15 +78,15 @@ public class KnifeBox implements Knife {
 		System.arraycopy(knives, 0, this.knives, 0, size);
 	}
 
-	public boolean assignable(CharSequence beef, int index) {
-		return true;
+	public int assignable(Beef beef, int history, int index) {
+		return ASSIGNED;
 	}
 
-	public int dissect(Collector collector, CharSequence beef, int offset) {
+	public int dissect(Collector collector, Beef beef, int offset) {
 		Knife knife;
 		for (int i = 0; i < size; i++) {
 			knife = knives[i];
-			if (knife.assignable(beef, offset)) {
+			if (ASSIGNED == knife.assignable(beef, offset, offset)) {
 				return knife.dissect(collector, beef, offset);
 			}
 		}

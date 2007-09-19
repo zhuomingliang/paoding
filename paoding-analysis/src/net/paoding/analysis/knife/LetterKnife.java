@@ -15,12 +15,13 @@
  */
 package net.paoding.analysis.knife;
 
+
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 
  */
-public class LetterKnife extends CharKnife {
+public class LetterKnife extends CombinatoricsKnife {
 
 	public static final String[] DEFAULT_NOISE = { "and", "are", "as", "at",
 			"be", "but", "by", "for", "if", "in", "into", "is", "it", "no",
@@ -28,6 +29,7 @@ public class LetterKnife extends CharKnife {
 			"there", "these", "they", "this", "to", "was", "will", "with",
 			"www" };
 
+	
 	public LetterKnife() {
 		super(DEFAULT_NOISE);
 	}
@@ -36,19 +38,21 @@ public class LetterKnife extends CharKnife {
 		super(noiseWords);
 	}
 
-	public boolean assignable(CharSequence beef, int index) {
-		return CharSet.isLetter(beef.charAt(index));
-	}
-
-	protected boolean isTokenChar(CharSequence beef, int history, int index) {
+	public int assignable(Beef beef, int history, int index) {
 		char ch = beef.charAt(index);
-		return CharSet.isLetter(ch) || (ch >= '0' && ch <= '9') || ch == '-';
+		if (CharSet.isLantingLetter(ch)) {
+			return ASSIGNED;
+		}
+		if ((ch >= '0' && ch <= '9') || ch == '-' || ch == '_') {
+			return POINT;
+		}
+		return LIMIT;
 	}
-
-	protected void collect(Collector collector, CharSequence beef, int offset,
-			int end, String word) {
+	
+	protected void doCollect(Collector collector, String word, Beef beef,
+			int offset, int end) {
 		if (word.length() > 1) {
-			super.collect(collector, beef, offset, end, word);
+			collector.collect(word, offset, end);
 		}
 	}
 
