@@ -23,10 +23,10 @@ import net.paoding.analysis.dictionary.Hit;
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 
  */
-public class NumberKnife extends CharKnife implements DictionariesWare {
+public class NumberKnife extends CombinatoricsKnife implements DictionariesWare {
 
 	private Dictionary units;
-
+	
 	public NumberKnife() {
 	}
 
@@ -35,32 +35,43 @@ public class NumberKnife extends CharKnife implements DictionariesWare {
 	}
 
 	public void setDictionaries(Dictionaries dictionaries) {
+		super.setDictionaries(dictionaries);
 		units = dictionaries.getUnitsDictionary();
 	}
+	
 
-	public boolean assignable(CharSequence beef, int index) {
-		return CharSet.isArabianNumber(beef.charAt(index));
-	}
-
-	protected boolean isTokenChar(CharSequence beef, int history, int index) {
+	public int assignable(Beef beef, int history, int index) {
 		char ch = beef.charAt(index);
-		return CharSet.isArabianNumber(ch) || CharSet.isLetter(ch) || ch == '.';
+		if (CharSet.isArabianNumber(ch))
+			return ASSIGNED;
+		if (CharSet.isLantingLetter(ch) || ch == '.' || ch == '-' || ch == '_') {
+			if (CharSet.isLantingLetter(ch) || history == index
+					|| !CharSet.isArabianNumber(beef.charAt(index + 1))) {
+				//分词效果
+				//123.456		->123.456/
+				//123.abc.34	->123/123.abc.34/abc/34/	["abc"、"abc/34"系由LetterKnife分出，非NumberKnife]
+				//没有或判断!CharSet.isArabianNumber(beef.charAt(index + 1))，则分出"123."，而非"123"
+				//123.abc.34	->123./123.abc.34/abc/34/
+				return POINT;
+			}
+			return ASSIGNED;
+		}
+		return LIMIT;
 	}
 
-	protected void collect(Collector collector, CharSequence beef, int offset,
-			int end, String word) {
-		super.collect(collector, beef, offset, end, word);
-		
-		if (units != null
-				&& end < beef.length() //后面不是cjk，则不用探索后面是单位词
+	protected void doCollect(Collector collector, String word, Beef beef,
+			int offset, int end) {
+		collector.collect(word, offset, end);
+
+		if (units != null && end < beef.length() // 后面不是cjk，则不用探索后面是单位词
 				&& CharSet.isCjkUnifiedIdeographs(beef.charAt(end))) {
-			//只要全为数字才需要继续探索是否后继字符是否是一个单位
+			// 只要全为数字才需要继续探索是否后继字符是否是一个单位
 			for (int i = offset; i < end; i++) {
 				if (!CharSet.isArabianNumber(beef.charAt(i))) {
 					return;
 				}
 			}
-			//通过单位词典探索
+			// 通过单位词典探索
 			Hit wd;
 			int i = end + 1;
 			while (i <= beef.length()

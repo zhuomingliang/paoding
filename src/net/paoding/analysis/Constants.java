@@ -65,9 +65,14 @@ public class Constants {
 	// like "Wang", "Zhang", ...
 	public static final String DIC_CONFUCIAN_FAMILY_NAME = "paoding.dic.confucian-family-name";
 	public static final String DIC_CONFUCIAN_FAMILY_NAME_DEFAULT = "x-confucian-family-name";
+	
+	// -------------------------------------------------------------
+	// like 
+	public static final String DIC_FOR_COMBINATORICS = "paoding.dic.for-combinatorics";
+	public static final String DIC_FOR_COMBINATORICS_DEFAULT = "x-lantin,num+cjk";
 
 	// -------------------------------------------------------------
-	// like "Wang", "Zhang", ...
+	// like 
 	public static final String DIC_DETECTOR_INTERVAL = "paoding.dic.detector.interval";
 	public static final String DIC_DETECTOR_INTERVAL_DEFAULT = "60";
 
@@ -88,6 +93,7 @@ public class Constants {
 		map.put(DIC_NOISE_WORD, DIC_NOISE_WORD_DEFAULT);
 		map.put(DIC_UNIT, DIC_UNIT_DEFAULT);
 		map.put(DIC_CONFUCIAN_FAMILY_NAME, DIC_CONFUCIAN_FAMILY_NAME_DEFAULT);
+		map.put(DIC_FOR_COMBINATORICS, DIC_FOR_COMBINATORICS_DEFAULT);
 		map.put(DIC_DETECTOR_INTERVAL, DIC_DETECTOR_INTERVAL_DEFAULT);
 		map.put(ANALYZER_MODE, ANALYZER_MOE_DEFAULT);
 	}
