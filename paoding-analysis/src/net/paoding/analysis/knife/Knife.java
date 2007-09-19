@@ -32,19 +32,44 @@ package net.paoding.analysis.knife;
  * 
  */
 public interface Knife {
+	/**
+	 * 字符性质
+	 * <P>
+	 * 
+	 * beef当前位置的字符不是Knife分词字符。 当没有存在POINT性质的字符时，下一个KNIFE从返回LIMIT性质的字符开始分词
+	 */
 	int LIMIT = -1;
+
+	/**
+	 * 字符性质
+	 * <P>
+	 * beef当前位置的字符是Knife分词字符
+	 */
 	int ASSIGNED = 1;
+
+	/**
+	 * 字符性质
+	 * <P>
+	 * beef当前位置的字符是Knife分词字符，但是下一个Knife从第一个返回POINT值的位置开始分词
+	 * 如果没有POINT性质的字符，则返回LIMIT作为下一个Knife的分词开始位置
+	 */
 	int POINT = 0;
-	
+
 	/**
 	 * 
 	 * @param beef
+	 *            要被分词的字符串
 	 * @param history
+	 *            Knife开始或有可能开始切词的始发位置，外部调用此方法判断Knife是否接受分词时应该设置history=index=当前的字符位置
 	 * @param index
-	 * @return
+	 *            用以检视该位置字符是否能够被Knife分词，index >=history
+	 * @return 字符性质 <br>
+	 *         返回以下其中一个参数。且当history==index时只能返回LIMIT或ASSIGNED
+	 * @see #LIMIT
+	 * @see #ASSIGNED
+	 * @see #POINT
 	 */
 	public int assignable(Beef beef, int history, int index);
-	//public boolean assignable(Beef beef, int index);
 
 	/**
 	 * 分解词语，并将分解成的词语相关信息告知{@link Collector}接口。
