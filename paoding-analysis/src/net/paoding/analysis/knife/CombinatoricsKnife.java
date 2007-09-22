@@ -93,35 +93,34 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare{
 		// ->当然可能从point到limit的字符也可能是一个词，不过这不是本次分解的责任
 		// ->如果认为它应该是个词，那么只要配置对应的其它Knife实例，该Knife会有机会把它切出来的
 		// ->因为我们会返回point作为下一个Knife分词的开始。
-		if (point != -1) {
-			collectPoint(collector, beef, offset, point);
-		}
-		collectLimit(collector, beef, offset, limit);
+		
+		int pointVote = collectPoint(collector, beef, offset, point, limit);
+		int limitVote = collectLimit(collector, beef, offset, point, limit);
 
 		//检索是否有以该词语位前缀的词典词语
 		//若有，则将它解出
-		int followedEnd = limit;
+		int dicWordVote = -1;
 		if (combinatoricsDictionary != null && limit < beef.length() && beef.charAt(limit) > 0xFF) {
-			followedEnd = tryFollows(collector, beef, offset, limit);
+			dicWordVote = tryDicWord(collector, beef, offset, limit);
 		}
-		// 如果从词典找到相应的词，则下一个Knife直接从这个词的结束位置开始，而不是返回point或limit
-		if (followedEnd != limit) {
-			return followedEnd;
-		}
-		return nextOffset(beef, offset, point, limit);
+		return nextOffset(beef, offset, point, limit, pointVote, limitVote, dicWordVote);
 	}
 
-	protected void collectPoint(Collector collector, Beef beef,
-			int offset, int point) {
-		collectIfNotNoise(collector, beef, offset, point);
+	protected int collectPoint(Collector collector, Beef beef,
+			int offset, int point, int limit) {
+		if (point != -1) {
+			collectIfNotNoise(collector, beef, offset, point);
+		}
+		return -1;
 	}
 
-	protected void collectLimit(Collector collector, Beef beef,
-			int offset, int limit) {
+	protected int collectLimit(Collector collector, Beef beef,
+			int offset, int point, int limit) {
 		collectIfNotNoise(collector, beef, offset, limit);
+		return -1;
 	}
 
-	protected int tryFollows(Collector collector, Beef beef,
+	protected int tryDicWord(Collector collector, Beef beef,
 			int offset, int limit) {
 		int ret = limit;
 		for (int end = limit + 1, count = limit - offset + 1; end <= beef
@@ -163,6 +162,12 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare{
 			doCollect(collector, word, beef, offset, end);
 		}
 	}
+	
+	protected void collect(Collector collector, Beef beef,
+			int offset, int end) {
+		String word = beef.subSequence(offset, end).toString();
+		doCollect(collector, word, beef, offset, end);
+	}
 
 	/**
 	 * 收集分解出的候选词语。 默认实现是将该候选词语通知给收集器collector。<br>
@@ -181,8 +186,17 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare{
 	}
 
 	protected int nextOffset(Beef beef, int offset, int point,
-			int limit) {
-		// 按照postition和limit的语义说明，返回下一个Knife可以从该位置开始分解
-		return point != -1 ? point : limit;
+			int limit, int pointVote, int limitVote, int dicWordVote) {
+		int max = pointVote > limitVote ? pointVote : limitVote;
+		max =  max > dicWordVote ? max : dicWordVote;
+		if (max == -1) {
+			return point != -1 ? point : limit;
+		}
+		else if (max > limit) {
+			return max;
+		}
+		else {
+			return limit;
+		}
 	}
 }

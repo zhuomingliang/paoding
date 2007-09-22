@@ -44,46 +44,44 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 		char ch = beef.charAt(index);
 		if (CharSet.isArabianNumber(ch))
 			return ASSIGNED;
-		if (CharSet.isLantingLetter(ch) || ch == '.' || ch == '-' || ch == '_') {
-			if (CharSet.isLantingLetter(ch) || history == index
-					|| !CharSet.isArabianNumber(beef.charAt(index + 1))) {
-				//分词效果
-				//123.456		->123.456/
-				//123.abc.34	->123/123.abc.34/abc/34/	["abc"、"abc/34"系由LetterKnife分出，非NumberKnife]
-				//没有或判断!CharSet.isArabianNumber(beef.charAt(index + 1))，则分出"123."，而非"123"
-				//123.abc.34	->123./123.abc.34/abc/34/
-				return POINT;
+		if (index > history) {
+			if (CharSet.isLantingLetter(ch) || ch == '.' || ch == '-' || ch == '_') {
+				if (CharSet.isLantingLetter(ch)
+						|| !CharSet.isArabianNumber(beef.charAt(index + 1))) {
+					//分词效果
+					//123.456		->123.456/
+					//123.abc.34	->123/123.abc.34/abc/34/	["abc"、"abc/34"系由LetterKnife分出，非NumberKnife]
+					//没有或判断!CharSet.isArabianNumber(beef.charAt(index + 1))，则分出"123."，而非"123"
+					//123.abc.34	->123./123.abc.34/abc/34/
+					return POINT;
+				}
+				return ASSIGNED;
 			}
-			return ASSIGNED;
 		}
 		return LIMIT;
 	}
-
-	protected void doCollect(Collector collector, String word, Beef beef,
-			int offset, int end) {
-		collector.collect(word, offset, end);
-
-		if (units != null && end < beef.length() // 后面不是cjk，则不用探索后面是单位词
-				&& CharSet.isCjkUnifiedIdeographs(beef.charAt(end))) {
-			// 只要全为数字才需要继续探索是否后继字符是否是一个单位
-			for (int i = offset; i < end; i++) {
-				if (!CharSet.isArabianNumber(beef.charAt(i))) {
-					return;
-				}
-			}
-			// 通过单位词典探索
+	
+	protected int collectLimit(Collector collector, Beef beef,
+			int offset, int point, int limit) {
+		int sup = super.collectLimit(collector, beef, offset, point, limit);
+		if (units == null) return sup;
+		// 2.2两
+		//    ^=_point
+		//     
+		final int _point = point != -1 ? point : limit;
+		if (CharSet.isCjkUnifiedIdeographs(beef.charAt(_point))) {
 			Hit wd;
-			int i = end + 1;
-			while (i <= beef.length()
-					&& (wd = units.search(beef, end, i - end)).isHit()) {
-				collector.collect(word + beef.subSequence(end, i), offset, i);
-				end++;
+			int count = 1;
+			while ((wd = units.search(beef, _point, count)).isHit()) {
+				collectIfNotNoise(collector, beef, offset, _point + count);
 				if (!wd.isUnclosed()) {
-					break;
+					int _limit = _point + count;
+					return  sup > _limit ? sup : _limit;
 				}
-				i++;
+				count++;
 			}
 		}
+		return sup;
 	}
 
 }

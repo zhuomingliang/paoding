@@ -64,7 +64,7 @@ public interface Knife {
 	 * @param index
 	 *            用以检视该位置字符是否能够被Knife分词，index >=history
 	 * @return 字符性质 <br>
-	 *         返回以下其中一个参数。且当history==index时只能返回LIMIT或ASSIGNED
+	 *         返回以下其中一个参数。当history==index时仅当返回ASSIGNED时，该Knife才有机会接收beef进行分词(即才有机会调用dissect方法)
 	 * @see #LIMIT
 	 * @see #ASSIGNED
 	 * @see #POINT
