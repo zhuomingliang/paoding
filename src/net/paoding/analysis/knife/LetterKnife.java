@@ -43,8 +43,10 @@ public class LetterKnife extends CombinatoricsKnife {
 		if (CharSet.isLantingLetter(ch)) {
 			return ASSIGNED;
 		}
-		if ((ch >= '0' && ch <= '9') || ch == '-' || ch == '_') {
-			return POINT;
+		if (index > history) {
+			if ((ch >= '0' && ch <= '9') || ch == '-' || ch == '_') {
+				return POINT;
+			}
 		}
 		return LIMIT;
 	}

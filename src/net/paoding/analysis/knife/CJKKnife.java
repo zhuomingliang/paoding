@@ -59,9 +59,12 @@ public class CJKKnife implements Knife, DictionariesWare {
 		char ch = beef.charAt(index);
 		if (CharSet.isCjkUnifiedIdeographs(ch))
 			return ASSIGNED;
-		if (CharSet.isArabianNumber(ch) || CharSet.isLantingLetter(ch)
-				|| ch == '-' || ch == '_')
-			return POINT;
+		if (index > history) {
+			if (CharSet.isArabianNumber(ch) || CharSet.isLantingLetter(ch)
+					|| ch == '-' || ch == '_') {
+				return POINT;
+			}
+		}
 		return LIMIT;
 	}
 
@@ -101,13 +104,13 @@ public class CJKKnife implements Knife, DictionariesWare {
 		}
 
 		// 记录当前正在检视(是否是词典词语)的字符串在beef中的始止位置(包含开始位置，不包含结束位置)
-		int curWordOffset = offset, curWordEnd;
+		int curSearchOffset = offset, curSearchEnd;
 
-		// 记录当前被检视的字符串的长度，它的值恒等于(curWordEnd - curWordOffset)
-		int curWordLength;
+		// 记录当前被检视的字符串的长度，它的值恒等于(curSearchEnd - curSearchOffset)
+		int curSearchLength;
 
 		// 当前检视的字符串的判断结果
-		Hit curWord = null;
+		Hit curSearch = null;
 
 		// 限制要判断的字符串的最大开始位置
 		// 这个变量不随着程序的运行而变化
@@ -130,22 +133,23 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 		// 第1个循环定位被检视字符串的开始位置
 		// 被检视的字符串开始位置的极限是offsetLimit，而非limit
-		for (; curWordOffset < offsetLimit; curWordOffset++) {
+		for (; curSearchOffset < offsetLimit; curSearchOffset++) {
 
 			// 第二个循环定位被检视字符串的结束位置(不包含该位置的字符)
 			// 它的起始状态是：被检视的字符串一长度为1，即结束位置为开始位置+1
-			curWordEnd = curWordOffset + 1;
-			curWordLength = 1;
-			for (; curWordEnd <= limit; curWordEnd++, curWordLength++) {
+			curSearchEnd = curSearchOffset + 1;
+			curSearchLength = 1;
+			for (; curSearchEnd <= limit; curSearchEnd++, curSearchLength++) {
 
 				// 通过词汇表判断，返回判断结果curWord
-				curWord = vocabulary.search(beef, curWordOffset, curWordLength);
+				curSearch = vocabulary.search(beef, curSearchOffset,
+						curSearchLength);
 
 				// ---------------分析返回的判断结果--------------------------
 
 				// 1)
 				// 从词汇表中找到了该词语...
-				if (curWord.isHit()) {
+				if (curSearch.isHit()) {
 
 					// 1.1)
 					// 确认孤立字符串的结束位置(也就是curWordOffset)，
@@ -153,7 +157,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 					// 孤立字符串分解完毕，将孤立字符串开始位置isolatedOffset清空
 					if (isolatedOffset >= 0) {
 						dissectIsolated(collector, beef, isolatedOffset,
-								curWordOffset - isolatedOffset);
+								curSearchOffset);
 						isolatedOffset = -1;
 					}
 
@@ -163,41 +167,41 @@ public class CJKKnife implements Knife, DictionariesWare {
 					// 这里不需要执行过滤是否是noise词采用，直接通知collector便可：
 					// 为了性能考虑，词汇表已经承诺会过滤noise词汇表的词，这样就意味着从词汇表找到的词一定不是noise词汇
 					// 参见：FileDictionaries.getVocabularyWords()方法
-					collector.collect(curWord.getWord(), curWordOffset,
-							curWordEnd);
+					collector.collect(curSearch.getWord(), curSearchOffset,
+							curSearchEnd);
 
 					// 1.3)
 					// 更新最大结束位置
-					if (maxDicWordEnd < curWordEnd) {
-						maxDicWordEnd = curWordEnd;
+					if (maxDicWordEnd < curSearchEnd) {
+						maxDicWordEnd = curSearchEnd;
 					}
 
 					// 1.4)
 					// 更新词语最大长度变量的值
-					if (curWordOffset == offset
-							&& maxDicWordLength < curWordLength) {
-						maxDicWordLength = curWordLength;
+					if (curSearchOffset == offset
+							&& maxDicWordLength < curSearchLength) {
+						maxDicWordLength = curSearchLength;
 					}
 				}
 
 				// 若isolatedFound==true，表示词典没有该词语
-				boolean isolatedFound = curWord.isUndefined();
+				boolean isolatedFound = curSearch.isUndefined();
 
 				// 若isolatedFound==false，则通过Hit的next属性检视词典没有beef的从offset到curWordEnd
 				// + 1位置的词
 				// 这个判断完全是为了减少一次词典检索而设计的，
 				// 如果去掉这个if判断，并不影响程序的正确性(但是会多一次词典检索)
-				if (!isolatedFound && !curWord.isHit()) {
-					isolatedFound = curWordEnd >= limit
-							|| beef.charAt(curWordEnd) < curWord.getNext()
-									.charAt(curWordLength);
+				if (!isolatedFound && !curSearch.isHit()) {
+					isolatedFound = curSearchEnd >= limit
+							|| beef.charAt(curSearchEnd) < curSearch.getNext()
+									.charAt(curSearchLength);
 				}
 				// 2)
 				// 词汇表中没有该词语，且没有以该词语开头的词汇...
 				// -->讲它记录为孤立词语
 				if (isolatedFound) {
-					if (isolatedOffset < 0 && curWordOffset >= maxDicWordEnd) {
-						isolatedOffset = curWordOffset;
+					if (isolatedOffset < 0 && curSearchOffset >= maxDicWordEnd) {
+						isolatedOffset = curSearchOffset;
 					}
 					break;
 				}
@@ -212,8 +216,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		// 所以不能通过isolatedOffset来判断是否此时存在有孤立词，判断依据转换为：
 		// 最后一个词典的词的结束位置是否小于offsetLimit(!!offsetLimit, not Limit!!)
 		if (maxDicWordEnd < offsetLimit) {
-			dissectIsolated(collector, beef, maxDicWordEnd, offsetLimit
-					- maxDicWordEnd);
+			dissectIsolated(collector, beef, maxDicWordEnd, offsetLimit);
 		}
 
 		// 现在是利用maxDicWordLength的时候了
@@ -233,7 +236,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 	// -------------------------------------------------
 
 	/**
-	 * 对非词汇表中的字词分词
+	 * 对孤立字符串分词
 	 * 
 	 * @param cellector
 	 * @param beef
@@ -241,43 +244,174 @@ public class CJKKnife implements Knife, DictionariesWare {
 	 * @param count
 	 */
 	protected void dissectIsolated(Collector collector, Beef beef, int offset,
-			int count) {
-		int end = offset + count;
-		Hit word = null;
-		int nearEnd = end - 1;
-		for (int i = offset, j = i; i < end;) {
-			j = skipXword(beef, i, end);
-			if (j >= 0 && i != j) {
-				i = j;
+			int limit) {
+		int curSearchOffset = offset;
+		int binOffset = curSearchOffset; // 进行一般二元分词的开始位置
+		int tempEnd;
+		
+		while (curSearchOffset < limit) {
+			// 孤立字符串如果是数字数字，比如"五十二万"，"十三亿"，。。。
+			tempEnd = collectNumber(collector, beef, curSearchOffset, limit,
+					binOffset);
+			if (tempEnd > curSearchOffset) {
+				curSearchOffset = tempEnd;
+				binOffset = tempEnd;
 				continue;
 			}
-			j = collectNumber(collector, beef, i, end);
-			if (j >= 0 && i != j) {
-				i = j;
+
+			// 孤立字符串是否是没有在CJK词汇表的，但确实noise词典规定的noise词汇时
+			// 魔幻逻辑：
+			// noiseWords的词在语言学上虽然也是词，但CJKKnife不会把它当成词汇表中的词，
+			// 从而被视为孤立字符串在此处理(不被视为词汇、不进行二元分词)
+			tempEnd = skipNoiseWords(collector, beef, curSearchOffset, limit,
+					binOffset);
+			if (tempEnd > curSearchOffset) {
+				curSearchOffset = tempEnd;
+				binOffset = tempEnd;
 				continue;
 			}
-			word = noiseCharactors.search(beef, i, 1);
-			if (word.isHit()) {
+
+			// 如果当前字符是noise单字，其不参加二元分词
+			Hit curSearch = noiseCharactors.search(beef, curSearchOffset, 1);
+			if (curSearch.isHit()) {
+				binDissect(collector, beef, binOffset, curSearchOffset);
+				binOffset = ++curSearchOffset;
+				continue;
+			}
+			curSearchOffset++;
+		}
+
+		// 
+		if (limit > binOffset) {
+			binDissect(collector, beef, binOffset, limit);
+		}
+	}
+
+	protected int collectNumber(Collector collector, Beef beef, int offset,
+			int limit, int binOffset) {
+		
+		// 当前尝试判断的字符的位置
+		int curTail = offset;
+		int number1 = -1;
+		int number2 = -1;
+		int bitValue = 0;
+		int maxUnit = 0;
+		boolean hasDigit = false;// 作用：去除没有数字只有单位的汉字，如“万”，“千”
+		for (; curTail < limit
+				&& (bitValue = CharSet.toNumber(beef.charAt(curTail))) >= 0; curTail++) {
+			// 
+			if (bitValue == 2
+					&& (beef.charAt(curTail) == '两' || beef.charAt(curTail) == '俩' || beef
+							.charAt(curTail) == '倆')) {
+				if (curTail != offset) {
+					break;
+				}
+			}
+			// 处理连续汉字个位值的数字："三四五六"	->"3456"
+			if (bitValue >= 0 && bitValue < 10) {
+				hasDigit = true;
+				if (number2 < 0)
+					number2 = bitValue;
+				else {
+					number2 *= 10;
+					number2 += bitValue;
+				}
+			} else {
+				if (number2 < 0) {
+					if (number1 < 0) {
+						number1 = 1;
+					}
+					number1 *= bitValue;
+				} else {
+					if (number1 < 0) {
+						number1 = 0;
+					}
+					if (bitValue >= maxUnit) {
+						number1 += number2;
+						number1 *= bitValue;
+						maxUnit = bitValue;
+					} else {
+						number1 += number2 * bitValue;
+					}
+				}
+				number2 = -1;
+			}
+		}
+		if (!hasDigit && curTail < beef.length()
+				&& !units.search(beef, curTail, 1).isHit()) {
+			return offset;
+		}
+		if (number2 > 0) {
+			if (number1 < 0) {
+				number1 = number2;
+			} else {
+				number1 += number2;
+			}
+		}
+		if (number1 >= 0) {
+			// 二元分词先
+			if (offset > binOffset) {
+				binDissect(collector, beef, binOffset, offset);
+			}
+			collector.collect(String.valueOf(number1), offset, curTail);
+
+			// 后面可能跟了计量单位
+			Hit wd;
+			int i = curTail + 1;
+			while (i <= beef.length()
+					&& (wd = units.search(beef, curTail, i - curTail)).isHit()) {
+				collector.collect(String.valueOf(number1)
+						+ beef.subSequence(curTail, i), offset, i);
+				curTail++;
+				if (!wd.isUnclosed()) {
+					break;
+				}
 				i++;
-				continue;
 			}
-			// 头字
-			if (i == offset) {
-				// 百度门事件=百度+门+...!=百度+门事+...
-				// collect(collector, beef, offset, offset + 1);
+		}
+		
+		// 返回最后一个判断失败字符的结束位置：
+		// 该位置要么是offset，要么表示curTail之前的字符(不包括curTail字符)已经被认为是汉字数字
+		return curTail;
+	}
+
+	protected int skipNoiseWords(Collector collector, Beef beef,
+			int offset, int end, int binOffset) {
+		Hit word;
+		for (int k = offset + 2; k <= end; k++) {
+			word = noiseWords.search(beef, offset, k - offset);
+			if (word.isHit()) {
+				// 二元分词
+				if (binOffset > 0 && offset > binOffset) {
+					binDissect(collector, beef, binOffset, offset);
+					binOffset = -1;
+				}
+				offset = k;
 			}
-			// 尾字
-			if (i == nearEnd) {
-				// if (nearEnd != offset) {
-				// collect(collector, beef, nearEnd, end);
-				// }
+			if (word.isUndefined() || !word.isUnclosed()) {
+				break;
 			}
+		}
+		return offset;
+	}
+
+	protected void binDissect(Collector collector, Beef beef, int offset,
+			int limit) {
+		// 二元分词之策略：以W、X、Y、Z表示孤立字符串中的4个汉字
+		// X ->X 单个字的孤立字符串作为一个词
+		// XY ->XY 只有两个字的孤立字符串作为一个词
+		// XYZ ->XY/YZ 多个字(>=3)的孤立字符串"两两组合"作为一个词
+		// WXYZ ->WX/XY/YZ 同上
+
+		if (limit - offset == 1) {
+			collector.collect(beef.subSequence(offset, limit).toString(),
+					offset, limit);
+		} else {
 			// 穷尽二元分词
-			else {
-				collector.collect(beef.subSequence(i, i + 2).toString(), i,
-						i + 2);
+			for (int curOffset = offset; curOffset < limit - 1; curOffset++) {
+				collector.collect(beef.subSequence(curOffset, curOffset + 2)
+						.toString(), curOffset, curOffset + 2);
 			}
-			i++;
 		}
 	}
 
@@ -308,149 +442,6 @@ public class CJKKnife implements Knife, DictionariesWare {
 			}
 		}
 		return false;
-	}
-
-	private final int skipXword(Beef beef, int offset, int end) {
-		Hit word;
-		for (int k = offset + 2; k <= end; k++) {
-			word = noiseWords.search(beef, offset, k - offset);
-			if (word.isHit()) {
-				offset = k;
-			}
-			if (word.isUndefined() || !word.isUnclosed()) {
-				break;
-			}
-		}
-		return offset;
-	}
-
-	private final int collectNumber(Collector collector, Beef beef, int offset,
-			int end) {
-		int number1 = -1;
-		int number2 = -1;
-		int cur = offset;
-		int bitValue = 0;
-		int maxUnit = 0;
-		boolean hasDigit = false;// 作用：去除没有数字只有单位的汉字，如“万”，“千”
-		for (; cur <= end && (bitValue = toNumber(beef.charAt(cur))) >= 0; cur++) {
-			if (bitValue == 2
-					&& (beef.charAt(cur) == '两' || beef.charAt(cur) == '俩' || beef
-							.charAt(cur) == '倆')) {
-				if (cur != offset)
-					break;
-			}
-			if (bitValue >= 0 && bitValue < 10) {
-				hasDigit = true;
-				if (number2 < 0)
-					number2 = bitValue;
-				else {
-					number2 *= 10;
-					number2 += bitValue;
-				}
-			} else {
-				if (number2 < 0) {
-					if (number1 < 0) {
-						number1 = 1;
-					}
-					number1 *= bitValue;
-				} else {
-					if (number1 < 0) {
-						number1 = 0;
-					}
-					if (bitValue >= maxUnit) {
-						number1 += number2;
-						number1 *= bitValue;
-						maxUnit = bitValue;
-					} else {
-						number1 += number2 * bitValue;
-					}
-				}
-				number2 = -1;
-			}
-		}
-		if (!hasDigit && cur < beef.length()
-				&& !units.search(beef, cur, 1).isHit()) {
-			return offset;
-		}
-		if (number2 > 0) {
-			if (number1 < 0) {
-				number1 = number2;
-			} else {
-				number1 += number2;
-			}
-		}
-		if (number1 >= 0) {
-			collector.collect(String.valueOf(number1), offset, cur);
-
-			// 后面可能跟了计量单位
-			Hit wd;
-			int i = cur + 1;
-			while (i <= beef.length()
-					&& (wd = units.search(beef, cur, i - cur)).isHit()) {
-				collector.collect(String.valueOf(number1)
-						+ beef.subSequence(cur, i), offset, i);
-				cur++;
-				if (!wd.isUnclosed()) {
-					break;
-				}
-				i++;
-			}
-		}
-		return cur;
-	}
-
-	private final int toNumber(char c) {
-		switch (c) {
-		case '零':
-		case '〇':
-			return 0;
-		case '一':
-		case '壹':
-			return 1;
-		case '二':
-		case '两':
-		case '俩':
-		case '貳':
-			return 2;
-		case '三':
-		case '叁':
-			return 3;
-		case '四':
-		case '肆':
-			return 4;
-		case '五':
-		case '伍':
-			return 5;
-		case '六':
-		case '陸':
-			return 6;
-		case '柒':
-		case '七':
-			return 7;
-		case '捌':
-		case '八':
-			return 8;
-		case '九':
-		case '玖':
-			return 9;
-		case '十':
-		case '什':
-			return 10;
-		case '百':
-		case '佰':
-			return 100;
-		case '千':
-		case '仟':
-			return 1000;
-		case '万':
-		case '萬':
-			return 10000;
-		case '亿':
-		case '億':
-			return 100000000;
-		default:
-			return -1;
-		}
 	}
 
 }

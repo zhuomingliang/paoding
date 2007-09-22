@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 
+import net.paoding.analysis.knife.CharSet;
+
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -50,7 +52,29 @@ public class SimpleReadListener implements ReadListener {
 				|| word.charAt(0) == '-') {
 			return;
 		}
-
+		//去除汉字数字词
+		for (int i = 0; i < word.length(); i++) {
+			char ch = word.charAt(i);
+			int num = CharSet.toNumber(ch);
+			if (num >= 0) {
+				if (i == 0) {
+					if (num > 10) {//"十二" vs "千万"
+						break;
+					}
+				}
+				if (num == 2) {
+					if (word.equals("两") || word.equals("两两")) {
+						break;
+					}
+				}
+				if (i + 1 == word.length()) {
+					return;
+				}
+			}
+			else {
+				break;
+			}
+		}
 		words.add(word);
 	}
 

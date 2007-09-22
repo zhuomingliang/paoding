@@ -40,5 +40,59 @@ public class CharSet {
 		// ref:http://www.w3.org/International/questions/qa-utf8-bom
 		return ch == 0xFEFF || ch == 0xFFFE;
 	}
+	
+	public static int toNumber(char ch) {
+		switch (ch) {
+		case '零':
+		case '〇':
+			return 0;
+		case '一':
+		case '壹':
+			return 1;
+		case '二':
+		case '两':
+		case '俩':
+		case '貳':
+			return 2;
+		case '三':
+		case '叁':
+			return 3;
+		case '四':
+		case '肆':
+			return 4;
+		case '五':
+		case '伍':
+			return 5;
+		case '六':
+		case '陸':
+			return 6;
+		case '柒':
+		case '七':
+			return 7;
+		case '捌':
+		case '八':
+			return 8;
+		case '九':
+		case '玖':
+			return 9;
+		case '十':
+		case '什':
+			return 10;
+		case '百':
+		case '佰':
+			return 100;
+		case '千':
+		case '仟':
+			return 1000;
+		case '万':
+		case '萬':
+			return 10000;
+		case '亿':
+		case '億':
+			return 100000000;
+		default:
+			return -1;
+		}
+	}
 
 }
