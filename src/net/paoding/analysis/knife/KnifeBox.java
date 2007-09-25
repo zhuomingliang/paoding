@@ -78,7 +78,7 @@ public class KnifeBox implements Knife {
 		System.arraycopy(knives, 0, this.knives, 0, size);
 	}
 
-	public int assignable(Beef beef, int history, int index) {
+	public int assignable(Beef beef, int offset, int index) {
 		return ASSIGNED;
 	}
 
@@ -87,7 +87,12 @@ public class KnifeBox implements Knife {
 		for (int i = 0; i < size; i++) {
 			knife = knives[i];
 			if (ASSIGNED == knife.assignable(beef, offset, offset)) {
-				return knife.dissect(collector, beef, offset);
+				int lastLimit = knife.dissect(collector, beef, offset);
+				// 如果返回的下一个分词点发生了变化(可进可退)，则直接返回之，
+				// 否则继续让下一个Knife有机会分词
+				if (lastLimit != offset) {
+					return lastLimit;
+				}
 			}
 		}
 		return ++offset;
