@@ -40,11 +40,11 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 	}
 	
 
-	public int assignable(Beef beef, int history, int index) {
+	public int assignable(Beef beef, int offset, int index) {
 		char ch = beef.charAt(index);
 		if (CharSet.isArabianNumber(ch))
 			return ASSIGNED;
-		if (index > history) {
+		if (index > offset) {
 			if (CharSet.isLantingLetter(ch) || ch == '.' || ch == '-' || ch == '_') {
 				if (CharSet.isLantingLetter(ch)
 						|| !CharSet.isArabianNumber(beef.charAt(index + 1))) {
@@ -63,25 +63,104 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 	
 	protected int collectLimit(Collector collector, Beef beef,
 			int offset, int point, int limit) {
-		int sup = super.collectLimit(collector, beef, offset, point, limit);
-		if (units == null) return sup;
+		// "123abc"的直接调用super的
+		if (point != -1) {
+			return super.collectLimit(collector, beef, offset, point, limit);
+		}
+		// 
 		// 2.2两
 		//    ^=_point
 		//     
-		final int _point = point != -1 ? point : limit;
-		if (CharSet.isCjkUnifiedIdeographs(beef.charAt(_point))) {
-			Hit wd;
-			int count = 1;
-			while ((wd = units.search(beef, _point, count)).isHit()) {
-				collectIfNotNoise(collector, beef, offset, _point + count);
-				if (!wd.isUnclosed()) {
-					int _limit = _point + count;
-					return  sup > _limit ? sup : _limit;
+		final int _point = limit;
+		// 当前尝试判断的字符的位置
+		int curTail = offset;
+		int number1 = -1;
+		int number2 = -1;
+		int bitValue = 0;
+		int maxUnit = 0;
+		for (; (bitValue = CharSet.toNumber(beef.charAt(curTail))) >= 0; curTail++) {
+			// 
+			if (bitValue == 2
+					&& (beef.charAt(curTail) == '两' || beef.charAt(curTail) == '俩' || beef
+							.charAt(curTail) == '倆')) {
+				if (curTail != offset) {
+					break;
 				}
-				count++;
+			}
+			// 处理连续汉字个位值的数字："三四五六"	->"3456"
+			if (bitValue >= 0 && bitValue < 10) {
+				if (number2 < 0)
+					number2 = bitValue;
+				else {
+					number2 *= 10;
+					number2 += bitValue;
+				}
+			} else {
+				if (number2 < 0) {
+					if (number1 < 0) {
+						number1 = 1;
+					}
+					number1 *= bitValue;
+				} else {
+					if (number1 < 0) {
+						number1 = 0;
+					}
+					if (bitValue >= maxUnit) {
+						number1 += number2;
+						number1 *= bitValue;
+						maxUnit = bitValue;
+					} else {
+						number1 += number2 * bitValue;
+					}
+				}
+				number2 = -1;
 			}
 		}
-		return sup;
+		if (number2 > 0) {
+			if (number1 < 0) {
+				number1 = number2;
+			} else {
+				number1 += number2;
+			}
+		}
+		boolean gotNum = number1 >= 0 && curTail > _point;
+		if (gotNum) {
+			doCollect(collector, String.valueOf(number1), beef, offset, curTail);
+		}
+		else {
+			super.collectLimit(collector, beef, offset, point, limit);
+		}
+		
+		curTail = curTail > limit ? curTail : limit;
+		
+		//
+		// 后面可能跟了计量单位
+		int _limit = -1;
+		if (units != null && CharSet.isCjkUnifiedIdeographs(beef.charAt(curTail))) {
+			Hit wd = null;
+			Hit wd2 = null;
+			int i = curTail + 1;
+			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
+				wd2 = wd;
+				curTail++;
+				if (!wd.isUnclosed()) {
+					break;
+				}
+				i++;
+			}
+			if (wd2 != null) {
+				if (gotNum) {
+					collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
+				}
+				else {
+					collector.collect(beef.subSequence(offset, i).toString(), offset, i);
+				}
+			}
+		}
+		//
+		
+		return curTail > _limit ? curTail : _limit;
 	}
+
 
 }

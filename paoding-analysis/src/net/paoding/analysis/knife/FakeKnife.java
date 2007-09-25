@@ -63,7 +63,7 @@ public class FakeKnife implements Knife, DictionariesWare {
 		return inner;
 	}
 
-	public int assignable(Beef beef, int history, int index) {
+	public int assignable(Beef beef, int offset, int index) {
 		return LIMIT;
 	}
 

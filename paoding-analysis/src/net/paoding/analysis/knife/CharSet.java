@@ -43,35 +43,45 @@ public class CharSet {
 	
 	public static int toNumber(char ch) {
 		switch (ch) {
+		case '0':
 		case '零':
 		case '〇':
 			return 0;
+		case '1':
 		case '一':
 		case '壹':
 			return 1;
+		case '2':
 		case '二':
 		case '两':
 		case '俩':
 		case '貳':
 			return 2;
+		case '3':
 		case '三':
 		case '叁':
 			return 3;
+		case '4':
 		case '四':
 		case '肆':
 			return 4;
+		case '5':
 		case '五':
 		case '伍':
 			return 5;
+		case '6':
 		case '六':
 		case '陸':
 			return 6;
+		case '7':
 		case '柒':
 		case '七':
 			return 7;
+		case '8':
 		case '捌':
 		case '八':
 			return 8;
+		case '9':
 		case '九':
 		case '玖':
 			return 9;

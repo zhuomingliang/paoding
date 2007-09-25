@@ -55,11 +55,11 @@ public class CJKKnife implements Knife, DictionariesWare {
 	/**
 	 * 分解以CJK字符开始的，后可带阿拉伯数字、英文字母、横线、下划线的字符组成的语句
 	 */
-	public int assignable(Beef beef, int history, int index) {
+	public int assignable(Beef beef, int offset, int index) {
 		char ch = beef.charAt(index);
 		if (CharSet.isCjkUnifiedIdeographs(ch))
 			return ASSIGNED;
-		if (index > history) {
+		if (index > offset) {
 			if (CharSet.isArabianNumber(ch) || CharSet.isLantingLetter(ch)
 					|| ch == '-' || ch == '_') {
 				return POINT;
@@ -69,7 +69,6 @@ public class CJKKnife implements Knife, DictionariesWare {
 	}
 
 	public int dissect(Collector collector, Beef beef, int offset) {
-
 		// 当point == -1时表示本次分解没有遇到POINT性质的字符；
 		// 如果point != -1，该值表示POINT性质字符的开始位置，
 		// 这个位置将被返回，下一个Knife将从point位置开始分词
@@ -356,17 +355,19 @@ public class CJKKnife implements Knife, DictionariesWare {
 			collector.collect(String.valueOf(number1), offset, curTail);
 
 			// 后面可能跟了计量单位
-			Hit wd;
+			Hit wd = null;
+			Hit wd2 = null;
 			int i = curTail + 1;
-			while (i <= beef.length()
-					&& (wd = units.search(beef, curTail, i - curTail)).isHit()) {
-				collector.collect(String.valueOf(number1)
-						+ beef.subSequence(curTail, i), offset, i);
+			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
+				wd2 = wd;
 				curTail++;
 				if (!wd.isUnclosed()) {
 					break;
 				}
 				i++;
+			}
+			if (wd2 != null) {
+				collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
 			}
 		}
 		

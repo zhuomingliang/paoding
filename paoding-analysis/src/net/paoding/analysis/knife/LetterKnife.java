@@ -38,12 +38,12 @@ public class LetterKnife extends CombinatoricsKnife {
 		super(noiseWords);
 	}
 
-	public int assignable(Beef beef, int history, int index) {
+	public int assignable(Beef beef, int offset, int index) {
 		char ch = beef.charAt(index);
 		if (CharSet.isLantingLetter(ch)) {
 			return ASSIGNED;
 		}
-		if (index > history) {
+		if (index > offset) {
 			if ((ch >= '0' && ch <= '9') || ch == '-' || ch == '_') {
 				return POINT;
 			}
