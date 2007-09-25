@@ -140,7 +140,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 			curSearchLength = 1;
 			for (; curSearchEnd <= limit; curSearchEnd++, curSearchLength++) {
 
-				// 通过词汇表判断，返回判断结果curWord
+				// 通过词汇表判断，返回判断结果curSearch
 				curSearch = vocabulary.search(beef, curSearchOffset,
 						curSearchLength);
 
@@ -151,8 +151,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 				if (curSearch.isHit()) {
 
 					// 1.1)
-					// 确认孤立字符串的结束位置(也就是curWordOffset)，
-					// 并调用子方法先把之前的孤立字符串进行类似二元分词(但不完全一样，这里仅是为方便而简化说明)
+					// 确认孤立字符串的结束位置=curSearchOffset，
+					// 并调用子方法分解把从isolatedOffset开始的到curSearchOffset之间的孤立字符串
 					// 孤立字符串分解完毕，将孤立字符串开始位置isolatedOffset清空
 					if (isolatedOffset >= 0) {
 						dissectIsolated(collector, beef, isolatedOffset,
@@ -197,7 +197,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 				}
 				// 2)
 				// 词汇表中没有该词语，且没有以该词语开头的词汇...
-				// -->讲它记录为孤立词语
+				// -->将它记录为孤立词语
 				if (isolatedFound) {
 					if (isolatedOffset < 0 && curSearchOffset >= maxDicWordEnd) {
 						isolatedOffset = curSearchOffset;
@@ -206,8 +206,8 @@ public class CJKKnife implements Knife, DictionariesWare {
 				}
 
 				// ^^^^^^^^^^^^^^^^^^分析返回的判断结果^^^^^^^^^^^^^^^^^^^^^^^^
-			}
-		}
+			} // end of the second for loop
+		} // end of the first for loop
 
 		// 上面循环分词结束后，可能存在最后的几个未能从词典检索成词的孤立字符串，
 		// 此时isolatedOffset不一定等于一个有效值(因为这些孤立字虽然不是词语，但是词典可能存在以它为开始的词语，
@@ -247,7 +247,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		int curSearchOffset = offset;
 		int binOffset = curSearchOffset; // 进行一般二元分词的开始位置
 		int tempEnd;
-		
+
 		while (curSearchOffset < limit) {
 			// 孤立字符串如果是数字数字，比如"五十二万"，"十三亿"，。。。
 			tempEnd = collectNumber(collector, beef, curSearchOffset, limit,
@@ -288,7 +288,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 	protected int collectNumber(Collector collector, Beef beef, int offset,
 			int limit, int binOffset) {
-		
+
 		// 当前尝试判断的字符的位置
 		int curTail = offset;
 		int number1 = -1;
@@ -300,13 +300,14 @@ public class CJKKnife implements Knife, DictionariesWare {
 				&& (bitValue = CharSet.toNumber(beef.charAt(curTail))) >= 0; curTail++) {
 			// 
 			if (bitValue == 2
-					&& (beef.charAt(curTail) == '两' || beef.charAt(curTail) == '俩' || beef
+					&& (beef.charAt(curTail) == '两'
+							|| beef.charAt(curTail) == '俩' || beef
 							.charAt(curTail) == '倆')) {
 				if (curTail != offset) {
 					break;
 				}
 			}
-			// 处理连续汉字个位值的数字："三四五六"	->"3456"
+			// 处理连续汉字个位值的数字："三四五六" ->"3456"
 			if (bitValue >= 0 && bitValue < 10) {
 				hasDigit = true;
 				if (number2 < 0)
@@ -367,17 +368,18 @@ public class CJKKnife implements Knife, DictionariesWare {
 				i++;
 			}
 			if (wd2 != null) {
-				collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
+				collector.collect(String.valueOf(number1) + wd2.getWord(),
+						offset, i);
 			}
 		}
-		
+
 		// 返回最后一个判断失败字符的结束位置：
 		// 该位置要么是offset，要么表示curTail之前的字符(不包括curTail字符)已经被认为是汉字数字
 		return curTail;
 	}
 
-	protected int skipNoiseWords(Collector collector, Beef beef,
-			int offset, int end, int binOffset) {
+	protected int skipNoiseWords(Collector collector, Beef beef, int offset,
+			int end, int binOffset) {
 		Hit word;
 		for (int k = offset + 2; k <= end; k++) {
 			word = noiseWords.search(beef, offset, k - offset);
@@ -417,30 +419,29 @@ public class CJKKnife implements Knife, DictionariesWare {
 	}
 
 	protected boolean shouldBeWord(Beef beef, int offset, int end) {
-		if (offset > 0 && end < beef.length()) {// 确保前有字符，后也有字符
-			int prev = offset - 1;
-			// 中文单双引号
-			if (beef.charAt(prev) == '“' && beef.charAt(end) == '”') {
-				return true;
-			} else if (beef.charAt(prev) == '‘' && beef.charAt(end) == '’') {
-				return true;
-			}
-			// 英文单双引号
-			else if (beef.charAt(prev) == '\'' && beef.charAt(end) == '\'') {
-				return true;
-			} else if (beef.charAt(prev) == '\"' && beef.charAt(end) == '\"') {
-				return true;
-			}
-			// 中文书名号
-			else if (beef.charAt(prev) == '《' && beef.charAt(end) == '》') {
-				return true;
-			} else if (beef.charAt(prev) == '〈' && beef.charAt(end) == '〉') {
-				return true;
-			}
-			// 英文尖括号
-			else if (beef.charAt(prev) == '<' && beef.charAt(end) == '>') {
-				return true;
-			}
+		char prevChar = beef.charAt(offset - 1);
+		char endChar = beef.charAt(end);
+		// 中文单双引号
+		if (prevChar == '“' && endChar == '”') {
+			return true;
+		} else if (prevChar == '‘' && endChar == '’') {
+			return true;
+		}
+		// 英文单双引号
+		else if (prevChar == '\'' && endChar == '\'') {
+			return true;
+		} else if (prevChar == '\"' && endChar == '\"') {
+			return true;
+		}
+		// 中文书名号
+		else if (prevChar == '《' && endChar == '》') {
+			return true;
+		} else if (prevChar == '〈' && endChar == '〉') {
+			return true;
+		}
+		// 英文尖括号
+		else if (prevChar == '<' && endChar == '>') {
+			return true;
 		}
 		return false;
 	}
