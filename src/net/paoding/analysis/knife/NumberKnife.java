@@ -78,6 +78,8 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 		int number2 = -1;
 		int bitValue = 0;
 		int maxUnit = 0;
+		//TODO:这里又重复从curTail(其值为offset)判断，重新遍历判断是否为数字，算是一个重复计算
+		//但考虑这个计算对中文分词性能影响微乎其微暂时先不优化
 		for (; (bitValue = CharSet.toNumber(beef.charAt(curTail))) >= 0; curTail++) {
 			// 
 			if (bitValue == 2
@@ -143,11 +145,12 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
 				wd2 = wd;
 				curTail++;
+				i++;
 				if (!wd.isUnclosed()) {
 					break;
 				}
-				i++;
 			}
+			i --;
 			if (wd2 != null) {
 				if (gotNum) {
 					collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
