@@ -69,7 +69,7 @@ public class Constants {
 	// -------------------------------------------------------------
 	// like 
 	public static final String DIC_FOR_COMBINATORICS = "paoding.dic.for-combinatorics";
-	public static final String DIC_FOR_COMBINATORICS_DEFAULT = "x-lantin,num+cjk";
+	public static final String DIC_FOR_COMBINATORICS_DEFAULT = "x-for-combinatorics";
 
 	// -------------------------------------------------------------
 	// like 
