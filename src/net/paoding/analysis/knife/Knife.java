@@ -72,6 +72,7 @@ public interface Knife {
 	int LIMIT = -1;
 
 	/**
+	 * 返回beef的index位置字符的性质，{@link KnifeBox}据此决定将一段文本内容“交给”一个合适的Knife切词
 	 * 
 	 * @param beef
 	 *            要被分词的字符串
@@ -103,7 +104,7 @@ public interface Knife {
 	 * @return 非0的整数，即正整数或负整数。<br>
 	 *         正数时：表示此次分解到该结束位置(不包括该边界)，即此次成功分解了从offset到该位置的文本流。<br>
 	 *         特别地，当其>=beef.lenght()表示已经把beef所有的词语分解完毕<br>
-	 *         如果，当其==offset时，表示{@link KnifeBox}应该继续遍历还未遍历Knife，确定是否有其他Knife接收分解offset位置开始的文本内容<br>
+	 *         如果，当其==offset时，表示{@link KnifeBox}应该继续遍历还未遍历的Knife，确定是否有其他Knife接收分解offset位置开始的文本内容<br>
 	 *         <p>
 	 *         负数时：该负数的绝对值必须>=offset。这个绝对值表示此次成功分解了从offset到该绝对值的文本流，剩下的字符，该knife已经不能正确解析。(一般此时应该重新传入新的beef对象解析)
 	 *         <p>
