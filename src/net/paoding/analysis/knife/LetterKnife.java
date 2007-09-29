@@ -53,7 +53,7 @@ public class LetterKnife extends CombinatoricsKnife {
 	
 	protected void doCollect(Collector collector, String word, Beef beef,
 			int offset, int end) {
-		if (word.length() > 1) {
+		if (word.length() > 1 || (beef.charAt(end) > 0 && !Character.isSpaceChar(beef.charAt(end)))) {
 			collector.collect(word, offset, end);
 		}
 	}
