@@ -220,7 +220,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 
 		// 现在是利用maxDicWordLength的时候了
 		// 如果本次负责的所有字符串文本没有作为一个词被切分出(包括词典切词和孤立串切分)，
-		// 那如果它被showAsWord方法认定为应该作为一个词切分，则将它切出来
+		// 那如果它被shouldBeWord方法认定为应该作为一个词切分，则将它切出来
 		int len = limit - offset;
 		if (len > 2 && len != maxDicWordLength
 				&& shouldBeWord(beef, offset, limit)) {
