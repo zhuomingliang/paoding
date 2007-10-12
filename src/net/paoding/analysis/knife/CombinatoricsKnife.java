@@ -57,7 +57,6 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 	}
 
 	public int dissect(Collector collector, Beef beef, int offset) {
-
 		// 当point == -1时表示本次分解没有遇到POINT性质的字符；
 		// 如果point != -1，该值表示POINT性质字符的开始位置，
 		// 这个位置将被返回，下一个Knife将从point位置开始分词
@@ -175,7 +174,7 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 		int ret = limit;
 		for (int end = limit + 1, count = limit - offset + 1; end <= beef
 				.length(); end++, count++) {
-			Hit hit = combinatoricsDictionary.search(beef, offset, end);
+			Hit hit = combinatoricsDictionary.search(beef, offset, count);
 			if (hit.isUndefined()) {
 				break;
 			} else if (hit.isHit()) {
