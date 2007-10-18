@@ -16,24 +16,19 @@
 package net.paoding.analysis.analyzer;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-
 
 import org.apache.lucene.analysis.Token;
 
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
- *
+ * 
  * @since 1.1
  */
-public class DefaultTokenCollector implements TokenCollector {
+public class DefaultTokenCollector implements TokenCollector, Iterator {
 
-	/**
-	 * 存储当前被knife分解而成的Token对象
-	 * 
-	 */
-	private LinkedList/* <Token> */ tokens;
+	private LinkedToken firstToken;
+	private LinkedToken lastToken;
 
 	/**
 	 * Collector接口实现。<br>
@@ -41,19 +36,76 @@ public class DefaultTokenCollector implements TokenCollector {
 	 * 
 	 */
 	public void collect(String word, int begin, int end) {
-		if (tokens == null) {
-			this.tokens = new LinkedList/* <Token> */();
+		LinkedToken tokenToAdd = new LinkedToken(word, begin, end);
+		if (firstToken == null) {
+			firstToken = tokenToAdd;
+			lastToken = tokenToAdd;
+			return;
 		}
-		this.tokens.add(new Token(word, begin, end));
+		if (tokenToAdd.compareTo(lastToken) > 0) {
+			tokenToAdd.pre = lastToken;
+			lastToken.next = tokenToAdd;
+			lastToken = tokenToAdd;
+			//
+		} else {
+			LinkedToken curTokenToTry = lastToken.pre;
+			while (curTokenToTry != null
+					&& tokenToAdd.compareTo(curTokenToTry) < 0) {
+				curTokenToTry = curTokenToTry.pre;
+			}
+			if (curTokenToTry == null) {
+				firstToken.pre = tokenToAdd;
+				tokenToAdd.next = firstToken;
+				firstToken = tokenToAdd;
+			} else {
+				tokenToAdd.next = curTokenToTry.next;
+				curTokenToTry.next.pre = tokenToAdd;
+				tokenToAdd.pre = curTokenToTry;
+				curTokenToTry.next = tokenToAdd;
+				
+			}
+		}
 	}
 
-	public Iterator/* <Token> */ iterator() {
-		if (this.tokens == null) {
-			this.tokens = new LinkedList/* <Token> */();
+	private LinkedToken nextLinkedToken;
+
+	public Iterator/* <Token> */iterator() {
+		nextLinkedToken = firstToken;
+		firstToken = null;
+		return this;
+	}
+
+	public boolean hasNext() {
+		return nextLinkedToken != null;
+	}
+
+	public Object next() {
+		LinkedToken ret = nextLinkedToken;
+		nextLinkedToken = nextLinkedToken.next;
+		return ret;
+	}
+
+	public void remove() {
+	}
+
+	private static class LinkedToken extends Token implements Comparable {
+		public LinkedToken pre;
+		public LinkedToken next;
+
+		public LinkedToken(String word, int begin, int end) {
+			super(word, begin, end);
 		}
-		Iterator/* <Token> */ iter = this.tokens.iterator();
-		this.tokens = null;
-		return iter;
+
+		public int compareTo(Object obj) {
+			LinkedToken that = (LinkedToken) obj;
+			// 简单/单单/简简单单/
+			if (this.endOffset() > that.endOffset())
+				return 1;
+			if (this.endOffset() == that.endOffset()) {
+				return that.startOffset() - this.startOffset();
+			}
+			return -1;
+		}
 	}
 
 }
