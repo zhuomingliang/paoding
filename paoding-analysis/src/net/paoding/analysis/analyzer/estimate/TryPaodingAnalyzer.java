@@ -209,7 +209,7 @@ public class TryPaodingAnalyzer {
 		System.out.println("\t--file, -f:\n\t\t文章以文件的形式输入，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
 		System.out.println("\t--charset, -c:\n\t\t文章的字符集编码，比如gbk,utf-8等。如果没有设置该选项，则使用Java环境默认的字符集编码。");
 		System.out.println("\t--properties, -p:\n\t\t不读取默认的类路径下的庖丁分词属性文件，而使用指定的文件，在前缀加上\"classpath:\"表示从类路径中寻找该文件。");
-		System.out.println("\t--mode, -m:\n\t\t强制使用给定的mode的分词器；可以设定为default,max或指定类名的其他mode(指定类名的，需要加前缀\"class:\")。");
+		System.out.println("\t--mode, -m:\n\t\t强制使用给定的mode的分词器；可以设定为default,most-words,max-word-length或指定类名的其他mode(指定类名的，需要加前缀\"class:\")。");
 		System.out.println("\t--input, -i:\n\t\t要被分词的文章内容；当没有通过-f或--file指定文章输入文件时可选择这个选项指定要被分词的内容。");
 		System.out.println("\t--analyzer, -a:\n\t\t测试其他分词器，通过--analyzer或-a指定其完整类名。特别地，paoding、cjk、chinese、st分别对应PaodingAnalyzer、CJKAnalyzer、ChineseAnalyzer、StandardAnalyzer");
 		System.out.println("\t--print, -P:\n\t\t 是否打印分词结果。默认打印前50行。规则：no表示不打印；50等价于1-50行；1-50表示打印1至50行;可以以逗号组合使用，如20,40-50表示打印1-20以及40-50行");
@@ -219,7 +219,7 @@ public class TryPaodingAnalyzer {
 		System.out.println("\t" + cmd + " 中华人民共和国");
 		System.out.println("\t" + cmd + " -m max 中华人民共和国");
 		System.out.println("\t" + cmd + " -f e:/content.txt -c utf8");
-		System.out.println("\t" + cmd + " -f e:/content.txt -c utf8 -m max");
+		System.out.println("\t" + cmd + " -f e:/content.txt -c utf8 -m max-word-length");
 		System.out.println("\t" + cmd + " -f e:/content.txt -c utf8 -a cjk");
 		System.out.println("\n若是控制台进入\"paoding>\"后:");
 		titlePrinted = false;
