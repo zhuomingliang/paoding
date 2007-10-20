@@ -1,4 +1,4 @@
-package net.paoding.analysis.analyzer;
+package net.paoding.analysis.analyzer.estimate;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 
+import net.paoding.analysis.analyzer.PaodingAnalyzer;
 import net.paoding.analysis.knife.PaodingMaker;
 
 import org.apache.lucene.analysis.Analyzer;

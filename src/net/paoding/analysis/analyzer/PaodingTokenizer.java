@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
+import net.paoding.analysis.analyzer.impl.MostWordsTokenCollector;
 import net.paoding.analysis.knife.Beef;
 import net.paoding.analysis.knife.Collector;
 import net.paoding.analysis.knife.Knife;
@@ -44,7 +45,7 @@ import org.apache.lucene.analysis.Tokenizer;
  * @see Collector
  * @see TokenCollector
  * @see MAxTokenCollector
- * @see DefaultTokenCollector
+ * @see MostWordsTokenCollector
  * 
  * @since 1.0
  */

@@ -249,7 +249,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 		int tempEnd;
 
 		while (curSearchOffset < limit) {
-			// 孤立字符串如果是数字数字，比如"五十二万"，"十三亿"，。。。
+			// 孤立字符串如果是汉字数字，比如"五十二万"，"十三亿"，。。。
 			tempEnd = collectNumber(collector, beef, curSearchOffset, limit,
 					binOffset);
 			if (tempEnd > curSearchOffset) {

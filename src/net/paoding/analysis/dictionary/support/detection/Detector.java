@@ -111,13 +111,12 @@ public class Detector implements Runnable {
 		Difference diff = current.diff(lastSnapshot);
 		if (!diff.isEmpty()) {
 			try {
-				if (listener.on(diff)) {
-					log.info("found differen for " + home);
-					log.info(diff);
-					lastSnapshot = current;
-				}
+				listener.on(diff);
+				log.info("found differen for " + home);
+				log.info(diff);
+				lastSnapshot = current;
 			} catch (Exception e) {
-				log.error(e);
+				log.error("", e);
 			}
 		}
 	}
@@ -141,9 +140,8 @@ public class Detector implements Runnable {
 		d.setHome(new File("dic"));
 		d.setFilter(new ExtensionFileFilter(".dic"));
 		d.setListener(new DifferenceListener() {
-			public boolean on(Difference diff) {
+			public void on(Difference diff) {
 				System.out.println(diff);
-				return true;
 			}
 
 		});

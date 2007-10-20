@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.paoding.analysis.knife;
+package net.paoding.analysis.analyzer.impl;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.paoding.analysis.dictionary.BinaryDictionary;
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.HashBinaryDictionary;
 import net.paoding.analysis.dictionary.support.detection.Detector;
 import net.paoding.analysis.dictionary.support.detection.DifferenceListener;
-import net.paoding.analysis.dictionary.support.detection.ExtensionFileFilter;
 import net.paoding.analysis.dictionary.support.filewords.FileWordsReader;
 import net.paoding.analysis.exception.PaodingAnalysisException;
+import net.paoding.analysis.knife.CJKKnife;
+import net.paoding.analysis.knife.Dictionaries;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @since 1.0
  */
-public class FileDictionaries implements Dictionaries {
+public class CompiledFileDictionaries implements Dictionaries {
 
 	// -------------------------------------------------
 
@@ -88,10 +87,7 @@ public class FileDictionaries implements Dictionaries {
 
 	// -------------------------------------------------
 
-	protected Map/* <String, Set<String>> */allWords;
-
 	protected String dicHome;
-	protected String skipPrefix;
 	protected String noiseCharactor;
 	protected String noiseWord;
 	protected String unit;
@@ -101,21 +97,19 @@ public class FileDictionaries implements Dictionaries {
 
 	// ----------------------
 
-	public FileDictionaries() {
+	public CompiledFileDictionaries() {
 	}
 
-	public FileDictionaries(String dicHome, String skipPrefix,
-			String noiseCharactor, String noiseWord, String unit,
-			String confucianFamilyName, String combinatorics, String charsetName) {
+	public CompiledFileDictionaries(String dicHome, String noiseCharactor,
+			String noiseWord, String unit, String confucianFamilyName,
+			String combinatorics, String charsetName) {
 		this.dicHome = dicHome;
-		this.skipPrefix = skipPrefix;
 		this.noiseCharactor = noiseCharactor;
 		this.noiseWord = noiseWord;
 		this.unit = unit;
 		this.confucianFamilyName = confucianFamilyName;
 		this.combinatorics = combinatorics;
 		this.charsetName = charsetName;
-
 	}
 
 	public String getDicHome() {
@@ -124,14 +118,6 @@ public class FileDictionaries implements Dictionaries {
 
 	public void setDicHome(String dicHome) {
 		this.dicHome = dicHome;
-	}
-
-	public String getSkipPrefix() {
-		return skipPrefix;
-	}
-
-	public void setSkipPrefix(String skipPrefix) {
-		this.skipPrefix = skipPrefix;
 	}
 
 	public String getNoiseCharactor() {
@@ -256,7 +242,6 @@ public class FileDictionaries implements Dictionaries {
 		return combinatoricsDictionary;
 	}
 
-	
 	private Detector detector;
 	
 	public synchronized void startDetecting(int interval, DifferenceListener l) {
@@ -265,7 +250,7 @@ public class FileDictionaries implements Dictionaries {
 		}
 		Detector detector = new Detector();
 		detector.setHome(dicHome);
-		detector.setFilter(new ExtensionFileFilter(".dic"));
+		detector.setFilter(null);
 		detector.setLastSnapshot(detector.flash());
 		detector.setListener(l);
 		detector.setInterval(interval);
@@ -282,89 +267,32 @@ public class FileDictionaries implements Dictionaries {
 		detector = null;
 	}
 	
-	/**
-	 * 
-	 * @param dicName
-	 */
-	protected synchronized void refreshDicWords(String dicPath) {
-		int index = dicPath.lastIndexOf(".dic");
-		String dicName = dicPath.substring(0, index);
-		if (allWords != null) {
-			try {
-				Map/* <String, Set<String>> */temp = FileWordsReader
-						.readWords(dicHome + dicPath, charsetName);
-				allWords.put(dicName, temp.values().iterator().next());
-			} catch (FileNotFoundException e) {
-				// 如果源文件已经被删除了，则表示该字典不要了
-				allWords.remove(dicName);
-			} catch (IOException e) {
-				throw toRuntimeException(e);
-			}
-			if (!isSkipForVacabulary(dicName)) {
-				this.vocabularyDictionary = null;
-			}
-			// 如果来的是noiseWord
-			if (isNoiseWordDicFile(dicName)) {
-				this.noiseWordsDictionary = null;
-				// noiseWord和vocabulary有关，所以需要更新vocabulary
-				this.vocabularyDictionary = null;
-			}
-			// 如果来的是noiseCharactors
-			else if (isNoiseCharactorDicFile(dicName)) {
-				this.noiseCharactorsDictionary = null;
-				// noiseCharactorsDictionary和vocabulary有关，所以需要更新vocabulary
-				this.vocabularyDictionary = null;
-			}
-			// 如果来的是单元
-			else if (isUnitDicFile(dicName)) {
-				this.unitsDictionary = null;
-			}
-			// 如果来的是亚洲人人姓氏
-			else if (isConfucianFamilyNameDicFile(dicName)) {
-				this.confucianFamilyNamesDictionary = null;
-			}
-			// 如果来的是以字母,数字等组合类语言为开头的词汇
-			else if (isLantinFollowedByCjkDicFile(dicName)) {
-				this.combinatoricsDictionary = null;
-			}
-		}
-	}
-
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
 
 	protected String[] getVocabularyWords() {
-		Map/* <String, Set<String>> */dics = loadAllWordsIfNecessary();
-		Set/* <String> */set = null;
-		Iterator/* <String> */iter = dics.keySet().iterator();
-		while (iter.hasNext()) {
-			String name = (String) iter.next();
-			if (isSkipForVacabulary(name)) {
-				continue;
-			}
-			Set/* <String> */dic = (Set/* <String> */) dics.get(name);
-			if (set == null) {
-				set = new HashSet/* <String> */(dic);
-			} else {
-				set.addAll(dic);
-			}
+		File f = new File(this.dicHome, "/vocabulary.dic.compiled");
+		try {
+			Map words = FileWordsReader.readWords(f.getAbsolutePath(),
+					charsetName, LinkedList.class, ".dic.compiled");
+			List wordsList = (List) words.values().iterator().next();
+			return (String[]) wordsList.toArray(new String[wordsList.size()]);
+		} catch (IOException e) {
+			throw toRuntimeException(e);
 		}
-		// 根据CJKKnife的要求，这里将noise词、字从词汇表移出，以免在切词把他们视为词典规定的成词，而还要从另外判断移出。
-		String[] noiseWordDic = getNoiseWords();
-		if (noiseWordDic != null) {
-			for (int i = 0; i < noiseWordDic.length; i++) {
-				set.remove(noiseWordDic[i]);
-			}
+	}
+
+	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
+		File f = new File(this.dicHome, "/" + dicNameRelativeDicHome
+				+ ".dic.compiled");
+		try {
+			Map words = FileWordsReader.readWords(f.getAbsolutePath(),
+					charsetName, LinkedList.class, ".dic.compiled");
+			List wordsList = (List) words.values().iterator().next();
+			return (String[]) wordsList.toArray(new String[wordsList.size()]);
+		} catch (IOException e) {
+			throw toRuntimeException(e);
 		}
-		String[] noiseCharactorDic = getNoiseCharactors();
-		if (noiseCharactorDic != null) {
-			for (int i = 0; i < noiseCharactorDic.length; i++) {
-				set.remove(noiseCharactorDic[i]);
-			}
-		}
-		String[] words = (String[]) set.toArray(new String[set.size()]);
-		Arrays.sort(words);
-		return words;
 	}
 
 	protected String[] getConfucianFamilyNames() {
@@ -385,73 +313,6 @@ public class FileDictionaries implements Dictionaries {
 
 	protected String[] getCombinatoricsWords() {
 		return getDictionaryWords(combinatorics);
-	}
-
-	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
-		Map dics;
-		try {
-			dics = FileWordsReader.readWords(dicHome + "/"
-					+ dicNameRelativeDicHome + ".dic", charsetName);
-		} catch (IOException e) {
-			throw toRuntimeException(e);
-		}
-		Set/* <String> */set = (Set/* <String> */) dics
-				.get(dicNameRelativeDicHome);
-		String[] words = (String[]) set.toArray(new String[set.size()]);
-		Arrays.sort(words);
-		return words;
-	}
-
-	// -------------------------------------
-
-	/**
-	 * 读取字典安装目录及子孙目录下的字典文件；并以该字典相对安装目录的路径(包括该字典的文件名，但不包括扩展名)作为key。
-	 * 比如，如果字典安装在dic目录下，该目录下有division/china.dic，则该字典文件对应的key是"division/china"
-	 */
-	protected synchronized Map/* <String, Set<String>> */loadAllWordsIfNecessary() {
-		if (allWords == null) {
-			try {
-				log.info("loading dictionaries from " + dicHome);
-				allWords = FileWordsReader.readWords(dicHome, charsetName);
-				if (allWords.size() == 0) {
-					String message = "Not found any dictionary files, have you set the 'paoding.dic.home' right? ("
-							+ this.dicHome + ")";
-					log.error(message);
-					throw new PaodingAnalysisException(message);
-				}
-				log.info("loaded success!");
-			} catch (IOException e) {
-				throw toRuntimeException(e);
-			}
-		}
-		return allWords;
-	}
-
-	// ---------------------------------------
-
-	protected final boolean isSkipForVacabulary(String dicNameRelativeDicHome) {
-		return dicNameRelativeDicHome.startsWith(skipPrefix)
-				|| dicNameRelativeDicHome.indexOf("/" + skipPrefix) != -1;
-	}
-
-	protected boolean isUnitDicFile(String dicName) {
-		return dicName.equals(this.unit);
-	}
-
-	protected boolean isNoiseCharactorDicFile(String dicName) {
-		return dicName.equals(this.noiseCharactor);
-	}
-
-	protected boolean isNoiseWordDicFile(String dicName) {
-		return dicName.equals(this.noiseWord);
-	}
-
-	protected boolean isConfucianFamilyNameDicFile(String dicName) {
-		return dicName.equals(this.confucianFamilyName);
-	}
-
-	protected boolean isLantinFollowedByCjkDicFile(String dicName) {
-		return dicName.equals(this.combinatorics);
 	}
 
 	// --------------------------------------

@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.paoding.analysis.analyzer;
+package net.paoding.analysis.analyzer.impl;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 
+
+import net.paoding.analysis.analyzer.TokenCollector;
 
 import org.apache.lucene.analysis.Token;
 
@@ -28,7 +30,7 @@ import org.apache.lucene.analysis.Token;
  * 
  * @since 1.1
  */
-public class MaxTokenCollector implements TokenCollector {
+public class MaxWordLengthTokenCollector implements TokenCollector {
 
 	/**
 	 * 存储当前被knife分解而成的Token对象

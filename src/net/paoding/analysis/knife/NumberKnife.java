@@ -26,6 +26,7 @@ import net.paoding.analysis.dictionary.Hit;
 public class NumberKnife extends CombinatoricsKnife implements DictionariesWare {
 
 	private Dictionary units;
+	private Dictionary vocabulary;
 	
 	public NumberKnife() {
 	}
@@ -37,6 +38,7 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 	public void setDictionaries(Dictionaries dictionaries) {
 		super.setDictionaries(dictionaries);
 		units = dictionaries.getUnitsDictionary();
+		vocabulary = dictionaries.getVocabularyDictionary();
 	}
 	
 
@@ -137,14 +139,12 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 		
 		//
 		// 后面可能跟了计量单位
-		int _limit = -1;
 		if (units != null && CharSet.isCjkUnifiedIdeographs(beef.charAt(curTail))) {
 			Hit wd = null;
 			Hit wd2 = null;
 			int i = curTail + 1;
 			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
 				wd2 = wd;
-				curTail++;
 				i++;
 				if (!wd.isUnclosed()) {
 					break;
@@ -152,17 +152,24 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			}
 			i --;
 			if (wd2 != null) {
-				if (gotNum) {
-					collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
+				//如果这个计量单位已经在词汇表，则不收集
+				if (vocabulary.search(wd2.getWord(), 0, wd2.getWord().length()).isHit()) {
+					return -1;
 				}
 				else {
-					collector.collect(beef.subSequence(offset, i).toString(), offset, i);
+					if (gotNum) {
+						collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
+					}
+					else {
+						collector.collect(beef.subSequence(offset, i).toString(), offset, i);
+					}
+					return i;
 				}
 			}
 		}
 		//
 		
-		return curTail > _limit ? curTail : _limit;
+		return curTail > limit ? curTail : -1;
 	}
 
 

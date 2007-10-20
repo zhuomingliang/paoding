@@ -16,19 +16,37 @@
 package net.paoding.analysis.knife;
 
 
+import java.util.Properties;
 /**
- * Paoding是一个背着“刀箱”(内藏各种“刀”)毕生精力“解牛”的人，即“庖丁”。
- * <p>
- * 正因为他拥有各种不同的“刀”，而且能够识别什么“肉(字符)”应该用什么“刀”分割，所以他能游刃有余地把整头牛切割，成为合适的“肉片(词语)”。 <br>
- * 这里的“刀”由Knife扮演，各种“刀”由“刀箱”KnifeBox管理(Paoding对象本身就是一个KnifeBox)，并由KnifeBox决策什么时候出什么“刀”。
  * 
- * @author Zhiliang Wang [qieqie.wang@gmail.com]
+ * @author  Zhiliang Wang [qieqie.wang@gmail.com]
  * 
- * @see Knife
- * @see KnifeBox
- * 
- * @since 1.0
+ * @since 2.0.4
  */
-public class Paoding extends SmartKnifeBox implements Knife {
+public interface DictionariesCompiler {
 
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean shouldCompile(Properties p) throws Exception;
+	
+	/**
+	 * 
+	 * @param dictionaries
+	 * @param knife
+	 * @param p
+	 * @throws Exception
+	 */
+	public void compile(Dictionaries dictionaries, Knife knife, Properties p) throws Exception;
+	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 * @throws Exception
+	 */
+	public Dictionaries readCompliedDictionaries(Properties p) throws Exception;
 }

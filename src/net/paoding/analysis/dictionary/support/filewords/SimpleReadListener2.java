@@ -15,6 +15,7 @@
  */
 package net.paoding.analysis.dictionary.support.filewords;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -28,23 +29,31 @@ import net.paoding.analysis.knife.CharSet;
  * @since 1.0
  * 
  */
-public class SimpleReadListener implements ReadListener {
-	private Map/* <String, Set<String>> */dics = new Hashtable/* <String, Set<String>> */();
-	private HashSet/* <String> */words = new HashSet/* <String> */();
+public class SimpleReadListener2 implements ReadListener {
+	private Map/* <String, List<String>> */dics = new Hashtable/* <String, List<String>> */();
+	private Class collectionClass = HashSet.class;
+	private Collection/* <String> */words;
 	private String ext = ".dic";
 
-	public SimpleReadListener(String ext) {
+	public SimpleReadListener2(Class collectionClass, String ext) {
 		this.ext = ext;
+		this.collectionClass = collectionClass;
 	}
 
-	public SimpleReadListener() {
+	public SimpleReadListener2() {
 	}
 
 	public boolean onFileBegin(String file) {
 		if (!file.endsWith(ext)) {
 			return false;
 		}
-		words = new HashSet/* <String> */();
+		try {
+			words = (Collection) collectionClass.newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

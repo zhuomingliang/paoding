@@ -1,4 +1,4 @@
-package net.paoding.analysis.analyzer;
+package net.paoding.analysis.analyzer.estimate;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -6,6 +6,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import net.paoding.analysis.analyzer.PaodingTokenizer;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
