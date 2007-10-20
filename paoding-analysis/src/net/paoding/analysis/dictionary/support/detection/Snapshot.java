@@ -63,6 +63,7 @@ public class Snapshot {
 		root = rootFile.getAbsolutePath().replace('\\', '/');
 		if (!rootFile.exists()) {
 			// do nothing, maybe the file has been deleted
+			nodes = new InnerNode[0];
 		} else {
 			InnerNode rootNode = new InnerNode();
 			rootNode.path = root;
@@ -118,7 +119,7 @@ public class Snapshot {
 		if (!younger.root.equals(older.root)) {
 			throw new IllegalArgumentException("the snaps should be same root");
 		}
-		for (int i = 0; i< older.nodes.length; i ++) {
+		for (int i = 0; i < older.nodes.length; i ++) {
 			InnerNode olderNode = older.nodes[i];
 			InnerNode yongerNode = (InnerNode) younger.nodesMap.get((String) olderNode.path);
 			if (yongerNode == null) {
@@ -128,7 +129,7 @@ public class Snapshot {
 			}
 		}
 
-		for (int i = 0; i< younger.nodes.length; i ++) {
+		for (int i = 0; i < younger.nodes.length; i ++) {
 			InnerNode yongerNode = younger.nodes[i];
 			InnerNode olderNode = (InnerNode) older.nodesMap.get((String) yongerNode.path);
 			if (olderNode == null) {

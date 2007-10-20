@@ -79,7 +79,12 @@ public class Constants {
 	// -------------------------------------------------------------
 	// like "default", "max", ...
 	public static final String ANALYZER_MODE = "paoding.analyzer.mode";
-	public static final String ANALYZER_MOE_DEFAULT = "default";
+	public static final String ANALYZER_MOE_DEFAULT = "most-words";
+
+	// -------------------------------------------------------------
+	// 
+	public static final String ANALYZER_DICTIONARIES_COMPILER = "paoding.analyzer.dictionaries.compiler";
+	public static final String ANALYZER_DICTIONARIES_COMPILER_DEFAULT = null;
 
 	// -------------------------------------------------------------
 	private static final Map/* <String, String> */map = new HashMap();
@@ -96,6 +101,7 @@ public class Constants {
 		map.put(DIC_FOR_COMBINATORICS, DIC_FOR_COMBINATORICS_DEFAULT);
 		map.put(DIC_DETECTOR_INTERVAL, DIC_DETECTOR_INTERVAL_DEFAULT);
 		map.put(ANALYZER_MODE, ANALYZER_MOE_DEFAULT);
+		map.put(ANALYZER_DICTIONARIES_COMPILER, ANALYZER_DICTIONARIES_COMPILER_DEFAULT);
 	}
 
 	//

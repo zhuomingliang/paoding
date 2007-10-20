@@ -2,6 +2,8 @@ package net.paoding.analysis.analyzer;
 
 import java.io.Reader;
 
+import net.paoding.analysis.analyzer.impl.MaxWordLengthTokenCollector;
+import net.paoding.analysis.analyzer.impl.MostWordsTokenCollector;
 import net.paoding.analysis.knife.Knife;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -12,24 +14,14 @@ public class PaodingAnalyzerBean extends Analyzer {
 	// -------------------------------------------------
 
 	/**
-	 * 最大切分和最小切分兼有
+	 * 最多切分
 	 */
-	public static final int DEFAULT_MODE = 1;
-
-	/**
-	 * @deprecated 请使用DEFAULT_MODE
-	 */
-	public static final int WRITER_MODE = DEFAULT_MODE;
+	public static final int MOST_WORDS_MODE = 1;
 
 	/**
 	 * 按最大切分
 	 */
-	public static final int MAX_MODE = 2;
-
-	/**
-	 * @deprecated 请使用MAX_MODE
-	 */
-	public static final int QUERY_MODE = MAX_MODE;
+	public static final int MAX_WORD_LENGTH_MODE = 2;
 
 	// -------------------------------------------------
 	/**
@@ -41,11 +33,14 @@ public class PaodingAnalyzerBean extends Analyzer {
 	private Knife knife;
 
 	/**
-	 * @see #DEFAULT_MODE
-	 * @see #MAX_MODE
+	 * @see #MOST_WORDS_MODE
+	 * @see #MAX_WORD_LENGTH_MODE
 	 */
-	private int mode = DEFAULT_MODE;
+	private int mode = MOST_WORDS_MODE;
 
+	/**
+	 * 
+	 */
 	private Class modeClass;
 
 	// -------------------------------------------------
@@ -104,7 +99,7 @@ public class PaodingAnalyzerBean extends Analyzer {
 	 * @param mode
 	 */
 	public void setMode(int mode) {
-		if (mode != DEFAULT_MODE && mode != MAX_MODE) {
+		if (mode != MOST_WORDS_MODE && mode != MAX_WORD_LENGTH_MODE) {
 			throw new IllegalArgumentException("wrong mode:" + mode);
 		}
 		this.mode = mode;
@@ -133,15 +128,16 @@ public class PaodingAnalyzerBean extends Analyzer {
 		if (mode.startsWith("class:")) {
 			setModeClass(mode.substring("class:".length()));
 		} else {
-			if ("default".equalsIgnoreCase(mode)
-					|| "writer".equalsIgnoreCase(mode)
-					|| "index".equalsIgnoreCase(mode)
-					|| ("" + DEFAULT_MODE).equals(mode)) {
-				setMode(DEFAULT_MODE);
-			} else if ("max".equalsIgnoreCase(mode)
-					|| "query".equalsIgnoreCase(mode)
-					|| ("" + MAX_MODE).equals(mode)) {
-				setMode(MAX_MODE);
+			if ("most-words".equalsIgnoreCase(mode)
+					|| "default".equalsIgnoreCase(mode)
+					|| ("" + MOST_WORDS_MODE).equals(mode)) {
+				setMode(MOST_WORDS_MODE);
+			} else if ("max-word-length".equalsIgnoreCase(mode)
+					|| ("" + MAX_WORD_LENGTH_MODE).equals(mode)) {
+				setMode(MAX_WORD_LENGTH_MODE);
+			}
+			else {
+				throw new IllegalArgumentException("不合法的分析器Mode参数设置:" + mode);
 			}
 		}
 	}
@@ -167,10 +163,10 @@ public class PaodingAnalyzerBean extends Analyzer {
 			}
 		}
 		switch (mode) {
-		case DEFAULT_MODE:
-			return new DefaultTokenCollector();
-		case MAX_MODE:
-			return new MaxTokenCollector();
+		case MOST_WORDS_MODE:
+			return new MostWordsTokenCollector();
+		case MAX_WORD_LENGTH_MODE:
+			return new MaxWordLengthTokenCollector();
 		default:
 			throw new Error("never happened");
 		}

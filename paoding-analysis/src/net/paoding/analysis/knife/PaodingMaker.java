@@ -30,6 +30,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.paoding.analysis.Constants;
+import net.paoding.analysis.analyzer.impl.MostWordsModeDictionariesCompiler;
+import net.paoding.analysis.analyzer.impl.SortingDictionariesCompiler;
+import net.paoding.analysis.dictionary.support.detection.Difference;
+import net.paoding.analysis.dictionary.support.detection.DifferenceListener;
 import net.paoding.analysis.exception.PaodingAnalysisException;
 
 import org.apache.commons.logging.Log;
@@ -177,7 +181,14 @@ public class PaodingMaker {
 			file = new File(url.getFile());
 			in = url.openStream();
 		} else {
-			file = new File(path);
+			if (path.startsWith("dic-home:")) {
+				File dicHome = new File(getDicHome(p));
+				path = path.substring("dic-home:".length());
+				file = new File(dicHome, path);
+			}
+			else {
+				file = new File(path);
+			}
 			if (skipWhenNotExists && !file.exists()) {
 				return p;
 			}
@@ -213,8 +224,22 @@ public class PaodingMaker {
 		return p;
 	}
 	
+	private static String getDicHome(Properties p) {
+		setDicHomeProperties(p);
+		return p.getProperty("paoding.dic.home.absolute.path");
+	}
+
 	private static void postPropertiesLoaded(Properties p) {
 		if ("done".equals(p.getProperty("paoding.analysis.postPropertiesLoaded"))) {
+			return;
+		}
+		setDicHomeProperties(p);
+		p.setProperty("paoding.analysis.postPropertiesLoaded", "done");
+	}
+
+	private static void setDicHomeProperties(Properties p) {
+		String dicHomeAbsultePath = p.getProperty("paoding.dic.home.absolute.path");
+		if (dicHomeAbsultePath != null) {
 			return;
 		}
 		// 获取词典安装目录配置：
@@ -254,7 +279,7 @@ public class PaodingMaker {
 		}
 		if (dicHome == null) {
 			throw new PaodingAnalysisException(
-					"please set a system env PAODING_DIC_HOME or Config paoding.dic.home in paoding-analysis.properties point to the dictionaries!");
+					"please set a system env PAODING_DIC_HOME or Config paoding.dic.home in paoding-dic-home.properties point to the dictionaries!");
 		}
 		// 规范化dicHome，并设置到属性文件对象中
 		dicHome = dicHome.replace('\\', '/');
@@ -272,15 +297,14 @@ public class PaodingMaker {
 			throw new PaodingAnalysisException("dic home should not be a file, but a directory!");
 		}
 		p.setProperty("paoding.dic.home.absolute.path", dicHomeFile.getAbsolutePath());
-		p.setProperty("paoding.analysis.postPropertiesLoaded", "done");
 	}
 
 	
-	private static Paoding implMake(Properties p) {
+	private static Paoding implMake(final Properties p) {
 		// 将要返回的Paoding对象，它可能是新创建的，也可能使用paodingHolder中已有的Paoding对象
 		Paoding paoding;
 		// 作为本次返回的Paoding对象在paodingHolder中的key，使之后同样的key不会重复创建Paoding对象
-		Object paodingKey;
+		final Object paodingKey;
 		// 如果该属性对象是通过PaodingMaker由文件读入的，则必然存在paoding.dic.properties.path属性
 		// 详细请参考loadProperties方法)
 		String path = p.getProperty("paoding.dic.properties.path");
@@ -295,88 +319,140 @@ public class PaodingMaker {
 		if (paoding != null) {
 			return paoding;
 		}
-		// 如果PaodingHolder中并没有缓存该属性文件或对象对应的Paoding对象，
-		// 则根据给定的属性创建一个新的Paoding对象，并在返回之前存入paodingHolder
-		String dicHomeAbsolutePath = p.getProperty("paoding.dic.home.absolute.path");
-		String interval = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
-		paoding = new Paoding();
-		paoding.setDicHomeAbsolutePath(dicHomeAbsolutePath);
-		paoding.setInterval(Integer.parseInt(interval));
 		try {
-			//将字典命名规则参数读出来，从而创建FileDictionaries
-			String skipPrefix = getProperty(p, Constants.DIC_SKIP_PREFIX);
-			String noiseCharactor = getProperty(p, Constants.DIC_NOISE_CHARACTOR);
-			String noiseWord = getProperty(p, Constants.DIC_NOISE_WORD);
-			String unit = getProperty(p, Constants.DIC_UNIT);
-			String confucianFamilyName = getProperty(p, Constants.DIC_CONFUCIAN_FAMILY_NAME);
-			String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
-			String charsetName = getProperty(p, Constants.DIC_CHARSET);
-			Dictionaries dictionaries = new FileDictionaries(dicHomeAbsolutePath,
-					skipPrefix, noiseCharactor, noiseWord, unit,
-					confucianFamilyName, combinatorics, charsetName);
-			paoding.setDictionaries(dictionaries);
-			//寻找传说中的Knife。。。。
-			final Map /* <String, Knife> */ knifeMap = new HashMap /* <String, Knife> */ ();
-			List /* <Knife> */ knifeList = new LinkedList/* <Knife> */();
-			List /* <Function> */ functions = new LinkedList/* <Function> */();
-			Iterator iter = p.entrySet().iterator();
-			while (iter.hasNext()) {
-				Map.Entry e = (Map.Entry) iter.next();
-				final String key = (String) e.getKey();
-				final String value = (String) e.getValue();
-				int index = key.indexOf(Constants.KNIFE_CLASS);
-				if (index == 0 && key.length() > Constants.KNIFE_CLASS.length()) {
-					final int end = key.indexOf('.', Constants.KNIFE_CLASS.length());
-					if (end  == -1) {
-						Class clazz = Class.forName(value);
-						Knife knife = (Knife) clazz.newInstance();
-						if (knife instanceof DictionariesWare) {
-							((DictionariesWare) knife)
-									.setDictionaries(dictionaries);
-						}
-						knifeList.add(knife);
-						knifeMap.put(key, knife);
-						log.info("add knike: " + value);
-					}
-					else {
-						// 由于属性对象属于hash表，key的读取顺序不和文件的顺序一致，不能保证属性设置时，knife对象已经创建
-						// 所以这里只定义函数放到functions中，待到所有的knife都创建之后，在执行该程序
-						functions.add(new Function() {
-							public void run() throws Exception {
-								String knifeName = key.substring(0, end);
-								Object obj = knifeMap.get(knifeName);
-								if (!obj.getClass().getName().equals("org.springframework.beans.BeanWrapperImpl")) {
-									Class beanWrapperImplClass = Class.forName("org.springframework.beans.BeanWrapperImpl");
-									Method setWrappedInstance = beanWrapperImplClass.getMethod("setWrappedInstance", new Class[]{Object.class});
-									Object beanWrapperImpl = beanWrapperImplClass.newInstance();
-									setWrappedInstance.invoke(beanWrapperImpl, new Object[]{obj});
-									knifeMap.put(knifeName, beanWrapperImpl);
-									obj = beanWrapperImpl;
-								}
-								String propertyName = key.substring(end + 1);
-								Method setPropertyValue = obj.getClass().getMethod("setPropertyValue", new Class[]{String.class, Object.class});
-								setPropertyValue.invoke(obj, new Object[]{propertyName, value});
-							}
-						});
-					}
+			paoding = createPaodingWithKnives(p);
+			final Paoding finalPaoding = paoding;
+			//
+			String compilerClassName = getProperty(p, Constants.ANALYZER_DICTIONARIES_COMPILER);
+			Class compilerClass = null;
+			if (compilerClassName != null) {
+				compilerClass = Class.forName(compilerClassName);
+			}
+			if (compilerClass == null) {
+				String analyzerMode = getProperty(p, Constants.ANALYZER_MODE);
+				if ("most-words".equalsIgnoreCase(analyzerMode)
+						|| "default".equalsIgnoreCase(analyzerMode)) {
+					compilerClass = MostWordsModeDictionariesCompiler.class;
+				}
+				else {
+					compilerClass = SortingDictionariesCompiler.class;
 				}
 			}
-			// 完成所有留后执行的程序
-			for (Iterator iterator = functions.iterator(); iterator.hasNext();) {
-				Function function = (Function) iterator.next();
-				function.run();
-			}
-			// 把刀交给庖丁
-			paoding.setKnives(knifeList);
-			
+			final DictionariesCompiler compiler 
+				= (DictionariesCompiler)compilerClass.newInstance();
+			new Function() {
+				public void run() throws Exception {
+					// 编译词典-对词典进行可能的处理，以符合分词器的要求
+					if (compiler.shouldCompile(p)) {
+						Dictionaries dictionaries = readUnCompiledDictionaries(p);
+						Paoding tempPaoding = createPaodingWithKnives(p);
+						setDictionaries(tempPaoding, dictionaries);
+						compiler.compile(dictionaries, tempPaoding, p);
+					}
+					
+					// 使用编译后的词典
+					final Dictionaries dictionaries = compiler.readCompliedDictionaries(p);
+					setDictionaries(finalPaoding, dictionaries);
+					
+					// 启动字典动态转载/卸载检测器
+					// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
+					String interval = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
+					dictionaries.startDetecting(Integer.parseInt(interval), new DifferenceListener() {
+						public void on(Difference diff) throws Exception {
+							dictionaries.stopDetecting();
+							// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
+							// 重新编译源词典、重新创建并启动dictionaries自检测
+							run();
+						}
+					});
+				}
+			}.run();
 			// Paoding对象创建成功！此时可以将它寄放到paodingHolder中，给下次重复利用
 			paodingHolder.set(paodingKey, paoding);
-			// 启动字典动态转载/卸载检测器
-			// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
-			paoding.startAutoDetecting();
 			return paoding;
 		} catch (Exception e) {
 			throw new PaodingAnalysisException("", e);
+		}
+	}
+	
+	private static Paoding createPaodingWithKnives(Properties p) throws Exception {
+		// 如果PaodingHolder中并没有缓存该属性文件或对象对应的Paoding对象，
+		// 则根据给定的属性创建一个新的Paoding对象，并在返回之前存入paodingHolder
+		Paoding paoding = new Paoding();
+		
+		//寻找传说中的Knife。。。。
+		final Map /* <String, Knife> */ knifeMap = new HashMap /* <String, Knife> */ ();
+		final List /* <Knife> */ knifeList = new LinkedList/* <Knife> */();
+		final List /* <Function> */ functions = new LinkedList/* <Function> */();
+		Iterator iter = p.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry e = (Map.Entry) iter.next();
+			final String key = (String) e.getKey();
+			final String value = (String) e.getValue();
+			int index = key.indexOf(Constants.KNIFE_CLASS);
+			if (index == 0 && key.length() > Constants.KNIFE_CLASS.length()) {
+				final int end = key.indexOf('.', Constants.KNIFE_CLASS.length());
+				if (end  == -1) {
+					Class clazz = Class.forName(value);
+					Knife knife = (Knife) clazz.newInstance();
+					knifeList.add(knife);
+					knifeMap.put(key, knife);
+					log.info("add knike: " + value);
+				}
+				else {
+					// 由于属性对象属于hash表，key的读取顺序不和文件的顺序一致，不能保证属性设置时，knife对象已经创建
+					// 所以这里只定义函数放到functions中，待到所有的knife都创建之后，在执行该程序
+					functions.add(new Function() {
+						public void run() throws Exception {
+							String knifeName = key.substring(0, end);
+							Object obj = knifeMap.get(knifeName);
+							if (!obj.getClass().getName().equals("org.springframework.beans.BeanWrapperImpl")) {
+								Class beanWrapperImplClass = Class.forName("org.springframework.beans.BeanWrapperImpl");
+								Method setWrappedInstance = beanWrapperImplClass.getMethod("setWrappedInstance", new Class[]{Object.class});
+								Object beanWrapperImpl = beanWrapperImplClass.newInstance();
+								setWrappedInstance.invoke(beanWrapperImpl, new Object[]{obj});
+								knifeMap.put(knifeName, beanWrapperImpl);
+								obj = beanWrapperImpl;
+							}
+							String propertyName = key.substring(end + 1);
+							Method setPropertyValue = obj.getClass().getMethod("setPropertyValue", new Class[]{String.class, Object.class});
+							setPropertyValue.invoke(obj, new Object[]{propertyName, value});
+						}
+					});
+				}
+			}
+		}
+		// 完成所有留后执行的程序
+		for (Iterator iterator = functions.iterator(); iterator.hasNext();) {
+			Function function = (Function) iterator.next();
+			function.run();
+		}
+		// 把刀交给庖丁
+		paoding.setKnives(knifeList);
+		return paoding;
+	}
+
+	private static Dictionaries readUnCompiledDictionaries(Properties p) {
+		String skipPrefix = getProperty(p, Constants.DIC_SKIP_PREFIX);
+		String noiseCharactor = getProperty(p, Constants.DIC_NOISE_CHARACTOR);
+		String noiseWord = getProperty(p, Constants.DIC_NOISE_WORD);
+		String unit = getProperty(p, Constants.DIC_UNIT);
+		String confucianFamilyName = getProperty(p, Constants.DIC_CONFUCIAN_FAMILY_NAME);
+		String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
+		String charsetName = getProperty(p, Constants.DIC_CHARSET);
+		Dictionaries dictionaries = new FileDictionaries(getDicHome(p),
+				skipPrefix, noiseCharactor, noiseWord, unit,
+				confucianFamilyName, combinatorics, charsetName);
+		return dictionaries;
+	}
+
+	private static void setDictionaries(Paoding paoding, Dictionaries dictionaries) {
+		Knife[] knives = paoding.getKnives();
+		for (int i = 0; i < knives.length; i++) {
+			Knife knife = (Knife) knives[i];
+			if (knife instanceof DictionariesWare) {
+				((DictionariesWare) knife).setDictionaries(dictionaries);
+			}
 		}
 	}
 

@@ -61,7 +61,7 @@ public class FileDictionariesDifferenceListener implements DifferenceListener {
 		this.knifeBox = knifeBox;
 	}
 
-	public synchronized boolean on(Difference diff) {
+	public synchronized void on(Difference diff) {
 		List/* <Node> */all = new LinkedList/* <Node> */();
 		all.addAll((List/* <Node> */) diff.getDeleted());
 		all.addAll((List/* <Node> */) diff.getModified());
@@ -79,7 +79,6 @@ public class FileDictionariesDifferenceListener implements DifferenceListener {
 				((DictionariesWare) knife).setDictionaries(dictionaries);
 			}
 		}
-		return true;
 	}
 
 }

@@ -44,6 +44,13 @@ public class FileWordsReader {
 		readWords(fileOrDirectory, l, charsetName);
 		return l.getResult();
 	}
+	
+	public static Map/*<String, Collection<String>>*/ readWords(
+			String fileOrDirectory, String charsetName, Class collectionClass, String ext) throws IOException {
+		SimpleReadListener2 l = new SimpleReadListener2(collectionClass, ext);
+		readWords(fileOrDirectory, l, charsetName);
+		return l.getResult();
+	}
 
 	public static void readWords(String fileOrDirectory, ReadListener l, String charsetName)
 			throws IOException {

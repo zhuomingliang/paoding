@@ -18,6 +18,7 @@ package net.paoding.analysis.analyzer;
 import java.util.Properties;
 
 import net.paoding.analysis.Constants;
+import net.paoding.analysis.analyzer.estimate.TryPaodingAnalyzer;
 import net.paoding.analysis.knife.Knife;
 import net.paoding.analysis.knife.Paoding;
 import net.paoding.analysis.knife.PaodingMaker;
@@ -125,7 +126,7 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * @deprecated
 	 */
 	public static PaodingAnalyzer defaultMode(Knife knife) {
-		return new PaodingAnalyzer(knife, DEFAULT_MODE);
+		return new PaodingAnalyzer(knife, MOST_WORDS_MODE);
 	}
 
 	/**
@@ -135,7 +136,7 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 * @deprecated
 	 */
 	public static PaodingAnalyzer maxMode(Knife knife) {
-		return new PaodingAnalyzer(knife, MAX_MODE);
+		return new PaodingAnalyzer(knife, MAX_WORD_LENGTH_MODE);
 	}
 
 	/**
