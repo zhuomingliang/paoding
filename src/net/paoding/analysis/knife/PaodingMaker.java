@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import net.paoding.analysis.Constants;
 import net.paoding.analysis.analyzer.impl.MostWordsModeDictionariesCompiler;
@@ -141,7 +143,7 @@ public class PaodingMaker {
 	// -------------------私有 或 辅助方法----------------------------------
 	
 	private static boolean modified(Properties p)
-			throws FileNotFoundException {
+			throws IOException {
 		String lastModifieds = p
 				.getProperty("paoding.analysis.properties.lastModifieds");
 		String[] lastModifedsArray = lastModifieds.split(";");
@@ -149,7 +151,7 @@ public class PaodingMaker {
 		String[] filesArray = files.split(";");
 		for (int i = 0; i < filesArray.length; i++) {
 			File file = getFile(filesArray[i]);
-			if (file.exists() && !String.valueOf(file.lastModified()).equals(lastModifedsArray[i])) {
+			if (file.exists() && !String.valueOf(getFileLastModified(file)).equals(lastModifedsArray[i])) {
 				return true;
 			}
 		}
@@ -202,11 +204,11 @@ public class PaodingMaker {
 		String absolutePaths = p.getProperty("paoding.analysis.properties.files.absolutepaths");
 		if (lastModifieds == null) {
 			p.setProperty("paoding.dic.properties.path", path);
-			lastModifieds = String.valueOf(file.lastModified());
+			lastModifieds = String.valueOf(getFileLastModified(file));
 			files = path;
 			absolutePaths = absolutePath;
 		} else {
-			lastModifieds = lastModifieds + ";" + file.lastModified();
+			lastModifieds = lastModifieds + ";" + getFileLastModified(file);
 			files = files + ";" + path;
 			absolutePaths = absolutePaths + ";" + absolutePath;
 		}
@@ -222,6 +224,31 @@ public class PaodingMaker {
 			}
 		}
 		return p;
+	}
+
+	private static long getFileLastModified(File file) throws IOException {
+		String path = file.getPath();
+		int jarIndex = path.indexOf(".jar!");
+		if (jarIndex == -1) {
+			return file.lastModified();
+		}
+		else {
+			path = path.replaceAll("%20", " ").replaceAll("\\\\", "/");
+			int protocalIndex = path.indexOf(":");
+			String jarPath = path.substring(protocalIndex + ":".length(), jarIndex + ".jar".length());
+			File jarPathFile = new File(jarPath);
+			JarFile jarFile;
+			try {
+				jarFile = new JarFile(jarPathFile);
+				String entryPath = path.substring(jarIndex  + ".jar!/".length());
+				JarEntry entry = jarFile.getJarEntry(entryPath);
+				return entry.getTime();
+			} catch (IOException e) {
+				System.err.println("error in handler path=" + path);
+				System.err.println("error in handler jarPath=" + jarPath);
+				throw e;
+			}
+		}
 	}
 	
 	private static String getDicHome(Properties p) {
