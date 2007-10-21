@@ -26,7 +26,6 @@ import net.paoding.analysis.dictionary.Hit;
 public class NumberKnife extends CombinatoricsKnife implements DictionariesWare {
 
 	private Dictionary units;
-	private Dictionary vocabulary;
 	
 	public NumberKnife() {
 	}
@@ -38,7 +37,6 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 	public void setDictionaries(Dictionaries dictionaries) {
 		super.setDictionaries(dictionaries);
 		units = dictionaries.getUnitsDictionary();
-		vocabulary = dictionaries.getVocabularyDictionary();
 	}
 	
 
@@ -127,8 +125,7 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 				number1 += number2;
 			}
 		}
-		boolean gotNum = number1 >= 0 && curTail > _point;
-		if (gotNum) {
+		if (number1 >= 0 && curTail > _point) {
 			doCollect(collector, String.valueOf(number1), beef, offset, curTail);
 		}
 		else {
@@ -152,19 +149,8 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			}
 			i --;
 			if (wd2 != null) {
-				//如果这个计量单位已经在词汇表，则不收集
-				if (vocabulary.search(wd2.getWord(), 0, wd2.getWord().length()).isHit()) {
-					return -1;
-				}
-				else {
-					if (gotNum) {
-						collector.collect(String.valueOf(number1) + wd2.getWord(), offset, i);
-					}
-					else {
-						collector.collect(beef.subSequence(offset, i).toString(), offset, i);
-					}
-					return i;
-				}
+				collector.collect(wd2.getWord(), curTail, i);
+				return i;
 			}
 		}
 		//

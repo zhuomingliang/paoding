@@ -337,8 +337,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 				number2 = -1;
 			}
 		}
-		if (!hasDigit && curTail < beef.length()
-				&& !units.search(beef, curTail, 1).isHit()) {
+		if (!hasDigit) {
 			return offset;
 		}
 		if (number2 > 0) {
@@ -354,22 +353,24 @@ public class CJKKnife implements Knife, DictionariesWare {
 				binDissect(collector, beef, binOffset, offset);
 			}
 			collector.collect(String.valueOf(number1), offset, curTail);
-
-			// 后面可能跟了计量单位
-			Hit wd = null;
-			Hit wd2 = null;
-			int i = curTail + 1;
-			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
-				wd2 = wd;
-				curTail++;
-				if (!wd.isUnclosed()) {
-					break;
+			
+			if (units != null) {
+				// 后面可能跟了计量单位
+				Hit wd = null;
+				Hit wd2 = null;
+				int i = curTail + 1;
+				while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
+					wd2 = wd;
+					i ++;
+					if (!wd.isUnclosed()) {
+						break;
+					}
 				}
-				i++;
-			}
-			if (wd2 != null) {
-				collector.collect(String.valueOf(number1) + wd2.getWord(),
-						offset, i);
+				i --;
+				if (wd2 != null) {
+					collector.collect(wd2.getWord(), curTail, i);
+					return i;
+				}
 			}
 		}
 
