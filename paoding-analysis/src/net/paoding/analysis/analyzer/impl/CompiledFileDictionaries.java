@@ -16,6 +16,7 @@
 package net.paoding.analysis.analyzer.impl;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -243,7 +244,7 @@ public class CompiledFileDictionaries implements Dictionaries {
 	}
 
 	private Detector detector;
-	
+
 	public synchronized void startDetecting(int interval, DifferenceListener l) {
 		if (detector != null || interval < 0) {
 			return;
@@ -251,13 +252,18 @@ public class CompiledFileDictionaries implements Dictionaries {
 		Detector detector = new Detector();
 		detector.setHome(dicHome);
 		detector.setFilter(null);
+		detector.setFilter(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.getPath().endsWith(".dic.compiled")
+						|| pathname.getPath().endsWith(".metadata");
+			}
+		});
 		detector.setLastSnapshot(detector.flash());
 		detector.setListener(l);
 		detector.setInterval(interval);
 		detector.start(true);
 		this.detector = detector;
 	}
-
 
 	public synchronized void stopDetecting() {
 		if (detector == null) {
@@ -266,12 +272,16 @@ public class CompiledFileDictionaries implements Dictionaries {
 		detector.setStop();
 		detector = null;
 	}
-	
+
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
 
-	protected String[] getVocabularyWords() {
-		File f = new File(this.dicHome, "/vocabulary.dic.compiled");
+	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
+		File f = new File(this.dicHome, "/" + dicNameRelativeDicHome
+				+ ".dic.compiled");
+		if (!f.exists()) {
+			return new String[0];
+		}
 		try {
 			Map words = FileWordsReader.readWords(f.getAbsolutePath(),
 					charsetName, LinkedList.class, ".dic.compiled");
@@ -281,18 +291,10 @@ public class CompiledFileDictionaries implements Dictionaries {
 			throw toRuntimeException(e);
 		}
 	}
-
-	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
-		File f = new File(this.dicHome, "/" + dicNameRelativeDicHome
-				+ ".dic.compiled");
-		try {
-			Map words = FileWordsReader.readWords(f.getAbsolutePath(),
-					charsetName, LinkedList.class, ".dic.compiled");
-			List wordsList = (List) words.values().iterator().next();
-			return (String[]) wordsList.toArray(new String[wordsList.size()]);
-		} catch (IOException e) {
-			throw toRuntimeException(e);
-		}
+	
+	
+	protected String[] getVocabularyWords() {
+		return getDictionaryWords("vocabulary");
 	}
 
 	protected String[] getConfucianFamilyNames() {
