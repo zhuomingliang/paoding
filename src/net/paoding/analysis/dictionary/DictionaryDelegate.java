@@ -38,7 +38,7 @@ public class DictionaryDelegate implements Dictionary {
 		this.target = target;
 	}
 
-	public String get(int index) {
+	public Word get(int index) {
 		return target.get(index);
 	}
 

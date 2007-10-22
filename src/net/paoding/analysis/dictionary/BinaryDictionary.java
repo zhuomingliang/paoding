@@ -28,7 +28,7 @@ public class BinaryDictionary implements Dictionary {
 
 	// -------------------------------------------------
 
-	private String[] ascWords;
+	private Word[] ascWords;
 
 	private final int start;
 	private final int end;
@@ -43,11 +43,11 @@ public class BinaryDictionary implements Dictionary {
 	 * @param ascWords
 	 *            升序排列词语
 	 */
-	public BinaryDictionary(String[] ascWords) {
+	public BinaryDictionary(Word[] ascWords) {
 		this(ascWords, 0, ascWords.length);
 	}
 
-	public BinaryDictionary(String[] ascWords, int start, int end) {
+	public BinaryDictionary(Word[] ascWords, int start, int end) {
 		this.ascWords = ascWords;
 		this.start = start;
 		this.end = end;
@@ -56,7 +56,7 @@ public class BinaryDictionary implements Dictionary {
 
 	// -------------------------------------------------
 
-	public String get(int index) {
+	public Word get(int index) {
 		return ascWords[start + index];
 	}
 
@@ -68,7 +68,7 @@ public class BinaryDictionary implements Dictionary {
 		int left = this.start;
 		int right = this.end - 1;
 		int pointer = 0;
-		String word = null;
+		Word word = null;
 		int relation;
 		//
 		while (left <= right) {
@@ -96,8 +96,7 @@ public class BinaryDictionary implements Dictionary {
 		}
 		//
 		boolean asPrex = true;
-		String nextWord = ascWords[left];
-		// System.out.println(text);
+		Word nextWord = ascWords[left];
 		if (nextWord.length() < count) {
 			asPrex = false;
 		}

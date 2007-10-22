@@ -25,6 +25,7 @@ import java.util.Map;
 import net.paoding.analysis.dictionary.BinaryDictionary;
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.HashBinaryDictionary;
+import net.paoding.analysis.dictionary.Word;
 import net.paoding.analysis.dictionary.support.detection.Detector;
 import net.paoding.analysis.dictionary.support.detection.DifferenceListener;
 import net.paoding.analysis.dictionary.support.filewords.FileWordsReader;
@@ -276,44 +277,44 @@ public class CompiledFileDictionaries implements Dictionaries {
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
 
-	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
+	protected Word[] getDictionaryWords(String dicNameRelativeDicHome) {
 		File f = new File(this.dicHome, "/" + dicNameRelativeDicHome
 				+ ".dic.compiled");
 		if (!f.exists()) {
-			return new String[0];
+			return new Word[0];
 		}
 		try {
-			Map words = FileWordsReader.readWords(f.getAbsolutePath(),
+			Map map = FileWordsReader.readWords(f.getAbsolutePath(),
 					charsetName, LinkedList.class, ".dic.compiled");
-			List wordsList = (List) words.values().iterator().next();
-			return (String[]) wordsList.toArray(new String[wordsList.size()]);
+			List wordsList = (List) map.values().iterator().next();
+			return (Word[]) wordsList.toArray(new Word[wordsList.size()]);
 		} catch (IOException e) {
 			throw toRuntimeException(e);
 		}
 	}
 	
 	
-	protected String[] getVocabularyWords() {
+	protected Word[] getVocabularyWords() {
 		return getDictionaryWords("vocabulary");
 	}
 
-	protected String[] getConfucianFamilyNames() {
+	protected Word[] getConfucianFamilyNames() {
 		return getDictionaryWords(confucianFamilyName);
 	}
 
-	protected String[] getNoiseWords() {
+	protected Word[] getNoiseWords() {
 		return getDictionaryWords(noiseWord);
 	}
 
-	protected String[] getNoiseCharactors() {
+	protected Word[] getNoiseCharactors() {
 		return getDictionaryWords(noiseCharactor);
 	}
 
-	protected String[] getUnits() {
+	protected Word[] getUnits() {
 		return getDictionaryWords(unit);
 	}
 
-	protected String[] getCombinatoricsWords() {
+	protected Word[] getCombinatoricsWords() {
 		return getDictionaryWords(combinatorics);
 	}
 

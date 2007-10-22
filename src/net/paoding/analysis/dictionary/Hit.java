@@ -59,12 +59,12 @@ public class Hit {
 	/**
 	 * 查找命中时，词典中相应的词
 	 */
-	private String word;
+	private Word word;
 
 	/**
 	 * 词典中命中词的下一个单词，或{@link #isUnclosed()}为true时最接近的下一个词(参见本类的注释)
 	 */
-	private String next;
+	private Word next;
 
 	// -------------------------------------------------
 
@@ -77,7 +77,7 @@ public class Hit {
 	 * @param next
 	 *            词典中命中词的下一个单词，或{@link #isUnclosed()}为true时最接近的下一个词(参见本类的注释)
 	 */
-	public Hit(int index, String word, String next) {
+	public Hit(int index, Word word, Word next) {
 		this.index = index;
 		this.word = word;
 		this.next = next;
@@ -88,7 +88,7 @@ public class Hit {
 	/**
 	 * 查找命中时，词典中相应的词
 	 */
-	public String getWord() {
+	public Word getWord() {
 		return word;
 	}
 
@@ -104,7 +104,7 @@ public class Hit {
 	 * 词典中命中词的下一个单词，或{@link #isUnclosed()}为true时最接近的下一个词(参见本类的注释)
 	 * @return
 	 */
-	public String getNext() {
+	public Word getNext() {
 		return next;
 	}
 	
@@ -141,11 +141,11 @@ public class Hit {
 		this.index = index;
 	}
 
-	void setWord(String key) {
+	void setWord(Word key) {
 		this.word = key;
 	}
 
-	void setNext(String next) {
+	void setNext(Word next) {
 		this.next = next;
 	}
 

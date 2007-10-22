@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 
+import net.paoding.analysis.dictionary.Word;
 import net.paoding.analysis.knife.CharSet;
 
 /**
@@ -29,8 +30,8 @@ import net.paoding.analysis.knife.CharSet;
  * 
  */
 public class SimpleReadListener implements ReadListener {
-	private Map/* <String, Set<String>> */dics = new Hashtable/* <String, Set<String>> */();
-	private HashSet/* <String> */words = new HashSet/* <String> */();
+	private Map/* <String, Set<Word>> */dics = new Hashtable/* <String, Set<Word>> */();
+	private HashSet/* <Word> */words = new HashSet/* <Word> */();
 	private String ext = ".dic";
 
 	public SimpleReadListener(String ext) {
@@ -54,15 +55,15 @@ public class SimpleReadListener implements ReadListener {
 		words = null;
 	}
 
-	public void onWord(String word) {
-		word = word.trim().toLowerCase();
-		if (word.length() == 0 || word.charAt(0) == '#'
-				|| word.charAt(0) == '-') {
+	public void onWord(String wordText) {
+		wordText = wordText.trim().toLowerCase();
+		if (wordText.length() == 0 || wordText.charAt(0) == '#'
+				|| wordText.charAt(0) == '-') {
 			return;
 		}
 		// 去除汉字数字词
-		for (int i = 0; i < word.length(); i++) {
-			char ch = word.charAt(i);
+		for (int i = 0; i < wordText.length(); i++) {
+			char ch = wordText.charAt(i);
 			int num = CharSet.toNumber(ch);
 			if (num >= 0) {
 				if (i == 0) {
@@ -71,18 +72,31 @@ public class SimpleReadListener implements ReadListener {
 					}
 				}
 				if (num == 2) {
-					if (word.equals("两") || word.equals("两两")) {
+					if (wordText.equals("两") || wordText.equals("两两")) {
 						break;
 					}
 				}
-				if (i + 1 == word.length()) {
+				if (i + 1 == wordText.length()) {
 					return;
 				}
 			} else {
 				break;
 			}
 		}
-		words.add(word);
+		int index = wordText.indexOf('[');
+		if (index == -1) {
+			words.add(new Word(wordText));
+		}
+		else {
+			Word w = new Word(wordText.substring(0, index));
+			int mindex = wordText.indexOf("m=", index);
+			if (mindex != -1) {
+				int mEndIndex = wordText.indexOf("]", mindex);
+				String m = wordText.substring(mindex + "m=".length(), mEndIndex);
+				w.setModifiers(Integer.parseInt(m));
+				words.add(w);
+			}
+		}
 	}
 
 	public Map/* <String, Set<String>> */getResult() {

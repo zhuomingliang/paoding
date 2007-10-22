@@ -17,6 +17,7 @@ package net.paoding.analysis.knife;
 
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.Hit;
+import net.paoding.analysis.dictionary.Word;
 
 /**
  * 
@@ -161,25 +162,24 @@ public class CJKKnife implements Knife, DictionariesWare {
 					}
 
 					// 1.2)
-					// 通知collector本次找到的词语
-					// 魔幻逻辑：
-					// 这里不需要执行过滤是否是noise词采用，直接通知collector便可：
-					// 为了性能考虑，词汇表已经承诺会过滤noise词汇表的词，这样就意味着从词汇表找到的词一定不是noise词汇
-					// 参见：FileDictionaries.getVocabularyWords()方法
-					collector.collect(curSearch.getWord(), curSearchOffset,
-							curSearchEnd);
-
-					// 1.3)
 					// 更新最大结束位置
 					if (maxDicWordEnd < curSearchEnd) {
 						maxDicWordEnd = curSearchEnd;
 					}
 
-					// 1.4)
+					// 1.3)
 					// 更新词语最大长度变量的值
 					if (curSearchOffset == offset
 							&& maxDicWordLength < curSearchLength) {
 						maxDicWordLength = curSearchLength;
+					}
+					
+					// 1.2)
+					// 通知collector本次找到的词语
+					Word word = curSearch.getWord();
+					if (!word.isNoise()) {
+						collector.collect(word.getText(), curSearchOffset,
+							curSearchEnd);
 					}
 				}
 
@@ -258,10 +258,9 @@ public class CJKKnife implements Knife, DictionariesWare {
 				continue;
 			}
 
-			// 孤立字符串是否是没有在CJK词汇表的，但确实noise词典规定的noise词汇时
 			// 魔幻逻辑：
-			// noiseWords的词在语言学上虽然也是词，但CJKKnife不会把它当成词汇表中的词，
-			// 从而被视为孤立字符串在此处理(不被视为词汇、不进行二元分词)
+			// noiseWords的词在语言学上虽然也是词，但CJKKnife不会把它当成词汇表中的正常词，
+			// 有些noise词可能没有出现词汇表，则就会被视为孤立字符串在此处理(不被视为词汇、不进行二元分词)
 			tempEnd = skipNoiseWords(collector, beef, curSearchOffset, limit,
 					binOffset);
 			if (tempEnd > curSearchOffset) {
@@ -368,7 +367,7 @@ public class CJKKnife implements Knife, DictionariesWare {
 				}
 				i --;
 				if (wd2 != null) {
-					collector.collect(wd2.getWord(), curTail, i);
+					collector.collect(wd2.getWord().getText(), curTail, i);
 					return i;
 				}
 			}

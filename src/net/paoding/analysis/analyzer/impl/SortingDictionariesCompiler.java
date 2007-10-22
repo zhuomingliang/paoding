@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import net.paoding.analysis.Constants;
 import net.paoding.analysis.dictionary.Dictionary;
+import net.paoding.analysis.dictionary.Word;
 import net.paoding.analysis.knife.Dictionaries;
 import net.paoding.analysis.knife.DictionariesCompiler;
 import net.paoding.analysis.knife.Knife;
@@ -120,7 +121,13 @@ public class SortingDictionariesCompiler implements DictionariesCompiler {
 				new FileOutputStream(dicFile), 1024 * 16);
 		
 		for (int i = 0; i < wordsSize; i++) {
-			out.write(dictionary.get(i).getBytes(charsetName));
+			Word word = dictionary.get(i);
+			out.write(word.getText().getBytes(charsetName));
+			if (word.getModifiers() != Word.DEFAUL) {
+				out.write("[m=".getBytes());
+				out.write(String.valueOf(word.getModifiers()).getBytes());
+				out.write(']');
+			}
 			out.write('\r');
 			out.write('\n');
 		}

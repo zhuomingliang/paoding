@@ -149,7 +149,7 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			}
 			i --;
 			if (wd2 != null) {
-				collector.collect(wd2.getWord(), curTail, i);
+				collector.collect(wd2.getWord().getText(), curTail, i);
 				return i;
 			}
 		}
