@@ -23,7 +23,7 @@ package net.paoding.analysis.knife;
  */
 public class LetterKnife extends CombinatoricsKnife {
 
-	public static final String[] DEFAULT_NOISE = { "and", "are", "as", "at",
+	public static final String[] DEFAULT_NOISE = { "a", "an", "and", "are", "as", "at",
 			"be", "but", "by", "for", "if", "in", "into", "is", "it", "no",
 			"not", "of", "on", "or", "such", "that", "the", "their", "then",
 			"there", "these", "they", "this", "to", "was", "will", "with",
@@ -51,11 +51,5 @@ public class LetterKnife extends CombinatoricsKnife {
 		return LIMIT;
 	}
 	
-	protected void doCollect(Collector collector, String word, Beef beef,
-			int offset, int end) {
-		if (word.length() > 1 || (beef.charAt(end) > 0 && !Character.isSpaceChar(beef.charAt(end)))) {
-			collector.collect(word, offset, end);
-		}
-	}
 
 }

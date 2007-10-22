@@ -86,21 +86,24 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 			return -offset;
 		}
 
-		// 收集从offset分别到point以及limit的词
-		// 注意这里不收集从point到limit的词
-		// ->当然可能从point到limit的字符也可能是一个词，不过这不是本次分解的责任
-		// ->如果认为它应该是个词，那么只要配置对应的其它Knife实例，该Knife会有机会把它切出来的
-		// ->因为我们会返回point作为下一个Knife分词的开始。
-
-		int pointVote = collectPoint(collector, beef, offset, point, limit);
-		int limitVote = collectLimit(collector, beef, offset, point, limit);
-
 		// 检索是否有以该词语位前缀的词典词语
 		// 若有，则将它解出
 		int dicWordVote = -1;
 		if (combinatoricsDictionary != null && beef.charAt(limit) > 0xFF) {
 			dicWordVote = tryDicWord(collector, beef, offset, limit);
 		}
+
+		// 收集从offset分别到point以及limit的词
+		// 注意这里不收集从point到limit的词
+		// ->当然可能从point到limit的字符也可能是一个词，不过这不是本次分解的责任
+		// ->如果认为它应该是个词，那么只要配置对应的其它Knife实例，该Knife会有机会把它切出来的
+		// ->因为我们会返回point作为下一个Knife分词的开始。
+
+		int pointVote = collectPoint(collector, beef, offset, point, limit,
+				dicWordVote);
+		int limitVote = collectLimit(collector, beef, offset, point, limit,
+				dicWordVote);
+
 		return nextOffset(beef, offset, point, limit, pointVote, limitVote,
 				dicWordVote);
 	}
@@ -122,8 +125,8 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 	 * @return 投票下一个Knife开始分词的位置；-1表示弃权。默认方法实现：弃权。
 	 */
 	protected int collectPoint(Collector collector, Beef beef, int offset,
-			int point, int limit) {
-		if (point != -1) {
+			int point, int limit, int dicWordVote) {
+		if (point != -1 && dicWordVote == -1) {
 			collectIfNotNoise(collector, beef, offset, point);
 		}
 		return -1;
@@ -143,11 +146,16 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 	 *            本次分解的内容的第一个POINT性质字符的位置，-1表示不存在该性质的字符
 	 * @param limit
 	 *            本次分解的内容的LIMIT性质字符
+	 * 
+	 * @param dicWordVote 
+	 * 
 	 * @return 投票下一个Knife开始分词的位置；-1表示弃权。默认方法实现：弃权。
 	 */
 	protected int collectLimit(Collector collector, Beef beef, int offset,
-			int point, int limit) {
-		collectIfNotNoise(collector, beef, offset, limit);
+			int point, int limit, int dicWordVote) {
+		if (dicWordVote == -1) {
+			collectIfNotNoise(collector, beef, offset, limit);
+		}
 		return -1;
 	}
 
