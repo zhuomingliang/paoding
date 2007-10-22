@@ -233,7 +233,7 @@ public class TryPaodingAnalyzer {
 		if (!titlePrinted) {
 			System.out.println();
 			if (!welcomePrinted) {
-				System.out.println("Welcome to Paoding Analyser(2.0.2)");
+				System.out.println("Welcome to Paoding Analyser(2.0.4-alpha2)");
 				System.out.println();
 				welcomePrinted = true;
 			}
