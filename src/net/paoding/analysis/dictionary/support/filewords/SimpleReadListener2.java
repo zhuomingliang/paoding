@@ -69,19 +69,18 @@ public class SimpleReadListener2 implements ReadListener {
 				|| wordText.charAt(0) == '-') {
 			return;
 		}
-		int index = wordText.indexOf('[');
-		if (index == -1) {
+		
+		if (!wordText.endsWith("]")) {
 			words.add(new Word(wordText));
 		}
 		else {
+			int index = wordText.indexOf('[');
 			Word w = new Word(wordText.substring(0, index));
 			int mindex = wordText.indexOf("m=", index);
-			if (mindex != -1) {
-				int mEndIndex = wordText.indexOf("]", mindex);
-				String m = wordText.substring(mindex + "m=".length(), mEndIndex);
-				w.setModifiers(Integer.parseInt(m));
-				words.add(w);
-			}
+			int mEndIndex = wordText.indexOf("]", mindex);
+			String m = wordText.substring(mindex + "m=".length(), mEndIndex);
+			w.setModifiers(Integer.parseInt(m));
+			words.add(w);
 		}
 	}
 

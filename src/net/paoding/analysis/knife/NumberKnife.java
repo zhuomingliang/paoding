@@ -62,10 +62,10 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 	}
 	
 	protected int collectLimit(Collector collector, Beef beef,
-			int offset, int point, int limit) {
+			int offset, int point, int limit, int dicWordVote) {
 		// "123abc"的直接调用super的
 		if (point != -1) {
-			return super.collectLimit(collector, beef, offset, point, limit);
+			return super.collectLimit(collector, beef, offset, point, limit, dicWordVote);
 		}
 		// 
 		// 2.2两
@@ -129,7 +129,7 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			doCollect(collector, String.valueOf(number1), beef, offset, curTail);
 		}
 		else {
-			super.collectLimit(collector, beef, offset, point, limit);
+			super.collectLimit(collector, beef, offset, point, limit, dicWordVote);
 		}
 		
 		curTail = curTail > limit ? curTail : limit;
