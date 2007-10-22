@@ -179,7 +179,7 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 				break;
 			} else if (hit.isHit()) {
 				collectIfNotNoise(collector, beef, offset, end);
-				// 每前进1个位置收到词语，将ret自增
+				// 收到词语，将ret设置为该词语的end
 				ret = end;
 			}
 			// gotoNextChar为true表示在词典中存在以当前词为开头的词，
@@ -189,7 +189,7 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 				break;
 			}
 		}
-		return ret == limit ? -1 : ret;
+		return ret <= limit ? -1 : ret;
 		// TODO:
 		// 存在的局限:
 		// 刚好词语分隔在两次beef之中，比如"U"刚好是此次beef的最后字符，而"盘"是下一次beef的第一个字符
