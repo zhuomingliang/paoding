@@ -180,7 +180,7 @@ public abstract class CombinatoricsKnife implements Knife, DictionariesWare {
 			} else if (hit.isHit()) {
 				collectIfNotNoise(collector, beef, offset, end);
 				// 每前进1个位置收到词语，将ret自增
-				ret++;
+				ret = end;
 			}
 			// gotoNextChar为true表示在词典中存在以当前词为开头的词，
 			boolean gotoNextChar = hit.isUnclosed() && end < beef.length()
