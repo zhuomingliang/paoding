@@ -43,7 +43,7 @@ public interface Dictionary {
 	 *            0,1,2,...,size-1
 	 * @return
 	 */
-	public String get(int index);
+	public Word get(int index);
 
 	/**
 	 * 搜索词典是否收集input[offset]到input[offset+count-1]之间字符串(包含边界)的词。<br>

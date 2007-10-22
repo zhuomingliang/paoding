@@ -15,6 +15,7 @@ import java.util.Properties;
 import net.paoding.analysis.Constants;
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.Hit;
+import net.paoding.analysis.dictionary.Word;
 import net.paoding.analysis.knife.Beef;
 import net.paoding.analysis.knife.Collector;
 import net.paoding.analysis.knife.Dictionaries;
@@ -140,7 +141,13 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 				new FileOutputStream(dicFile), 1024 * 16);
 		
 		for (int i = 0; i < wordsSize; i++) {
-			out.write(dictionary.get(i).getBytes(charsetName));
+			Word word = dictionary.get(i);
+			out.write(word.getText().getBytes(charsetName));
+			if (word.getModifiers() != Word.DEFAUL) {
+				out.write("[m=".getBytes());
+				out.write(String.valueOf(word.getModifiers()).getBytes());
+				out.write(']');
+			}
 			out.write('\r');
 			out.write('\n');
 		}
@@ -153,11 +160,11 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 			File vocabularyFile, String charsetName) throws FileNotFoundException,
 			IOException, UnsupportedEncodingException {
 		int vocabularySize = vocabularyDictionary.size();
-		String[] vocabularyWords = new String[vocabularySize];
+		Word[] vocabularyWords = new Word[vocabularySize];
 		char[] chs = new char[128];
 		for (int i = 0; i < vocabularySize; i ++) {
-			final String curWord = vocabularyDictionary.get(i);
-			curWord.getChars(0, curWord.length(), chs, 0);
+			final Word curWord = vocabularyDictionary.get(i);
+			curWord.getText().getChars(0, curWord.length(), chs, 0);
 			chs[curWord.length()] = (char) -1;
 			Beef beef = new Beef(chs, 0, curWord.length() + 1);
 			final BitSet bs = new BitSet(curWord.length());
@@ -189,7 +196,12 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 		
 		for (int i = 0; i < vocabularySize; i++) {
 			if (vocabularyWords[i] != null) {
-				out.write(vocabularyWords[i].getBytes(charsetName));
+				out.write(vocabularyWords[i].getText().getBytes(charsetName));
+				if (vocabularyWords[i].getModifiers() != Word.DEFAUL) {
+					out.write("[m=".getBytes());
+					out.write(String.valueOf(vocabularyWords[i].getModifiers()).getBytes());
+					out.write(']');
+				}
 				out.write('\r');
 				out.write('\n');
 			}

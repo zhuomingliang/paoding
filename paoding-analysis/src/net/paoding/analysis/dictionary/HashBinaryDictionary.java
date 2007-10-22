@@ -42,7 +42,7 @@ public class HashBinaryDictionary implements Dictionary {
 	/**
 	 * 字典中所有词语，用于方便{@link #get(int)}方法
 	 */
-	private String[] ascWords;
+	private Word[] ascWords;
 
 	/**
 	 * 首字符到分词典的映射
@@ -67,12 +67,12 @@ public class HashBinaryDictionary implements Dictionary {
 	 * @param initialCapacity
 	 * @param loadFactor
 	 */
-	public HashBinaryDictionary(String[] ascWords, int initialCapacity,
+	public HashBinaryDictionary(Word[] ascWords, int initialCapacity,
 			float loadFactor) {
 		this(ascWords, 0, 0, ascWords.length, initialCapacity, loadFactor);
 	}
 
-	public HashBinaryDictionary(String[] ascWords, int hashIndex, int start,
+	public HashBinaryDictionary(Word[] ascWords, int hashIndex, int start,
 			int end, int initialCapacity, float loadFactor) {
 		this.ascWords = ascWords;
 		this.start = start;
@@ -111,7 +111,7 @@ public class HashBinaryDictionary implements Dictionary {
 		addSubDictionary(beginHashChar, beginIndex, this.end);
 	}
 
-	protected char getChar(String s, int index) {
+	protected char getChar(CharSequence s, int index) {
 		if (index >= s.length()) {
 			return (char) 0;
 		}
@@ -132,7 +132,7 @@ public class HashBinaryDictionary implements Dictionary {
 		subs.put(keyOf(hashChar), subDicWrap);
 	}
 
-	protected Dictionary createSubDictionary(String[] ascWords, int beginIndex,
+	protected Dictionary createSubDictionary(Word[] ascWords, int beginIndex,
 			int endIndex) {
 		int count = endIndex - beginIndex;
 		if (count < 16) {
@@ -165,7 +165,7 @@ public class HashBinaryDictionary implements Dictionary {
 
 	// -------------------------------------------------
 
-	public String get(int index) {
+	public Word get(int index) {
 		return ascWords[start + index];
 	}
 
@@ -178,7 +178,7 @@ public class HashBinaryDictionary implements Dictionary {
 		Dictionary dic = subDic.dic;
 		// 对count==hashIndex + 1的处理
 		if (count == hashIndex + 1) {
-			String header = dic.get(0);
+			Word header = dic.get(0);
 			if (header.length() == hashIndex + 1) {
 				if (subDic.wordIndexOffset + 1 < this.ascWords.length) {
 					return new Hit(subDic.wordIndexOffset, header,

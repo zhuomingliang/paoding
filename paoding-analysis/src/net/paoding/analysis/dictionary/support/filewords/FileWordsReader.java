@@ -38,14 +38,14 @@ import net.paoding.analysis.knife.CharSet;
  */
 public class FileWordsReader {
 
-	public static Map/*<String, Set<String>>*/ readWords(
+	public static Map/*<String, Set<Word>>*/ readWords(
 			String fileOrDirectory, String charsetName) throws IOException {
 		SimpleReadListener l = new SimpleReadListener();
 		readWords(fileOrDirectory, l, charsetName);
 		return l.getResult();
 	}
 	
-	public static Map/*<String, Collection<String>>*/ readWords(
+	public static Map/*<String, Collection<Word>>*/ readWords(
 			String fileOrDirectory, String charsetName, Class collectionClass, String ext) throws IOException {
 		SimpleReadListener2 l = new SimpleReadListener2(collectionClass, ext);
 		readWords(fileOrDirectory, l, charsetName);

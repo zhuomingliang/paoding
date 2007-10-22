@@ -20,19 +20,19 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 
-import net.paoding.analysis.knife.CharSet;
+import net.paoding.analysis.dictionary.Word;
 
 /**
- * 
+ * 本类用于读取编译后的词典
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
  * 
  * @since 1.0
  * 
  */
 public class SimpleReadListener2 implements ReadListener {
-	private Map/* <String, List<String>> */dics = new Hashtable/* <String, List<String>> */();
+	private Map/* <String, Collection<Word>> */dics = new Hashtable/* <String, Collection<String>> */();
 	private Class collectionClass = HashSet.class;
-	private Collection/* <String> */words;
+	private Collection/* <Word> */words;
 	private String ext = ".dic";
 
 	public SimpleReadListener2(Class collectionClass, String ext) {
@@ -63,38 +63,29 @@ public class SimpleReadListener2 implements ReadListener {
 		words = null;
 	}
 
-	public void onWord(String word) {
-		word = word.trim().toLowerCase();
-		if (word.length() == 0 || word.charAt(0) == '#'
-				|| word.charAt(0) == '-') {
+	public void onWord(String wordText) {
+		wordText = wordText.trim().toLowerCase();
+		if (wordText.length() == 0 || wordText.charAt(0) == '#'
+				|| wordText.charAt(0) == '-') {
 			return;
 		}
-		// 去除汉字数字词
-		for (int i = 0; i < word.length(); i++) {
-			char ch = word.charAt(i);
-			int num = CharSet.toNumber(ch);
-			if (num >= 0) {
-				if (i == 0) {
-					if (num > 10) {// "十二" vs "千万"
-						break;
-					}
-				}
-				if (num == 2) {
-					if (word.equals("两") || word.equals("两两")) {
-						break;
-					}
-				}
-				if (i + 1 == word.length()) {
-					return;
-				}
-			} else {
-				break;
+		int index = wordText.indexOf('[');
+		if (index == -1) {
+			words.add(new Word(wordText));
+		}
+		else {
+			Word w = new Word(wordText.substring(0, index));
+			int mindex = wordText.indexOf("m=", index);
+			if (mindex != -1) {
+				int mEndIndex = wordText.indexOf("]", mindex);
+				String m = wordText.substring(mindex + "m=".length(), mEndIndex);
+				w.setModifiers(Integer.parseInt(m));
+				words.add(w);
 			}
 		}
-		words.add(word);
 	}
 
-	public Map/* <String, Set<String>> */getResult() {
+	public Map/* <String, Collection<Word>> */getResult() {
 		return dics;
 	}
 

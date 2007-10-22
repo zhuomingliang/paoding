@@ -26,6 +26,8 @@ import java.util.Set;
 import net.paoding.analysis.dictionary.BinaryDictionary;
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.HashBinaryDictionary;
+import net.paoding.analysis.dictionary.Hit;
+import net.paoding.analysis.dictionary.Word;
 import net.paoding.analysis.dictionary.support.detection.Detector;
 import net.paoding.analysis.dictionary.support.detection.DifferenceListener;
 import net.paoding.analysis.dictionary.support.detection.ExtensionFileFilter;
@@ -194,6 +196,21 @@ public class FileDictionaries implements Dictionaries {
 			// 大概有5639个字有词语，故取0x2fff=x^13>8000>8000*0.75=6000>5639
 			vocabularyDictionary = new HashBinaryDictionary(
 					getVocabularyWords(), 0x2fff, 0.75f);
+			Dictionary noiseWordsDic = getNoiseWordsDictionary();
+			for (int i = 0; i < noiseWordsDic.size(); i++) {
+				Hit hit = vocabularyDictionary.search(noiseWordsDic.get(i), 0, noiseWordsDic.get(i).length());
+				if (hit.isHit()) {
+					hit.getWord().setNoiseWord();
+				}
+			}
+			Dictionary noiseCharactorsDic = getNoiseCharactorsDictionary();
+			for (int i = 0; i < noiseCharactorsDic.size(); i++) {
+				Hit hit = vocabularyDictionary.search(noiseCharactorsDic.get(i), 0, noiseCharactorsDic.get(i).length());
+				if (hit.isHit()) {
+					hit.getWord().setNoiseCharactor();
+				}
+			}
+			
 		}
 		return vocabularyDictionary;
 	}
@@ -333,61 +350,48 @@ public class FileDictionaries implements Dictionaries {
 	// ---------------------------------------------------------------
 	// 以下为辅助性的方式-类私有或package私有
 
-	protected String[] getVocabularyWords() {
-		Map/* <String, Set<String>> */dics = loadAllWordsIfNecessary();
-		Set/* <String> */set = null;
-		Iterator/* <String> */iter = dics.keySet().iterator();
+	protected Word[] getVocabularyWords() {
+		Map/* <String, Set<Word>> */dics = loadAllWordsIfNecessary();
+		Set/* <Word> */set = null;
+		Iterator/* <Word> */iter = dics.keySet().iterator();
 		while (iter.hasNext()) {
 			String name = (String) iter.next();
 			if (isSkipForVacabulary(name)) {
 				continue;
 			}
-			Set/* <String> */dic = (Set/* <String> */) dics.get(name);
+			Set/* <Word> */dic = (Set/* <Word> */) dics.get(name);
 			if (set == null) {
-				set = new HashSet/* <String> */(dic);
+				set = new HashSet/* <Word> */(dic);
 			} else {
 				set.addAll(dic);
 			}
 		}
-		// 根据CJKKnife的要求，这里将noise词、字从词汇表移出，以免在切词把他们视为词典规定的成词，而还要从另外判断移出。
-		String[] noiseWordDic = getNoiseWords();
-		if (noiseWordDic != null) {
-			for (int i = 0; i < noiseWordDic.length; i++) {
-				set.remove(noiseWordDic[i]);
-			}
-		}
-		String[] noiseCharactorDic = getNoiseCharactors();
-		if (noiseCharactorDic != null) {
-			for (int i = 0; i < noiseCharactorDic.length; i++) {
-				set.remove(noiseCharactorDic[i]);
-			}
-		}
-		String[] words = (String[]) set.toArray(new String[set.size()]);
+		Word[] words = (Word[]) set.toArray(new Word[set.size()]);
 		Arrays.sort(words);
 		return words;
 	}
 
-	protected String[] getConfucianFamilyNames() {
+	protected Word[] getConfucianFamilyNames() {
 		return getDictionaryWords(confucianFamilyName);
 	}
 
-	protected String[] getNoiseWords() {
+	protected Word[] getNoiseWords() {
 		return getDictionaryWords(noiseWord);
 	}
 
-	protected String[] getNoiseCharactors() {
+	protected Word[] getNoiseCharactors() {
 		return getDictionaryWords(noiseCharactor);
 	}
 
-	protected String[] getUnits() {
+	protected Word[] getUnits() {
 		return getDictionaryWords(unit);
 	}
 
-	protected String[] getCombinatoricsWords() {
+	protected Word[] getCombinatoricsWords() {
 		return getDictionaryWords(combinatorics);
 	}
 
-	protected String[] getDictionaryWords(String dicNameRelativeDicHome) {
+	protected Word[] getDictionaryWords(String dicNameRelativeDicHome) {
 		Map dics;
 		try {
 			dics = FileWordsReader.readWords(dicHome + "/"
@@ -395,9 +399,8 @@ public class FileDictionaries implements Dictionaries {
 		} catch (IOException e) {
 			throw toRuntimeException(e);
 		}
-		Set/* <String> */set = (Set/* <String> */) dics
-				.get(dicNameRelativeDicHome);
-		String[] words = (String[]) set.toArray(new String[set.size()]);
+		Set/* <Word> */set = (Set/* <Word> */) dics.get(dicNameRelativeDicHome);
+		Word[] words = (Word[]) set.toArray(new Word[set.size()]);
 		Arrays.sort(words);
 		return words;
 	}
