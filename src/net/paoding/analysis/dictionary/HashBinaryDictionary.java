@@ -90,10 +90,14 @@ public class HashBinaryDictionary implements Dictionary {
 	 * 创建分词典映射，为构造函数调用
 	 */
 	protected void createSubDictionaries() {
+		if (this.start >= ascWords.length) {
+			return;
+		}
+		
 		// 定位相同头字符词语的开头和结束位置以确认分字典
 		int beginIndex = this.start;
 		int endIndex = this.start + 1;
-
+		
 		char beginHashChar = getChar(ascWords[start], hashIndex);
 		char endHashChar;
 		for (; endIndex < this.end; endIndex++) {
