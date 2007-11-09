@@ -120,7 +120,7 @@ public class PaodingAnalyzerBean extends Analyzer {
 		try {
 			this.modeClass = Class.forName(modeClass);
 		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException("not found mode class", e);
+			throw new IllegalArgumentException("not found mode class:" + e.getMessage());
 		}
 	}
 
@@ -157,9 +157,9 @@ public class PaodingAnalyzerBean extends Analyzer {
 			try {
 				return (TokenCollector) modeClass.newInstance();
 			} catch (InstantiationException e) {
-				throw new IllegalArgumentException("wrong mode class", e);
+				throw new IllegalArgumentException("wrong mode class:" + e.getMessage());
 			} catch (IllegalAccessException e) {
-				throw new IllegalArgumentException("wrong mode class", e);
+				throw new IllegalArgumentException("wrong mode class:" + e.getMessage());
 			}
 		}
 		switch (mode) {

@@ -275,8 +275,7 @@ public class PaodingMaker {
 		// 但是如果属性文件中强制配置paoding.dic.home.config-first=this，
 		// 则优先考虑属性文件的paoding.dic.home配置，
 		// 此时只有当属性文件没有配置paoding.dic.home时才会采用环境变量的配置
-		String dicHomeBySystemEnv = System
-				.getenv(Constants.ENV_PAODING_DIC_HOME);
+		String dicHomeBySystemEnv = System.getenv(Constants.ENV_PAODING_DIC_HOME);
 		String dicHome = getProperty(p, Constants.DIC_HOME);
 		if (dicHomeBySystemEnv != null) {
 			String first = getProperty(p, Constants.DIC_HOME_CONFIG_FIRST);
@@ -383,15 +382,18 @@ public class PaodingMaker {
 					
 					// 启动字典动态转载/卸载检测器
 					// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
-					String interval = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
-					dictionaries.startDetecting(Integer.parseInt(interval), new DifferenceListener() {
-						public void on(Difference diff) throws Exception {
-							dictionaries.stopDetecting();
-							// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
-							// 重新编译源词典、重新创建并启动dictionaries自检测
-							run();
-						}
-					});
+					String intervalStr = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
+					int interval = Integer.parseInt(intervalStr);
+					if (interval > 0 ) {
+						dictionaries.startDetecting(interval, new DifferenceListener() {
+							public void on(Difference diff) throws Exception {
+								dictionaries.stopDetecting();
+								// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
+								// 重新编译源词典、重新创建并启动dictionaries自检测
+								run();
+							}
+						});
+					}
 				}
 			}.run();
 			// Paoding对象创建成功！此时可以将它寄放到paodingHolder中，给下次重复利用

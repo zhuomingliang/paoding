@@ -88,7 +88,7 @@ public class SortingDictionariesCompiler implements DictionariesCompiler {
 		//
 		File compliedMetadataFile = new File(dicHomeFile, ".compiled/sorting/.metadata");
 		if (compliedMetadataFile.exists()) {
-			compliedMetadataFile.setWritable(true);
+			//compliedMetadataFile.setWritable(true);
 			compliedMetadataFile.delete();
 		}
 		else {
