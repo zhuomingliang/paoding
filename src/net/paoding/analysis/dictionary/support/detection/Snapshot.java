@@ -151,15 +151,34 @@ public class Snapshot {
 		System.out.println("----");
 		Snapshot snapshot2 = Snapshot.flash(f, null);
 		Difference diff = snapshot2.diff(snapshot1);
-		String deleted = Arrays.toString(diff.getDeleted().toArray(
+		String deleted = ArraysToString(diff.getDeleted().toArray(
 				new Node[] {}));
 		System.out.println("deleted: " + deleted);
-		String modified = Arrays.toString(diff.getModified().toArray(
+		String modified = ArraysToString(diff.getModified().toArray(
 				new Node[] {}));
 		System.out.println("modified: " + modified);
-		String newcome = Arrays.toString(diff.getNewcome().toArray(
+		String newcome = ArraysToString(diff.getNewcome().toArray(
 				new Node[] {}));
 		System.out.println("newcome: " + newcome);
+	}
+	
+
+	// 低于JDK1.5无Arrays.toString()方法，故有以下方法
+	private static String ArraysToString(Object[] a) {
+		if (a == null)
+			return "null";
+		int iMax = a.length - 1;
+		if (iMax == -1)
+			return "[]";
+
+		StringBuffer b = new StringBuffer();
+		b.append('[');
+		for (int i = 0;; i++) {
+			b.append(String.valueOf(a[i]));
+			if (i == iMax)
+				return b.append(']').toString();
+			b.append(", ");
+		}
 	}
 
 	// --------------------------------------------

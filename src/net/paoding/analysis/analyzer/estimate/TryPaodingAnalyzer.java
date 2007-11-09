@@ -200,7 +200,7 @@ public class TryPaodingAnalyzer {
 
 	private static void printHelp() {
 		String app = System.getProperty("paoding.try.app",
-				TryPaodingAnalyzer.class.getSimpleName());
+				"TryPaodingAnalyzer");
 		String cmd = System.getProperty("paoding.try.cmd", "java "
 				+ TryPaodingAnalyzer.class.getName());
 		System.out.println(app + "的用法:");
@@ -288,7 +288,8 @@ public class TryPaodingAnalyzer {
 		}
 		char[] chs = new char[1024];
 		int count;
-		StringBuilder content = new StringBuilder();
+		// 为兼容低版本的JDK，使用StringBuffer而不是StringBuilder
+		StringBuffer content = new StringBuffer();
 		while ((count = re.read(chs)) != -1) {
 			content.append(chs, 0, count);
 		}

@@ -91,8 +91,8 @@ public class PaodingAnalyzer extends PaodingAnalyzerBean {
 	 */
 	public static void main(String[] args) {
 		if (System.getProperty("paoding.try.app") == null) {
-			System.setProperty("paoding.try.app", PaodingAnalyzer.class.getSimpleName());
-			System.setProperty("paoding.try.cmd", "java " + PaodingAnalyzer.class.getName());
+			System.setProperty("paoding.try.app", "PaodingAnalyzer");
+			System.setProperty("paoding.try.cmd", "java PaodingAnalyzer");
 		}
 		TryPaodingAnalyzer.main(args);
 	}

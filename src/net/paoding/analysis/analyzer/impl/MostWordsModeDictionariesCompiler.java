@@ -90,7 +90,7 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 		//
 		File compliedMetadataFile = new File(dicHomeFile, ".compiled/most-words-mode/.metadata");
 		if (compliedMetadataFile.exists()) {
-			compliedMetadataFile.setWritable(true);
+			//compliedMetadataFile.setWritable(true);
 			compliedMetadataFile.delete();
 		}
 		else {
@@ -134,7 +134,7 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 			IOException, UnsupportedEncodingException {
 		int wordsSize = dictionary.size();
 		if (dicFile.exists()) {
-			dicFile.setWritable(true);
+			//dicFile.setWritable(true);
 			dicFile.delete();
 		}
 		BufferedOutputStream out = new BufferedOutputStream(
@@ -188,7 +188,7 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 			}
 		}
 		if (vocabularyFile.exists()) {
-			vocabularyFile.setWritable(true);
+			//vocabularyFile.setWritable(true);
 			vocabularyFile.delete();
 		}
 		BufferedOutputStream out = new BufferedOutputStream(
