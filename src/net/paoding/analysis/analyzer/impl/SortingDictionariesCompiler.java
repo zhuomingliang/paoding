@@ -114,7 +114,7 @@ public class SortingDictionariesCompiler implements DictionariesCompiler {
 			IOException, UnsupportedEncodingException {
 		int wordsSize = dictionary.size();
 		if (dicFile.exists()) {
-			dicFile.setWritable(true);
+			//dicFile.setWritable(true);
 			dicFile.delete();
 		}
 		BufferedOutputStream out = new BufferedOutputStream(
