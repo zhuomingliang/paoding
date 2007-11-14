@@ -582,7 +582,7 @@ public class PaodingMaker {
 
 	private static String getSystemEnv(String name) {
 		try {
-			//return System.getenv(name);
+			return System.getenv(name);
 		} catch (Error error) {
 			String osName = System.getProperty("os.name").toLowerCase();
 			try {
