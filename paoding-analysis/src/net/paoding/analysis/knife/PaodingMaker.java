@@ -15,11 +15,13 @@
  */
 package net.paoding.analysis.knife;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
@@ -111,7 +113,6 @@ public class PaodingMaker {
 		return implMake(p);
 	}
 
-
 	// --------------------------------------------------
 
 	public static Properties getProperties() {
@@ -130,7 +131,8 @@ public class PaodingMaker {
 				propertiesHolder.set(path, p);
 				paodingHolder.remove(path);
 				postPropertiesLoaded(p);
-				String absolutePaths = p.getProperty("paoding.analysis.properties.files.absolutepaths");
+				String absolutePaths = p
+						.getProperty("paoding.analysis.properties.files.absolutepaths");
 				log.info("config paoding analysis from: " + absolutePaths);
 			}
 			return p;
@@ -139,11 +141,9 @@ public class PaodingMaker {
 		}
 	}
 
-
 	// -------------------私有 或 辅助方法----------------------------------
-	
-	private static boolean modified(Properties p)
-			throws IOException {
+
+	private static boolean modified(Properties p) throws IOException {
 		String lastModifieds = p
 				.getProperty("paoding.analysis.properties.lastModifieds");
 		String[] lastModifedsArray = lastModifieds.split(";");
@@ -151,7 +151,9 @@ public class PaodingMaker {
 		String[] filesArray = files.split(";");
 		for (int i = 0; i < filesArray.length; i++) {
 			File file = getFile(filesArray[i]);
-			if (file.exists() && !String.valueOf(getFileLastModified(file)).equals(lastModifedsArray[i])) {
+			if (file.exists()
+					&& !String.valueOf(getFileLastModified(file)).equals(
+							lastModifedsArray[i])) {
 				return true;
 			}
 		}
@@ -187,8 +189,7 @@ public class PaodingMaker {
 				File dicHome = new File(getDicHome(p));
 				path = path.substring("dic-home:".length());
 				file = new File(dicHome, path);
-			}
-			else {
+			} else {
 				file = new File(path);
 			}
 			if (skipWhenNotExists && !file.exists()) {
@@ -199,9 +200,11 @@ public class PaodingMaker {
 		absolutePath = file.getAbsolutePath();
 		p.load(in);
 		in.close();
-		String lastModifieds = p.getProperty("paoding.analysis.properties.lastModifieds");
+		String lastModifieds = p
+				.getProperty("paoding.analysis.properties.lastModifieds");
 		String files = p.getProperty("paoding.analysis.properties.files");
-		String absolutePaths = p.getProperty("paoding.analysis.properties.files.absolutepaths");
+		String absolutePaths = p
+				.getProperty("paoding.analysis.properties.files.absolutepaths");
 		if (lastModifieds == null) {
 			p.setProperty("paoding.dic.properties.path", path);
 			lastModifieds = String.valueOf(getFileLastModified(file));
@@ -212,9 +215,11 @@ public class PaodingMaker {
 			files = files + ";" + path;
 			absolutePaths = absolutePaths + ";" + absolutePath;
 		}
-		p.setProperty("paoding.analysis.properties.lastModifieds", lastModifieds);
+		p.setProperty("paoding.analysis.properties.lastModifieds",
+				lastModifieds);
 		p.setProperty("paoding.analysis.properties.files", files);
-		p.setProperty("paoding.analysis.properties.files.absolutepaths", absolutePaths);
+		p.setProperty("paoding.analysis.properties.files.absolutepaths",
+				absolutePaths);
 		String importsValue = p.getProperty("paoding.imports");
 		if (importsValue != null) {
 			p.remove("paoding.imports");
@@ -231,16 +236,16 @@ public class PaodingMaker {
 		int jarIndex = path.indexOf(".jar!");
 		if (jarIndex == -1) {
 			return file.lastModified();
-		}
-		else {
+		} else {
 			path = path.replaceAll("%20", " ").replaceAll("\\\\", "/");
 			int protocalIndex = path.indexOf(":");
-			String jarPath = path.substring(protocalIndex + ":".length(), jarIndex + ".jar".length());
+			String jarPath = path.substring(protocalIndex + ":".length(),
+					jarIndex + ".jar".length());
 			File jarPathFile = new File(jarPath);
 			JarFile jarFile;
 			try {
 				jarFile = new JarFile(jarPathFile);
-				String entryPath = path.substring(jarIndex  + ".jar!/".length());
+				String entryPath = path.substring(jarIndex + ".jar!/".length());
 				JarEntry entry = jarFile.getJarEntry(entryPath);
 				return entry.getTime();
 			} catch (IOException e) {
@@ -250,14 +255,15 @@ public class PaodingMaker {
 			}
 		}
 	}
-	
+
 	private static String getDicHome(Properties p) {
 		setDicHomeProperties(p);
 		return p.getProperty("paoding.dic.home.absolute.path");
 	}
 
 	private static void postPropertiesLoaded(Properties p) {
-		if ("done".equals(p.getProperty("paoding.analysis.postPropertiesLoaded"))) {
+		if ("done".equals(p
+				.getProperty("paoding.analysis.postPropertiesLoaded"))) {
 			return;
 		}
 		setDicHomeProperties(p);
@@ -265,7 +271,8 @@ public class PaodingMaker {
 	}
 
 	private static void setDicHomeProperties(Properties p) {
-		String dicHomeAbsultePath = p.getProperty("paoding.dic.home.absolute.path");
+		String dicHomeAbsultePath = p
+				.getProperty("paoding.dic.home.absolute.path");
 		if (dicHomeAbsultePath != null) {
 			return;
 		}
@@ -275,7 +282,12 @@ public class PaodingMaker {
 		// 但是如果属性文件中强制配置paoding.dic.home.config-first=this，
 		// 则优先考虑属性文件的paoding.dic.home配置，
 		// 此时只有当属性文件没有配置paoding.dic.home时才会采用环境变量的配置
-		String dicHomeBySystemEnv = System.getenv(Constants.ENV_PAODING_DIC_HOME);
+		String dicHomeBySystemEnv = null;
+		try {
+			dicHomeBySystemEnv = getSystemEnv(Constants.ENV_PAODING_DIC_HOME);
+		} catch (Error e) {
+			log.warn("System.getenv() is not supported in JDK1.4. ");
+		}
 		String dicHome = getProperty(p, Constants.DIC_HOME);
 		if (dicHomeBySystemEnv != null) {
 			String first = getProperty(p, Constants.DIC_HOME_CONFIG_FIRST);
@@ -313,19 +325,22 @@ public class PaodingMaker {
 			dicHome = dicHome + "/";
 		}
 		p.setProperty(Constants.DIC_HOME, dicHome);// writer to the properites
-													// object
+		// object
 		// 将dicHome转化为一个系统唯一的绝对路径，记录在属性对象中
 		File dicHomeFile = getFile(dicHome);
 		if (!dicHomeFile.exists()) {
-			throw new PaodingAnalysisException("not found the dic home dirctory! " + dicHomeFile.getAbsolutePath());
+			throw new PaodingAnalysisException(
+					"not found the dic home dirctory! "
+							+ dicHomeFile.getAbsolutePath());
 		}
-		if (!dicHomeFile.isDirectory()){
-			throw new PaodingAnalysisException("dic home should not be a file, but a directory!");
+		if (!dicHomeFile.isDirectory()) {
+			throw new PaodingAnalysisException(
+					"dic home should not be a file, but a directory!");
 		}
-		p.setProperty("paoding.dic.home.absolute.path", dicHomeFile.getAbsolutePath());
+		p.setProperty("paoding.dic.home.absolute.path", dicHomeFile
+				.getAbsolutePath());
 	}
 
-	
 	private static Paoding implMake(final Properties p) {
 		// 将要返回的Paoding对象，它可能是新创建的，也可能使用paodingHolder中已有的Paoding对象
 		Paoding paoding;
@@ -337,7 +352,7 @@ public class PaodingMaker {
 		// 如果该属性由文件读入，则文件地址作为Paoding对象在paodingHolder中的key
 		if (path != null) {
 			paodingKey = path;
-		// 否则以属性文件作为其key，之后只要进来的是同一个属性对象，都返回同一个Paoding对象
+			// 否则以属性文件作为其key，之后只要进来的是同一个属性对象，都返回同一个Paoding对象
 		} else {
 			paodingKey = p;
 		}
@@ -349,7 +364,8 @@ public class PaodingMaker {
 			paoding = createPaodingWithKnives(p);
 			final Paoding finalPaoding = paoding;
 			//
-			String compilerClassName = getProperty(p, Constants.ANALYZER_DICTIONARIES_COMPILER);
+			String compilerClassName = getProperty(p,
+					Constants.ANALYZER_DICTIONARIES_COMPILER);
 			Class compilerClass = null;
 			if (compilerClassName != null) {
 				compilerClass = Class.forName(compilerClassName);
@@ -359,13 +375,12 @@ public class PaodingMaker {
 				if ("most-words".equalsIgnoreCase(analyzerMode)
 						|| "default".equalsIgnoreCase(analyzerMode)) {
 					compilerClass = MostWordsModeDictionariesCompiler.class;
-				}
-				else {
+				} else {
 					compilerClass = SortingDictionariesCompiler.class;
 				}
 			}
-			final DictionariesCompiler compiler 
-				= (DictionariesCompiler)compilerClass.newInstance();
+			final DictionariesCompiler compiler = (DictionariesCompiler) compilerClass
+					.newInstance();
 			new Function() {
 				public void run() throws Exception {
 					// 编译词典-对词典进行可能的处理，以符合分词器的要求
@@ -375,24 +390,28 @@ public class PaodingMaker {
 						setDictionaries(tempPaoding, dictionaries);
 						compiler.compile(dictionaries, tempPaoding, p);
 					}
-					
+
 					// 使用编译后的词典
-					final Dictionaries dictionaries = compiler.readCompliedDictionaries(p);
+					final Dictionaries dictionaries = compiler
+							.readCompliedDictionaries(p);
 					setDictionaries(finalPaoding, dictionaries);
-					
+
 					// 启动字典动态转载/卸载检测器
 					// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
-					String intervalStr = getProperty(p, Constants.DIC_DETECTOR_INTERVAL);
+					String intervalStr = getProperty(p,
+							Constants.DIC_DETECTOR_INTERVAL);
 					int interval = Integer.parseInt(intervalStr);
-					if (interval > 0 ) {
-						dictionaries.startDetecting(interval, new DifferenceListener() {
-							public void on(Difference diff) throws Exception {
-								dictionaries.stopDetecting();
-								// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
-								// 重新编译源词典、重新创建并启动dictionaries自检测
-								run();
-							}
-						});
+					if (interval > 0) {
+						dictionaries.startDetecting(interval,
+								new DifferenceListener() {
+									public void on(Difference diff)
+											throws Exception {
+										dictionaries.stopDetecting();
+										// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
+										// 重新编译源词典、重新创建并启动dictionaries自检测
+										run();
+									}
+								});
 					}
 				}
 			}.run();
@@ -403,16 +422,20 @@ public class PaodingMaker {
 			throw new PaodingAnalysisException("", e);
 		}
 	}
-	
-	private static Paoding createPaodingWithKnives(Properties p) throws Exception {
+
+	private static Paoding createPaodingWithKnives(Properties p)
+			throws Exception {
 		// 如果PaodingHolder中并没有缓存该属性文件或对象对应的Paoding对象，
 		// 则根据给定的属性创建一个新的Paoding对象，并在返回之前存入paodingHolder
 		Paoding paoding = new Paoding();
-		
-		//寻找传说中的Knife。。。。
-		final Map /* <String, Knife> */ knifeMap = new HashMap /* <String, Knife> */ ();
-		final List /* <Knife> */ knifeList = new LinkedList/* <Knife> */();
-		final List /* <Function> */ functions = new LinkedList/* <Function> */();
+
+		// 寻找传说中的Knife。。。。
+		final Map /* <String, Knife> */knifeMap = new HashMap /*
+																 * <String,
+																 * Knife>
+																 */();
+		final List /* <Knife> */knifeList = new LinkedList/* <Knife> */();
+		final List /* <Function> */functions = new LinkedList/* <Function> */();
 		Iterator iter = p.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry e = (Map.Entry) iter.next();
@@ -420,32 +443,44 @@ public class PaodingMaker {
 			final String value = (String) e.getValue();
 			int index = key.indexOf(Constants.KNIFE_CLASS);
 			if (index == 0 && key.length() > Constants.KNIFE_CLASS.length()) {
-				final int end = key.indexOf('.', Constants.KNIFE_CLASS.length());
-				if (end  == -1) {
+				final int end = key
+						.indexOf('.', Constants.KNIFE_CLASS.length());
+				if (end == -1) {
 					Class clazz = Class.forName(value);
 					Knife knife = (Knife) clazz.newInstance();
 					knifeList.add(knife);
 					knifeMap.put(key, knife);
 					log.info("add knike: " + value);
-				}
-				else {
+				} else {
 					// 由于属性对象属于hash表，key的读取顺序不和文件的顺序一致，不能保证属性设置时，knife对象已经创建
 					// 所以这里只定义函数放到functions中，待到所有的knife都创建之后，在执行该程序
 					functions.add(new Function() {
 						public void run() throws Exception {
 							String knifeName = key.substring(0, end);
 							Object obj = knifeMap.get(knifeName);
-							if (!obj.getClass().getName().equals("org.springframework.beans.BeanWrapperImpl")) {
-								Class beanWrapperImplClass = Class.forName("org.springframework.beans.BeanWrapperImpl");
-								Method setWrappedInstance = beanWrapperImplClass.getMethod("setWrappedInstance", new Class[]{Object.class});
-								Object beanWrapperImpl = beanWrapperImplClass.newInstance();
-								setWrappedInstance.invoke(beanWrapperImpl, new Object[]{obj});
+							if (!obj
+									.getClass()
+									.getName()
+									.equals(
+											"org.springframework.beans.BeanWrapperImpl")) {
+								Class beanWrapperImplClass = Class
+										.forName("org.springframework.beans.BeanWrapperImpl");
+								Method setWrappedInstance = beanWrapperImplClass
+										.getMethod("setWrappedInstance",
+												new Class[] { Object.class });
+								Object beanWrapperImpl = beanWrapperImplClass
+										.newInstance();
+								setWrappedInstance.invoke(beanWrapperImpl,
+										new Object[] { obj });
 								knifeMap.put(knifeName, beanWrapperImpl);
 								obj = beanWrapperImpl;
 							}
 							String propertyName = key.substring(end + 1);
-							Method setPropertyValue = obj.getClass().getMethod("setPropertyValue", new Class[]{String.class, Object.class});
-							setPropertyValue.invoke(obj, new Object[]{propertyName, value});
+							Method setPropertyValue = obj.getClass().getMethod(
+									"setPropertyValue",
+									new Class[] { String.class, Object.class });
+							setPropertyValue.invoke(obj, new Object[] {
+									propertyName, value });
 						}
 					});
 				}
@@ -466,7 +501,8 @@ public class PaodingMaker {
 		String noiseCharactor = getProperty(p, Constants.DIC_NOISE_CHARACTOR);
 		String noiseWord = getProperty(p, Constants.DIC_NOISE_WORD);
 		String unit = getProperty(p, Constants.DIC_UNIT);
-		String confucianFamilyName = getProperty(p, Constants.DIC_CONFUCIAN_FAMILY_NAME);
+		String confucianFamilyName = getProperty(p,
+				Constants.DIC_CONFUCIAN_FAMILY_NAME);
 		String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
 		String charsetName = getProperty(p, Constants.DIC_CHARSET);
 		Dictionaries dictionaries = new FileDictionaries(getDicHome(p),
@@ -475,7 +511,8 @@ public class PaodingMaker {
 		return dictionaries;
 	}
 
-	private static void setDictionaries(Paoding paoding, Dictionaries dictionaries) {
+	private static void setDictionaries(Paoding paoding,
+			Dictionaries dictionaries) {
 		Knife[] knives = paoding.getKnives();
 		for (int i = 0; i < knives.length; i++) {
 			Knife knife = (Knife) knives[i];
@@ -484,7 +521,6 @@ public class PaodingMaker {
 			}
 		}
 	}
-
 
 	private static File getFile(String path) {
 		File file;
@@ -517,9 +553,9 @@ public class PaodingMaker {
 	private static String getProperty(Properties p, String name) {
 		return Constants.getProperty(p, name);
 	}
-	
-	//--------------------------------------------------------------------
-	
+
+	// --------------------------------------------------------------------
+
 	private static class ObjectHolder/* <T> */{
 
 		private ObjectHolder() {
@@ -539,9 +575,38 @@ public class PaodingMaker {
 			objects.remove(name);
 		}
 	}
-	
+
 	private static interface Function {
 		public void run() throws Exception;
+	}
+
+	private static String getSystemEnv(String name) {
+		try {
+			//return System.getenv(name);
+		} catch (Error error) {
+			String osName = System.getProperty("os.name").toLowerCase();
+			try {
+				String cmd;
+				if (osName.indexOf("win") != -1) {
+					cmd = "cmd /c SET";
+				} else {
+					cmd = "/usr/bin/printenv";
+				}
+				Process process = Runtime.getRuntime().exec(cmd);
+				InputStreamReader isr = new InputStreamReader(process.getInputStream());
+				BufferedReader br = new BufferedReader(isr); 
+				String line;
+				while((line = br.readLine()) != null && line.startsWith(name)) {
+					int index = line.indexOf(name + "=");
+					if (index != -1) {
+						return line.substring(index + name.length() + 1);
+					}
+				}
+			} catch (Exception e) {
+				log.warn("unable to read env from os．" + e.getMessage(), e);
+			}
+		}
+		return null;
 	}
 
 }
