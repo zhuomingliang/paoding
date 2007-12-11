@@ -238,6 +238,7 @@ public class PaodingMaker {
 			return file.lastModified();
 		} else {
 			path = path.replaceAll("%20", " ").replaceAll("\\\\", "/");
+			jarIndex = path.indexOf(".jar!");
 			int protocalIndex = path.indexOf(":");
 			String jarPath = path.substring(protocalIndex + ":".length(),
 					jarIndex + ".jar".length());
