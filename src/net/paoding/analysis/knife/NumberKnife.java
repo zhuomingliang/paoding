@@ -140,7 +140,11 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			Hit wd = null;
 			Hit wd2 = null;
 			int i = curTail + 1;
-			while ((wd = units.search(beef, curTail, i - curTail)).isHit()) {
+			
+			/*
+			 * Fix issue 48: 查找计量单位引起的高亮越界错误
+			 */
+			while (i <= limit && (wd = units.search(beef, curTail, i - curTail)).isHit()) {
 				wd2 = wd;
 				i++;
 				if (!wd.isUnclosed()) {
