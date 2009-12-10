@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -529,8 +530,19 @@ public class PaodingMaker {
 		if (path.startsWith("classpath:")) {
 			path = path.substring("classpath:".length());
 			url = getClassLoader().getResource(path);
+			
+			/*
+			 * Fix issue 42 : 读取配置文件的一个Bug
+			 */
+			if (url != null){
+				try {
+					path = url.toURI().getPath();
+				} catch (URISyntaxException e) {
+					path = url.getFile();
+				}
+			}
 			final boolean fileExist = url != null;
-			file = new File(fileExist ? url.getFile() : path) {
+			file = new File(path) {
 				private static final long serialVersionUID = 4009013298629147887L;
 
 				public boolean exists() {
