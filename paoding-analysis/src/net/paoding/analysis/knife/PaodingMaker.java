@@ -183,7 +183,11 @@ public class PaodingMaker {
 				throw new FileNotFoundException("Not found " + path
 						+ " in classpath.");
 			}
-			file = new File(url.getFile());
+			
+			/*
+			 * Fix issue 42 : 读取配置文件的一个Bug
+			 */
+			file = new File(getUrlPath(url));
 			in = url.openStream();
 		} else {
 			if (path.startsWith("dic-home:")) {
@@ -523,6 +527,17 @@ public class PaodingMaker {
 			}
 		}
 	}
+	
+	private static String getUrlPath(URL url){
+		if (url == null) return null;
+		String urlPath = null;
+		try {
+			urlPath = url.toURI().getPath();
+		} catch (URISyntaxException e) {
+			urlPath = url.getFile();
+		}			
+		return urlPath;
+	}
 
 	private static File getFile(String path) {
 		File file;
@@ -535,11 +550,7 @@ public class PaodingMaker {
 			 * Fix issue 42 : 读取配置文件的一个Bug
 			 */
 			if (url != null){
-				try {
-					path = url.toURI().getPath();
-				} catch (URISyntaxException e) {
-					path = url.getFile();
-				}
+				path = getUrlPath(url);
 			}
 			final boolean fileExist = url != null;
 			file = new File(path) {

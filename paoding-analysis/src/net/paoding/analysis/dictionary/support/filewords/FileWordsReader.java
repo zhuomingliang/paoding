@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,7 +62,7 @@ public class FileWordsReader {
 			if (url == null) {
 				throw new FileNotFoundException("file \"" + name + "\" not found in classpath!");
 			}
-			file = new File(url.getFile());
+			file = new File(getUrlPath(url));
 		}
 		else {
 			file = new File(fileOrDirectory);
@@ -121,6 +122,17 @@ public class FileWordsReader {
 			l.onFileEnd(name);
 			in.close();
 		}
+	}
+	
+	private static String getUrlPath(URL url){
+		if (url == null) return null;
+		String urlPath = null;
+		try {
+			urlPath = url.toURI().getPath();
+		} catch (URISyntaxException e) {
+			urlPath = url.getFile();
+		}			
+		return urlPath;
 	}
 	
 }
