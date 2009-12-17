@@ -533,9 +533,11 @@ public class PaodingMaker {
 		String urlPath = null;
 		try {
 			urlPath = url.toURI().getPath();
-		} catch (URISyntaxException e) {
-			urlPath = url.getFile();
+		} catch (URISyntaxException e) {			
 		}			
+		if (urlPath == null){
+			urlPath = url.getFile();
+		}
 		return urlPath;
 	}
 
