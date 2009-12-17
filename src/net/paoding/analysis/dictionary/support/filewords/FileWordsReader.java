@@ -130,8 +130,10 @@ public class FileWordsReader {
 		try {
 			urlPath = url.toURI().getPath();
 		} catch (URISyntaxException e) {
-			urlPath = url.getFile();
 		}			
+		if (urlPath == null){
+			urlPath = url.getFile();
+		}
 		return urlPath;
 	}
 	
