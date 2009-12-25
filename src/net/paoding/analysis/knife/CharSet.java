@@ -94,12 +94,17 @@ public class CharSet {
 		case '千':
 		case '仟':
 			return 1000;
+		/*
+		 * Fix issue 12: 溢出bug
+		 */
+		/*
 		case '万':
 		case '萬':
 			return 10000;
 		case '亿':
 		case '億':
 			return 100000000;
+		*/
 		default:
 			return -1;
 		}
