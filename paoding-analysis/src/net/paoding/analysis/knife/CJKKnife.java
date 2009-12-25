@@ -359,12 +359,17 @@ public class CJKKnife implements Knife, DictionariesWare {
 	protected int collectNumber(Collector collector, Beef beef, int offset,
 			int limit, int binOffset) {
 
+		/*
+		 * Fix : "百二十回" => 1020
+		 */
+		
 		// 当前尝试判断的字符的位置
 		int curTail = offset;
 		int number1 = -1;
 		int number2 = -1;
 		int bitValue = 0;
-		int maxUnit = 0;
+		int minUnit = 0;
+		int number2Start = curTail;
 		boolean hasDigit = false;// 作用：去除没有数字只有单位的汉字，如“万”，“千”
 		for (; curTail < limit
 				&& (bitValue = CharSet.toNumber(beef.charAt(curTail))) >= 0; curTail++) {
@@ -380,8 +385,10 @@ public class CJKKnife implements Knife, DictionariesWare {
 			// 处理连续汉字个位值的数字："三四五六" ->"3456"
 			if (bitValue >= 0 && bitValue < 10) {
 				hasDigit = true;
-				if (number2 < 0)
+				if (number2 < 0){
 					number2 = bitValue;
+					number2Start = curTail;
+				}
 				else {
 					number2 *= 10;
 					number2 += bitValue;
@@ -390,21 +397,43 @@ public class CJKKnife implements Knife, DictionariesWare {
 				if (number2 < 0) {
 					if (number1 < 0) {
 						number1 = 1;
+					} else {
+						//"一百十" => "一百" "十"
+						break;
 					}
-					number1 *= bitValue;
+					if (bitValue >= minUnit) {
+						if (minUnit == 0){
+							number1 *= bitValue;
+							minUnit = bitValue;
+						} else {
+							//"一千二百三十百" => "一千二百三十" "百"
+							break;
+						}
+					} else {
+						minUnit = bitValue;
+					}
 				} else {
 					if (number1 < 0) {
 						number1 = 0;
 					}
-					if (bitValue >= maxUnit) {
-						number1 += number2;
-						number1 *= bitValue;
-						maxUnit = bitValue;
+					if (bitValue >= minUnit) {
+						if (minUnit == 0){
+							number1 += number2;
+							number1 *= bitValue;
+							minUnit = bitValue;
+						} else {
+							//"一百二千" => "一百" "二千"
+							curTail = number2Start;
+							number2 = -1;
+							break;
+						}
 					} else {
+						minUnit = bitValue;
 						number1 += number2 * bitValue;
 					}
 				}
 				number2 = -1;
+				number2Start = -1;
 			}
 		}
 		if (!hasDigit) {
