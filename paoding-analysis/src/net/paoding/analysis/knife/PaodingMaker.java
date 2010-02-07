@@ -43,6 +43,10 @@ import net.paoding.analysis.exception.PaodingAnalysisException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.store.FSLockFactory;
+import org.apache.lucene.store.Lock;
+import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.store.NativeFSLockFactory;
 
 /**
  * 
@@ -389,35 +393,69 @@ public class PaodingMaker {
 					.newInstance();
 			new Function() {
 				public void run() throws Exception {
-					// 编译词典-对词典进行可能的处理，以符合分词器的要求
-					if (compiler.shouldCompile(p)) {
-						Dictionaries dictionaries = readUnCompiledDictionaries(p);
-						Paoding tempPaoding = createPaodingWithKnives(p);
-						setDictionaries(tempPaoding, dictionaries);
-						compiler.compile(dictionaries, tempPaoding, p);
-					}
+					System.out.println(">>>>>> run");
 
-					// 使用编译后的词典
-					final Dictionaries dictionaries = compiler
-							.readCompliedDictionaries(p);
-					setDictionaries(finalPaoding, dictionaries);
+					String LOCK_FILE = "write.lock";
+					String dicHome = p
+							.getProperty("paoding.dic.home.absolute.path");
+					FSLockFactory FileLockFactory = new NativeFSLockFactory(
+							dicHome);
+					Lock lock = FileLockFactory.makeLock(LOCK_FILE);
 
-					// 启动字典动态转载/卸载检测器
-					// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
-					String intervalStr = getProperty(p,
-							Constants.DIC_DETECTOR_INTERVAL);
-					int interval = Integer.parseInt(intervalStr);
-					if (interval > 0) {
-						dictionaries.startDetecting(interval,
-								new DifferenceListener() {
-									public void on(Difference diff)
-											throws Exception {
-										dictionaries.stopDetecting();
-										// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
-										// 重新编译源词典、重新创建并启动dictionaries自检测
-										run();
-									}
-								});
+					boolean obtained = false;
+					try {
+						obtained = lock.obtain(90000);
+						if (obtained) {
+							// 编译词典-对词典进行可能的处理，以符合分词器的要求
+							if (compiler.shouldCompile(p)) {
+								System.out.println(">>>>>> compile");
+								Dictionaries dictionaries = readUnCompiledDictionaries(p);
+								Paoding tempPaoding = createPaodingWithKnives(p);
+								setDictionaries(tempPaoding, dictionaries);
+								compiler.compile(dictionaries, tempPaoding, p);
+							}
+
+							// 使用编译后的词典
+							final Dictionaries dictionaries = compiler
+									.readCompliedDictionaries(p);
+							setDictionaries(finalPaoding, dictionaries);
+
+							// 启动字典动态转载/卸载检测器
+							// 侦测时间间隔(秒)。默认为60秒。如果设置为０或负数则表示不需要进行检测
+							String intervalStr = getProperty(p,
+									Constants.DIC_DETECTOR_INTERVAL);
+							int interval = Integer.parseInt(intervalStr);
+							if (interval > 0) {
+								dictionaries.startDetecting(interval,
+										new DifferenceListener() {
+											public void on(Difference diff)
+													throws Exception {
+												dictionaries.stopDetecting();
+												// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
+												// 重新编译源词典、重新创建并启动dictionaries自检测
+												System.out
+														.println(">>>>>> on difference");
+												run();
+											}
+										});
+							}
+						}
+					} catch (LockObtainFailedException ex) {
+						log.error("Obtain " + LOCK_FILE + " in " + dicHome
+								+ " failed:" + ex.getMessage());
+						throw ex;
+					} catch (IOException ex) {
+						log.error("Obtain " + LOCK_FILE + " in " + dicHome
+								+ " failed:" + ex.getMessage());
+						throw ex;
+					} finally {
+						if (obtained) {
+							try {
+								lock.release();
+							} catch (Exception ex) {
+
+							}
+						}
 					}
 				}
 			}.run();

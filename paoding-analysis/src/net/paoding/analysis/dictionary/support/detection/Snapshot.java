@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,6 +45,9 @@ public class Snapshot {
 
 	//
 	private InnerNode[] nodes;
+	
+	//checksum of this snapshot
+	private String checksum;
 
 	private Snapshot() {
 	}
@@ -90,6 +94,39 @@ public class Snapshot {
 				}
 			}
 		}
+		
+		//sort node for checksum
+		Arrays.sort(nodes, new InnerNodeComparator());
+		checksum = null;
+	}
+	
+	/**
+	 * build checksum of snapshot
+	 * 
+	 * @return checksum of current snapshot
+	 */
+	private void buildCheckSum() {
+		short checksum = -631;
+		short multiplier = 1;
+		String ENCODING = "UTF-8";
+		
+		StringBuilder value = new StringBuilder();
+		for(int i = 0; i < nodes.length; i++){
+			value.append(nodes[i].path);
+			value.append(nodes[i].isFile);
+			value.append(nodes[i].parent);
+			value.append(nodes[i].lastModified);
+		}
+
+		try {
+			byte[] data = value.toString().getBytes(ENCODING);
+			for (int b = 0; b < data.length; ++b)
+				checksum += data[b] * multiplier++;
+		} catch (java.io.UnsupportedEncodingException ex) {
+
+		}
+
+		this.checksum = String.valueOf(checksum);
 	}
 
 	public long getVersion() {
@@ -106,6 +143,12 @@ public class Snapshot {
 
 	public void setRoot(String root) {
 		this.root = root;
+	}
+
+	//get checksum in lazy mode
+	public String getCheckSum() {
+		if (checksum == null) buildCheckSum();
+		return checksum;
 	}
 
 	public Difference diff(Snapshot that) {
@@ -140,7 +183,7 @@ public class Snapshot {
 		diff.setYounger(younger);
 		return diff;
 	}
-
+	
 	public static void main(String[] args) throws InterruptedException {
 		File f = new File("dic");
 		Snapshot snapshot1 = Snapshot.flash(f, null);
@@ -208,6 +251,38 @@ public class Snapshot {
 	class InnerNode extends Node {
 		String parent;
 		long lastModified;
+	}
+
+	class InnerNodeComparator implements Comparator<InnerNode>{
+
+		public int compare(InnerNode o1, InnerNode o2) {
+			//path
+			if (o1.path != null && o2.path != null){
+				int cmp = o1.path.compareTo(o2.path);
+				if (cmp != 0) return cmp;
+			} else {
+				if (o1.path != null && o2.path == null) return 1;
+				if (o1.path == null && o2.path != null) return -1;
+			}
+			
+			//isfile
+			if (o1.isFile && !o2.isFile) return 1;
+			if (!o1.isFile && o2.isFile) return -1;
+
+			//parent
+			if (o1.parent != null && o2.parent != null){
+				int cmp = o1.parent.compareTo(o2.parent);
+				if (cmp != 0) return cmp;
+			} else {
+				if (o1.parent != null && o2.parent == null) return 1;
+				if (o1.parent == null && o2.parent != null) return -1;
+			}
+			
+			//lastModified
+			if (o1.lastModified > o2.lastModified) return 1;
+			if (o1.lastModified < o2.lastModified) return -1;
+			return 0;
+		}
 	}
 
 }
