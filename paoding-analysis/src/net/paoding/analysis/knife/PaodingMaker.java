@@ -393,8 +393,6 @@ public class PaodingMaker {
 					.newInstance();
 			new Function() {
 				public void run() throws Exception {
-					System.out.println(">>>>>> run");
-
 					String LOCK_FILE = "write.lock";
 					String dicHome = p
 							.getProperty("paoding.dic.home.absolute.path");
@@ -408,7 +406,6 @@ public class PaodingMaker {
 						if (obtained) {
 							// 编译词典-对词典进行可能的处理，以符合分词器的要求
 							if (compiler.shouldCompile(p)) {
-								System.out.println(">>>>>> compile");
 								Dictionaries dictionaries = readUnCompiledDictionaries(p);
 								Paoding tempPaoding = createPaodingWithKnives(p);
 								setDictionaries(tempPaoding, dictionaries);
@@ -431,10 +428,9 @@ public class PaodingMaker {
 											public void on(Difference diff)
 													throws Exception {
 												dictionaries.stopDetecting();
+												
 												// 此处调用run方法，以当检测到**编译后**的词典变更/删除/增加时，
 												// 重新编译源词典、重新创建并启动dictionaries自检测
-												System.out
-														.println(">>>>>> on difference");
 												run();
 											}
 										});
