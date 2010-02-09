@@ -253,33 +253,32 @@ public class Snapshot {
 		
 		@Override
 		public int compareTo(Node o) {
-			if (!(o instanceof InnerNode)) {
-				throw new IllegalStateException();
-			}
-			InnerNode node = (InnerNode) o;
-
 			// super compare
 			int result = super.compareTo(o);
 			if (result != 0)
 				return result;
 
-			// parent
-			if (this.parent != null && node.parent != null) {
-				int cmp = this.parent.compareTo(node.parent);
-				if (cmp != 0)
-					return cmp;
-			} else {
-				if (this.parent != null && node.parent == null)
+			if (o instanceof InnerNode) {
+				InnerNode node = (InnerNode) o;
+	
+				// parent
+				if (this.parent != null && node.parent != null) {
+					int cmp = this.parent.compareTo(node.parent);
+					if (cmp != 0)
+						return cmp;
+				} else {
+					if (this.parent != null && node.parent == null)
+						return 1;
+					if (this.parent == null && node.parent != null)
+						return -1;
+				}
+	
+				// lastModified
+				if (this.lastModified > node.lastModified)
 					return 1;
-				if (this.parent == null && node.parent != null)
+				if (this.lastModified < node.lastModified)
 					return -1;
 			}
-
-			// lastModified
-			if (this.lastModified > node.lastModified)
-				return 1;
-			if (this.lastModified < node.lastModified)
-				return -1;
 			return 0;
 		}
 	}
