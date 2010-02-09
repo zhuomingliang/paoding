@@ -247,36 +247,39 @@ public class Snapshot {
 		return files;
 	}
 
-	class InnerNode extends Node implements Comparable<InnerNode> {
+	class InnerNode extends Node {
 		String parent;
 		long lastModified;
 		
-		public int compareTo(InnerNode o) {
-			//path
-			if (this.path != null && o.path != null){
-				int cmp = this.path.compareTo(o.path);
-				if (cmp != 0) return cmp;
-			} else {
-				if (this.path != null && o.path == null) return 1;
-				if (this.path == null && o.path != null) return -1;
+		@Override
+		public int compareTo(Node o) {
+			if (!(o instanceof InnerNode)) {
+				throw new IllegalStateException();
 			}
-			
-			//isfile
-			if (this.isFile && !o.isFile) return 1;
-			if (!this.isFile && o.isFile) return -1;
+			InnerNode node = (InnerNode) o;
 
-			//parent
-			if (this.parent != null && o.parent != null){
-				int cmp = this.parent.compareTo(o.parent);
-				if (cmp != 0) return cmp;
+			// super compare
+			int result = super.compareTo(o);
+			if (result != 0)
+				return result;
+
+			// parent
+			if (this.parent != null && node.parent != null) {
+				int cmp = this.parent.compareTo(node.parent);
+				if (cmp != 0)
+					return cmp;
 			} else {
-				if (this.parent != null && o.parent == null) return 1;
-				if (this.parent == null && o.parent != null) return -1;
+				if (this.parent != null && node.parent == null)
+					return 1;
+				if (this.parent == null && node.parent != null)
+					return -1;
 			}
-			
-			//lastModified
-			if (this.lastModified > o.lastModified) return 1;
-			if (this.lastModified < o.lastModified) return -1;
+
+			// lastModified
+			if (this.lastModified > node.lastModified)
+				return 1;
+			if (this.lastModified < node.lastModified)
+				return -1;
 			return 0;
 		}
 	}

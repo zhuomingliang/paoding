@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package net.paoding.analysis.dictionary.support.detection;
+
 /**
  * 
  * @author Zhiliang Wang [qieqie.wang@gmail.com]
@@ -21,7 +22,7 @@ package net.paoding.analysis.dictionary.support.detection;
  * @since 2.0.2
  * 
  */
-public class Node {
+public class Node implements Comparable<Node>{
 
 	String path;
 
@@ -81,6 +82,22 @@ public class Node {
 		} else if (!path.equals(other.path))
 			return false;
 		return true;
+	}
+
+	public int compareTo(Node o) {
+		//path
+		if (this.path != null && o.path != null){
+			int cmp = this.path.compareTo(o.path);
+			if (cmp != 0) return cmp;
+		} else {
+			if (this.path != null && o.path == null) return 1;
+			if (this.path == null && o.path != null) return -1;
+		}
+		
+		//isfile
+		if (this.isFile && !o.isFile) return 1;
+		if (!this.isFile && o.isFile) return -1;
+		return 0;
 	}
 
 }
