@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -96,7 +95,7 @@ public class Snapshot {
 		}
 		
 		//sort node for checksum
-		Arrays.sort(nodes, new InnerNodeComparator());
+		Arrays.sort(nodes);
 		checksum = null;
 	}
 	
@@ -248,41 +247,37 @@ public class Snapshot {
 		return files;
 	}
 
-	class InnerNode extends Node {
+	class InnerNode extends Node implements Comparable<InnerNode> {
 		String parent;
 		long lastModified;
-	}
-
-	class InnerNodeComparator implements Comparator<InnerNode>{
-
-		public int compare(InnerNode o1, InnerNode o2) {
+		
+		public int compareTo(InnerNode o) {
 			//path
-			if (o1.path != null && o2.path != null){
-				int cmp = o1.path.compareTo(o2.path);
+			if (this.path != null && o.path != null){
+				int cmp = this.path.compareTo(o.path);
 				if (cmp != 0) return cmp;
 			} else {
-				if (o1.path != null && o2.path == null) return 1;
-				if (o1.path == null && o2.path != null) return -1;
+				if (this.path != null && o.path == null) return 1;
+				if (this.path == null && o.path != null) return -1;
 			}
 			
 			//isfile
-			if (o1.isFile && !o2.isFile) return 1;
-			if (!o1.isFile && o2.isFile) return -1;
+			if (this.isFile && !o.isFile) return 1;
+			if (!this.isFile && o.isFile) return -1;
 
 			//parent
-			if (o1.parent != null && o2.parent != null){
-				int cmp = o1.parent.compareTo(o2.parent);
+			if (this.parent != null && o.parent != null){
+				int cmp = this.parent.compareTo(o.parent);
 				if (cmp != 0) return cmp;
 			} else {
-				if (o1.parent != null && o2.parent == null) return 1;
-				if (o1.parent == null && o2.parent != null) return -1;
+				if (this.parent != null && o.parent == null) return 1;
+				if (this.parent == null && o.parent != null) return -1;
 			}
 			
 			//lastModified
-			if (o1.lastModified > o2.lastModified) return 1;
-			if (o1.lastModified < o2.lastModified) return -1;
+			if (this.lastModified > o.lastModified) return 1;
+			if (this.lastModified < o.lastModified) return -1;
 			return 0;
 		}
 	}
-
 }
