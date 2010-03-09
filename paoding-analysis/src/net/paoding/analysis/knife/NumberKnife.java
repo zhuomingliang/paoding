@@ -15,6 +15,8 @@
  */
 package net.paoding.analysis.knife;
 
+import java.math.BigInteger;
+
 import net.paoding.analysis.dictionary.Dictionary;
 import net.paoding.analysis.dictionary.Hit;
 
@@ -74,8 +76,11 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 		final int _point = limit;
 		// 当前尝试判断的字符的位置
 		int curTail = offset;
-		int number1 = -1;
-		int number2 = -1;
+		/*
+		 * Fix issue 56: 中文数字解析问题后续
+		 */				
+		BigInteger number1 = BigInteger.valueOf(-1);
+		BigInteger number2 = BigInteger.valueOf(-1);
 		int bitValue = 0;
 		int maxUnit = 0;
 		//TODO:这里又重复从curTail(其值为offset)判断，重新遍历判断是否为数字，算是一个重复计算
@@ -91,41 +96,41 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			}
 			// 处理连续汉字个位值的数字："三四五六"	->"3456"
 			if (bitValue >= 0 && bitValue < 10) {
-				if (number2 < 0)
-					number2 = bitValue;
+				if (number2.compareTo(BigInteger.ZERO) < 0)
+					number2 = BigInteger.valueOf(bitValue);
 				else {
-					number2 *= 10;
-					number2 += bitValue;
+					number2 = number2.multiply(BigInteger.valueOf(10));
+					number2 = number2.add(BigInteger.valueOf(bitValue));
 				}
 			} else {
-				if (number2 < 0) {
-					if (number1 < 0) {
-						number1 = 1;
+				if (number2.compareTo(BigInteger.ZERO) < 0) {
+					if (number1.compareTo(BigInteger.ZERO) < 0) {
+						number1 = BigInteger.ONE;
 					}
-					number1 *= bitValue;
+					number1 = number1.multiply(BigInteger.valueOf(bitValue));
 				} else {
-					if (number1 < 0) {
-						number1 = 0;
+					if (number1.compareTo(BigInteger.ZERO) < 0) {
+						number1 = BigInteger.ZERO;
 					}
 					if (bitValue >= maxUnit) {
-						number1 += number2;
-						number1 *= bitValue;
+						number1 = number1.add(number2);
+						number1 = number1.multiply(BigInteger.valueOf(bitValue));
 						maxUnit = bitValue;
 					} else {
-						number1 += number2 * bitValue;
+						number1 = number1.add(number2.multiply(BigInteger.valueOf(bitValue)));
 					}
 				}
-				number2 = -1;
+				number2 = BigInteger.valueOf(-1);
 			}
 		}
-		if (number2 > 0) {
-			if (number1 < 0) {
+		if (number2.compareTo(BigInteger.ZERO) > 0) {
+			if (number1.compareTo(BigInteger.ZERO) < 0) {
 				number1 = number2;
 			} else {
-				number1 += number2;
+				number1 = number1.add(number2);
 			}
 		}
-		if (number1 >= 0 && curTail > _point) {
+		if (number1.compareTo(BigInteger.ZERO) >= 0 && curTail > _point) {
 			doCollect(collector, String.valueOf(number1), beef, offset, curTail);
 		}
 		else {
