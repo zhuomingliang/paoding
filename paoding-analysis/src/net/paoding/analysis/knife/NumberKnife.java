@@ -48,7 +48,7 @@ public class NumberKnife extends CombinatoricsKnife implements DictionariesWare 
 			return ASSIGNED;
 		if (index > offset) {
 			if (CharSet.isLantingLetter(ch) || ch == '.' || ch == '-' || ch == '_') {
-				if (CharSet.isLantingLetter(ch)
+				if (ch == '-' || ch == '_' || CharSet.isLantingLetter(ch)
 						|| !CharSet.isArabianNumber(beef.charAt(index + 1))) {
 					//分词效果
 					//123.456		->123.456/
