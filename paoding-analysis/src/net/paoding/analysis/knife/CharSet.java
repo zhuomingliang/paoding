@@ -71,7 +71,7 @@ public class CharSet {
 			return 5;
 		case '6':
 		case '六':
-		case '陸':
+		case '陆':
 			return 6;
 		case '7':
 		case '柒':
