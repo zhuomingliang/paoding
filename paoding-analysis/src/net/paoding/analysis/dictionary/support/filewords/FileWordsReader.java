@@ -40,20 +40,20 @@ import net.paoding.analysis.knife.CharSet;
 public class FileWordsReader {
 
 	public static Map/*<String, Set<Word>>*/ readWords(
-			String fileOrDirectory, String charsetName) throws IOException {
+			String fileOrDirectory, String charsetName, int maxWordLen) throws IOException {
 		SimpleReadListener l = new SimpleReadListener();
-		readWords(fileOrDirectory, l, charsetName);
+		readWords(fileOrDirectory, l, charsetName, maxWordLen);
 		return l.getResult();
 	}
 	
 	public static Map/*<String, Collection<Word>>*/ readWords(
-			String fileOrDirectory, String charsetName, Class collectionClass, String ext) throws IOException {
+			String fileOrDirectory, String charsetName, int maxWordLen, Class collectionClass, String ext) throws IOException {
 		SimpleReadListener2 l = new SimpleReadListener2(collectionClass, ext);
-		readWords(fileOrDirectory, l, charsetName);
+		readWords(fileOrDirectory, l, charsetName, maxWordLen);
 		return l.getResult();
 	}
 
-	public static void readWords(String fileOrDirectory, ReadListener l, String charsetName)
+	public static void readWords(String fileOrDirectory, ReadListener l, String charsetName, int maxWordLen)
 			throws IOException {
 		File file;
 		if (fileOrDirectory.startsWith("classpath:")) {
@@ -117,7 +117,9 @@ public class FileWordsReader {
 						word = word.substring(1);
 					}
 				}
-				l.onWord(word);
+				
+				// maximum word length limitation
+				if (maxWordLen <= 0 || word.length() <= maxWordLen) l.onWord(word);
 			}
 			l.onFileEnd(name);
 			in.close();

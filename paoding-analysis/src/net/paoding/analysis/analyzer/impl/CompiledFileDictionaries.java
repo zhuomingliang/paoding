@@ -96,6 +96,7 @@ public class CompiledFileDictionaries implements Dictionaries {
 	protected String confucianFamilyName;
 	protected String combinatorics;
 	protected String charsetName;
+	protected int maxWordLen;
 
 	// ----------------------
 
@@ -104,7 +105,7 @@ public class CompiledFileDictionaries implements Dictionaries {
 
 	public CompiledFileDictionaries(String dicHome, String noiseCharactor,
 			String noiseWord, String unit, String confucianFamilyName,
-			String combinatorics, String charsetName) {
+			String combinatorics, String charsetName, int maxWordLen) {
 		this.dicHome = dicHome;
 		this.noiseCharactor = noiseCharactor;
 		this.noiseWord = noiseWord;
@@ -112,6 +113,7 @@ public class CompiledFileDictionaries implements Dictionaries {
 		this.confucianFamilyName = confucianFamilyName;
 		this.combinatorics = combinatorics;
 		this.charsetName = charsetName;
+		this.maxWordLen = maxWordLen;
 	}
 
 	public String getDicHome() {
@@ -162,7 +164,15 @@ public class CompiledFileDictionaries implements Dictionaries {
 		this.charsetName = charsetName;
 	}
 
-	public void setLantinFllowedByCjk(String lantinFllowedByCjk) {
+	public int getMaxWordLen() {
+		return maxWordLen;
+	}
+
+	public void setMaxWordLen(int maxWordLen) {
+		this.maxWordLen = maxWordLen;
+	}
+
+    public void setLantinFllowedByCjk(String lantinFllowedByCjk) {
 		this.combinatorics = lantinFllowedByCjk;
 	}
 
@@ -285,7 +295,7 @@ public class CompiledFileDictionaries implements Dictionaries {
 		}
 		try {
 			Map map = FileWordsReader.readWords(f.getAbsolutePath(),
-					charsetName, LinkedList.class, ".dic.compiled");
+					charsetName, maxWordLen, LinkedList.class, ".dic.compiled");
 			List wordsList = (List) map.values().iterator().next();
 			return (Word[]) wordsList.toArray(new Word[wordsList.size()]);
 		} catch (IOException e) {

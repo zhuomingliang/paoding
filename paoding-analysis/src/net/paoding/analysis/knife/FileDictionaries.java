@@ -100,6 +100,7 @@ public class FileDictionaries implements Dictionaries {
 	protected String confucianFamilyName;
 	protected String combinatorics;
 	protected String charsetName;
+	protected int maxWordLen;
 
 	// ----------------------
 
@@ -108,7 +109,7 @@ public class FileDictionaries implements Dictionaries {
 
 	public FileDictionaries(String dicHome, String skipPrefix,
 			String noiseCharactor, String noiseWord, String unit,
-			String confucianFamilyName, String combinatorics, String charsetName) {
+			String confucianFamilyName, String combinatorics, String charsetName, int maxWordLen) {
 		this.dicHome = dicHome;
 		this.skipPrefix = skipPrefix;
 		this.noiseCharactor = noiseCharactor;
@@ -117,7 +118,7 @@ public class FileDictionaries implements Dictionaries {
 		this.confucianFamilyName = confucianFamilyName;
 		this.combinatorics = combinatorics;
 		this.charsetName = charsetName;
-
+		this.maxWordLen = maxWordLen;
 	}
 
 	public String getDicHome() {
@@ -174,6 +175,14 @@ public class FileDictionaries implements Dictionaries {
 
 	public void setCharsetName(String charsetName) {
 		this.charsetName = charsetName;
+	}
+
+	public int getMaxWordLen() {
+		return maxWordLen;
+	}
+
+	public void setMaxWordLen(int maxWordLen) {
+		this.maxWordLen = maxWordLen;
 	}
 
 	public void setLantinFllowedByCjk(String lantinFllowedByCjk) {
@@ -309,7 +318,7 @@ public class FileDictionaries implements Dictionaries {
 		if (allWords != null) {
 			try {
 				Map/* <String, Set<String>> */temp = FileWordsReader
-						.readWords(dicHome + dicPath, charsetName);
+						.readWords(dicHome + dicPath, charsetName, maxWordLen);
 				allWords.put(dicName, temp.values().iterator().next());
 			} catch (FileNotFoundException e) {
 				// 如果源文件已经被删除了，则表示该字典不要了
@@ -395,7 +404,7 @@ public class FileDictionaries implements Dictionaries {
 		Map dics;
 		try {
 			dics = FileWordsReader.readWords(dicHome + "/"
-					+ dicNameRelativeDicHome + ".dic", charsetName);
+					+ dicNameRelativeDicHome + ".dic", charsetName, maxWordLen);
 		} catch (IOException e) {
 			throw toRuntimeException(e);
 		}
@@ -415,7 +424,7 @@ public class FileDictionaries implements Dictionaries {
 		if (allWords == null) {
 			try {
 				log.info("loading dictionaries from " + dicHome);
-				allWords = FileWordsReader.readWords(dicHome, charsetName);
+				allWords = FileWordsReader.readWords(dicHome, charsetName, maxWordLen);
 				if (allWords.size() == 0) {
 					String message = "Not found any dictionary files, have you set the 'paoding.dic.home' right? ("
 							+ this.dicHome + ")";

@@ -545,9 +545,10 @@ public class PaodingMaker {
 				Constants.DIC_CONFUCIAN_FAMILY_NAME);
 		String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
 		String charsetName = getProperty(p, Constants.DIC_CHARSET);
+		int maxWordLen = Integer.valueOf(getProperty(p, Constants.DIC_MAXWORDLEN));
 		Dictionaries dictionaries = new FileDictionaries(getDicHome(p),
 				skipPrefix, noiseCharactor, noiseWord, unit,
-				confucianFamilyName, combinatorics, charsetName);
+				confucianFamilyName, combinatorics, charsetName, maxWordLen);
 		return dictionaries;
 	}
 

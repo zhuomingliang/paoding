@@ -134,10 +134,11 @@ public class MostWordsModeDictionariesCompiler implements DictionariesCompiler {
 		String confucianFamilyName = getProperty(p, Constants.DIC_CONFUCIAN_FAMILY_NAME);
 		String combinatorics = getProperty(p, Constants.DIC_FOR_COMBINATORICS);
 		String charsetName = getProperty(p, Constants.DIC_CHARSET);
+		int maxWordLen = Integer.valueOf(getProperty(p, Constants.DIC_MAXWORDLEN));
 		return new CompiledFileDictionaries(
 				dicHomeAbsolutePath + "/.compiled/most-words-mode",
 				noiseCharactor, noiseWord, unit,
-				confucianFamilyName, combinatorics, charsetName);
+				confucianFamilyName, combinatorics, charsetName,maxWordLen);
 	}
 	
 	private static String getProperty(Properties p, String name) {

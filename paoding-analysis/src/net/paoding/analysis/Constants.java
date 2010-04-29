@@ -41,6 +41,10 @@ public class Constants {
 	public static final String DIC_CHARSET = "paoding.dic.charset";
 	public static final String DIC_CHARSET_DEFAULT = "UTF-8";
 
+	// dictionary word length limit
+	public static final String DIC_MAXWORDLEN = "paoding.dic.maxWordLen";
+	public static final String DIC_MAXWORDLEN_DEFAULT = "0";
+	
 	// -------------------------------------------------------------
 	// dictionaries which are skip
 	public static final String DIC_SKIP_PREFIX = "paoding.dic.skip.prefix";
@@ -93,6 +97,7 @@ public class Constants {
 		map.put(DIC_HOME_CONFIG_FIRST, DIC_HOME_CONFIG_FIRST_DEFAULT);
 		map.put(DIC_HOME, DIC_HOME_DEFAULT);
 		map.put(DIC_CHARSET, DIC_CHARSET_DEFAULT);
+		map.put(DIC_MAXWORDLEN, DIC_MAXWORDLEN_DEFAULT);
 		map.put(DIC_SKIP_PREFIX, DIC_SKIP_PREFIX_DEFAULT);
 		map.put(DIC_NOISE_CHARACTOR, DIC_NOISE_CHARACTOR_DEFAULT);
 		map.put(DIC_NOISE_WORD, DIC_NOISE_WORD_DEFAULT);
