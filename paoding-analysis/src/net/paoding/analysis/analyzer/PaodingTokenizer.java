@@ -156,14 +156,6 @@ public final class PaodingTokenizer extends Tokenizer implements Collector {
 		return inputLength;
 	}
 
-	// -------------------------------------------------
-
-	@Override
-	public void close() throws IOException {
-		super.close();
-		input.close();
-	}
-
 	@Override
 	public boolean incrementToken() throws IOException {
 		// 已经穷尽tokensIteractor的Token对象，则继续请求reader流入数据
@@ -215,5 +207,11 @@ public final class PaodingTokenizer extends Tokenizer implements Collector {
 		super.reset();
 		offset = 0;
 		inputLength = 0;
+	}
+	
+	@Override
+	public void reset(Reader input) throws IOException {
+		super.reset(input);
+		reset();
 	}
 }
